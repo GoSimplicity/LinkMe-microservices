@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "linkme-user/api/user/v1;v1";
+
+service User {
+  rpc SignUp (SignUpRequest) returns (SignUpReply) {
+    option (google.api.http) = {
+      post: "/users/signup"
+      body: "*"
+    };
+  }
+  rpc Login (LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/users/login"
+      body: "*"
+    };
+  }
+  rpc Logout (LogoutRequest) returns (LogoutReply) {
+    option (google.api.http) = {
+      post: "/users/logout"
+      body: "*"
+    };
+  }
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenReply) {
+    option (google.api.http) = {
+      put: "/users/refresh_token"
+      body: "*"
+    };
+  }
+  rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply) {
+    option (google.api.http) = {
+      post: "/users/change_password"
+      body: "*"
+    };
+  }
+  rpc WriteOff (WriteOffRequest) returns (WriteOffReply) {
+    option (google.api.http) = {
+      delete: "/users/write_off"
+    };
+  }
+  rpc GetProfile (GetProfileRequest) returns (GetProfileReply) {
+    option (google.api.http) = {
+      get: "/users/profile"
+    };
+  }
+  rpc UpdateProfile (UpdateProfileRequest) returns (UpdateProfileReply) {
+    option (google.api.http) = {
+      put: "/users/update_profile"
+      body: "*"
+    };
+  }
+}
+
+message SignUpRequest {
+  string email = 1;
+  string password = 2;
+  string confirmPassword = 3;
+}
+
+message SignUpReply {
+  int32 code = 1;
+  string msg = 2;
+  string data = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginReply {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutReply {
+  int32 code = 1;
+  string msg = 2;
+  string data = 3;
+}
+
+message RefreshTokenRequest {
+  string token = 1;
+}
+
+message RefreshTokenReply {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message ChangePasswordRequest {
+  string email = 1;
+  string password = 2;
+  string confirmPassword = 3;
+}
+
+message ChangePasswordReply {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message WriteOffRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message WriteOffReply {
+  int32 code = 1;
+  string msg = 2;
+  string data = 3;
+}
+
+message GetProfileRequest {
+  string token = 1;
+}
+
+message GetProfileReply {
+  int32 code = 1;
+  string msg = 2;
+  Profile data = 3;
+}
+
+message UpdateProfileRequest {
+  string token = 1;
+  string nickname = 2;
+  string avatar = 3;
+  string about = 4;
+  string birthday = 5;
+}
+
+message UpdateProfileReply {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message Profile {
+  string nickname = 1;
+  string avatar = 2;
+  string about = 3;
+  string birthday = 4;
+}
