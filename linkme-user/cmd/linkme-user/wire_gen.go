@@ -12,6 +12,7 @@ import (
 	"linkme-user/internal/biz"
 	"linkme-user/internal/conf"
 	"linkme-user/internal/data"
+	"linkme-user/internal/middleware"
 	"linkme-user/internal/server"
 	"linkme-user/internal/service"
 )
@@ -36,7 +37,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	handler := data.NewJWT(cmdable)
 	userService := service.NewUserService(userUsecase, handler)
 	grpcServer := server.NewGRPCServer(confServer, userService)
-	httpServer := server.NewHTTPServer(confServer, userService)
+	jwtMiddleware := middleware.NewJWTMiddleware(handler)
+	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 	}, nil

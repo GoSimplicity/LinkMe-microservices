@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	regexp "github.com/dlclark/regexp2"
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	pb "linkme-user/api/user/v1"
 	"linkme-user/domain"
@@ -93,7 +92,7 @@ func (s *UserService) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.Si
 	}, nil
 }
 func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
-	_, err := s.uc.Login(ctx, req.Email, req.Password)
+	du, err := s.uc.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, data.ErrInvalidUserOrPassword) {
 			return &pb.LoginReply{
@@ -106,16 +105,21 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 			Msg:  "User login failed",
 		}, err
 	}
+	token, refreshToken, err := s.ijwt.SetLoginToken(ctx, du.ID)
+	if err != nil {
+		return nil, err
+	}
 	return &pb.LoginReply{
-		Code: 0,
-		Msg:  "User login successful",
+		Code:         0,
+		Msg:          "User login successful",
+		Token:        token,
+		RefreshToken: refreshToken,
 	}, nil
 }
 
 func (s *UserService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutReply, error) {
-	ginCtx := ctx.(*gin.Context)
 	// 清除JWT令牌
-	if err := s.ijwt.ClearToken(ginCtx); err != nil {
+	if err := s.ijwt.ClearToken(ctx); err != nil {
 		return &pb.LogoutReply{
 			Code: 1,
 			Msg:  "User logout failed",
@@ -128,9 +132,8 @@ func (s *UserService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 }
 func (s *UserService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenReply, error) {
 	var rc data.RefreshClaims
-	ginCtx := ctx.(*gin.Context)
 	// 从前端的Authorization中取出token
-	tokenString := s.ijwt.ExtractToken(ginCtx)
+	tokenString := s.ijwt.ExtractToken(ctx)
 	// 解析token
 	token, err := jwt.ParseWithClaims(tokenString, &rc, func(token *jwt.Token) (interface{}, error) {
 		return data.Key2, nil
@@ -148,34 +151,34 @@ func (s *UserService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequ
 		}, err
 	}
 	// 检查会话状态是否异常
-	if err = s.ijwt.CheckSession(ginCtx, rc.Ssid); err != nil {
+	if err = s.ijwt.CheckSession(ctx, rc.Ssid); err != nil {
 		return &pb.RefreshTokenReply{
 			Code: 1,
 			Msg:  "User refresh token failed",
 		}, err
 	}
 	// 刷新短token
-	if err = s.ijwt.SetJWTToken(ginCtx, rc.Uid, rc.Ssid); err != nil {
+	tokenStr, err := s.ijwt.SetJWTToken(ctx, rc.Uid, rc.Ssid)
+	if err != nil {
 		return &pb.RefreshTokenReply{
 			Code: 1,
 			Msg:  "User refresh token failed",
 		}, err
 	}
 	return &pb.RefreshTokenReply{
-		Code: 0,
-		Msg:  "User refresh token successful",
+		Code:  0,
+		Msg:   "User refresh token successful",
+		Token: tokenStr,
 	}, nil
 }
 func (s *UserService) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordReply, error) {
-	// 检查新密码和确认密码是否匹配
-	ginCtx := ctx.(*gin.Context)
-	if req.Password != req.ConfirmPassword {
+	if req.NewPassword != req.ConfirmPassword {
 		return &pb.ChangePasswordReply{
 			Code: 1,
 			Msg:  "The two passwords entered are different, please re-enter",
 		}, nil
 	}
-	err := s.uc.ChangePassword(ginCtx.Request.Context(), req.Email, req.Password, req.ConfirmPassword)
+	err := s.uc.ChangePassword(ctx, req.Email, req.Password, req.NewPassword, req.ConfirmPassword)
 	if err != nil {
 		if errors.Is(err, data.ErrInvalidUserOrPassword) {
 			return &pb.ChangePasswordReply{
@@ -193,17 +196,23 @@ func (s *UserService) ChangePassword(ctx context.Context, req *pb.ChangePassword
 		Msg:  "User change password successful",
 	}, nil
 }
+
 func (s *UserService) WriteOff(ctx context.Context, req *pb.WriteOffRequest) (*pb.WriteOffReply, error) {
-	ginCtx := ctx.(*gin.Context)
-	uc := ginCtx.MustGet("user").(data.UserClaims)
-	err := s.uc.DeleteUser(ctx, req.Email, req.Password, uc.Uid)
+	u, ok := ctx.Value("user").(data.UserClaims)
+	if !ok {
+		return &pb.WriteOffReply{
+			Code: 1,
+			Msg:  "User write off failed",
+		}, errors.New("failed to get user claims from context")
+	}
+	err := s.uc.DeleteUser(ctx, req.Email, req.Password, u.Uid)
 	if err != nil {
 		return &pb.WriteOffReply{
 			Code: 1,
 			Msg:  "User write off failed",
 		}, err
 	}
-	if err = s.ijwt.ClearToken(ginCtx); err != nil {
+	if err = s.ijwt.ClearToken(ctx); err != nil {
 		return &pb.WriteOffReply{
 			Code: 1,
 			Msg:  "User write off failed",
@@ -216,9 +225,14 @@ func (s *UserService) WriteOff(ctx context.Context, req *pb.WriteOffRequest) (*p
 }
 
 func (s *UserService) GetProfile(ctx context.Context, req *pb.GetProfileRequest) (*pb.GetProfileReply, error) {
-	ginCtx := ctx.(*gin.Context)
-	uc := ginCtx.MustGet("user").(data.UserClaims)
-	profile, err := s.uc.GetProfileByUserID(ctx, uc.Uid)
+	u, ok := ctx.Value("user").(data.UserClaims)
+	if !ok {
+		return &pb.GetProfileReply{
+			Code: 1,
+			Msg:  "User get profile failed",
+		}, errors.New("failed to get user claims from context")
+	}
+	profile, err := s.uc.GetProfileByUserID(ctx, u.Uid)
 	if err != nil {
 		return &pb.GetProfileReply{
 			Code: 1,
@@ -239,14 +253,19 @@ func (s *UserService) GetProfile(ctx context.Context, req *pb.GetProfileRequest)
 }
 
 func (s *UserService) UpdateProfile(ctx context.Context, req *pb.UpdateProfileRequest) (*pb.UpdateProfileReply, error) {
-	ginCtx := ctx.(*gin.Context)
-	uc := ginCtx.MustGet("user").(data.UserClaims)
+	u, ok := ctx.Value("user").(data.UserClaims)
+	if !ok {
+		return &pb.UpdateProfileReply{
+			Code: 1,
+			Msg:  "User update profile failed",
+		}, errors.New("failed to get user claims from context")
+	}
 	if err := s.uc.UpdateProfile(ctx, domain.Profile{
 		NickName: req.Nickname,
 		Avatar:   req.Avatar,
 		About:    req.About,
 		Birthday: req.Birthday,
-		UserID:   uc.Uid,
+		UserID:   u.Uid,
 	}); err != nil {
 		return &pb.UpdateProfileReply{
 			Code: 1,

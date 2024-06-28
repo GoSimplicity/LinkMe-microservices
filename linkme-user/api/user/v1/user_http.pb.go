@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.3
 // - protoc             v5.26.1
-// source: api/user/v1/user.proto
+// source: user/v1/user.proto
 
 package v1
 
@@ -46,7 +46,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/users/logout", _User_Logout0_HTTP_Handler(srv))
 	r.PUT("/users/refresh_token", _User_RefreshToken0_HTTP_Handler(srv))
 	r.POST("/users/change_password", _User_ChangePassword0_HTTP_Handler(srv))
-	r.DELETE("/users/write_off", _User_WriteOff0_HTTP_Handler(srv))
+	r.POST("/users/write_off", _User_WriteOff0_HTTP_Handler(srv))
 	r.GET("/users/profile", _User_GetProfile0_HTTP_Handler(srv))
 	r.PUT("/users/update_profile", _User_UpdateProfile0_HTTP_Handler(srv))
 }
@@ -164,6 +164,9 @@ func _User_ChangePassword0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Contex
 func _User_WriteOff0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in WriteOffRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -334,10 +337,10 @@ func (c *UserHTTPClientImpl) UpdateProfile(ctx context.Context, in *UpdateProfil
 func (c *UserHTTPClientImpl) WriteOff(ctx context.Context, in *WriteOffRequest, opts ...http.CallOption) (*WriteOffReply, error) {
 	var out WriteOffReply
 	pattern := "/users/write_off"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserWriteOff))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

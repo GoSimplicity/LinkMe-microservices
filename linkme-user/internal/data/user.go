@@ -12,10 +12,11 @@ import (
 )
 
 var (
-	ErrCodeDuplicateEmailNumber uint16 = 1062
-	ErrDuplicateEmail                  = errors.New("duplicate email")
-	ErrUserNotFound                    = errors.New("user not found")
-	ErrInvalidUserOrPassword           = errors.New("username or password is incorrect")
+	ErrCodeDuplicateEmailNumber              uint16 = 1062
+	ErrDuplicateEmail                               = errors.New("duplicate email")
+	ErrUserNotFound                                 = errors.New("user not found")
+	ErrInvalidUserOrPassword                        = errors.New("username or password is incorrect")
+	ErrNewPasswordAndConfirmPasswordNotMatch        = errors.New("two passwords do not match")
 )
 
 // User 用户信息结构体
