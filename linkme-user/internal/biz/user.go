@@ -49,7 +49,7 @@ func (uu *UserUsecase) Login(ctx context.Context, email string, password string)
 	return u, nil
 }
 
-func (uu *UserUsecase) ChangePassword(ctx context.Context, email string, password string, confirmPassword string) error {
+func (uu *UserUsecase) ChangePassword(ctx context.Context, email string, password string, newPassword string, confirmPassword string) error {
 	u, err := uu.repo.FindByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, data.ErrUserNotFound) {
@@ -58,11 +58,15 @@ func (uu *UserUsecase) ChangePassword(ctx context.Context, email string, passwor
 		uu.l.Error("failed to find user", zap.Error(err))
 		return err
 	}
+	if newPassword != confirmPassword {
+		uu.l.Error("new password and confirm password do not match")
+		return data.ErrNewPasswordAndConfirmPasswordNotMatch
+	}
 	if er := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); er != nil {
 		uu.l.Error("password verification failed", zap.Error(er))
 		return data.ErrInvalidUserOrPassword
 	}
-	newHash, err := bcrypt.GenerateFromPassword([]byte(confirmPassword), bcrypt.DefaultCost)
+	newHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		uu.l.Error("failed to hash new password", zap.Error(err))
 		return err

@@ -39,7 +39,8 @@ service User {
   }
   rpc WriteOff (WriteOffRequest) returns (WriteOffReply) {
     option (google.api.http) = {
-      delete: "/users/write_off"
+      post: "/users/write_off"
+      body: "*"
     };
   }
   rpc GetProfile (GetProfileRequest) returns (GetProfileReply) {
@@ -75,6 +76,8 @@ message LoginRequest {
 message LoginReply {
   int32 code = 1;
   string msg = 2;
+  string token = 3;
+  string refreshToken = 4;
 }
 
 message LogoutRequest {
@@ -94,12 +97,14 @@ message RefreshTokenRequest {
 message RefreshTokenReply {
   int32 code = 1;
   string msg = 2;
+  string token = 3;
 }
 
 message ChangePasswordRequest {
   string email = 1;
   string password = 2;
-  string confirmPassword = 3;
+  string newPassword = 3;
+  string confirmPassword = 4;
 }
 
 message ChangePasswordReply {

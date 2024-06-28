@@ -5,14 +5,16 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 	v1 "linkme-user/api/user/v1"
 	"linkme-user/internal/conf"
+	"linkme-user/internal/middleware"
 	"linkme-user/internal/service"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, userService *service.UserService) *http.Server {
+func NewHTTPServer(c *conf.Server, userService *service.UserService, jwtMiddleware *middleware.JWTMiddleware) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
+			jwtMiddleware.CheckLogin(),
 		),
 	}
 	if c.Http.Network != "" {

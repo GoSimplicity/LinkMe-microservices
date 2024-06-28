@@ -1,9 +1,10 @@
 package data
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
@@ -17,12 +18,12 @@ var (
 )
 
 type Handler interface {
-	SetLoginToken(ctx *gin.Context, uid int64) error
-	SetJWTToken(ctx *gin.Context, uid int64, ssid string) error
-	ExtractToken(ctx *gin.Context) string
-	CheckSession(ctx *gin.Context, ssid string) error
-	ClearToken(ctx *gin.Context) error
-	setRefreshToken(ctx *gin.Context, uid int64, ssid string) error
+	SetLoginToken(ctx context.Context, uid int64) (string, string, error)
+	SetJWTToken(ctx context.Context, uid int64, ssid string) (string, error)
+	ExtractToken(ctx context.Context) string
+	CheckSession(ctx context.Context, ssid string) error
+	ClearToken(ctx context.Context) error
+	setRefreshToken(ctx context.Context, uid int64, ssid string) (string, error)
 }
 
 type UserClaims struct {
@@ -54,21 +55,31 @@ func NewJWT(c redis.Cmdable) Handler {
 }
 
 // SetLoginToken 设置长短Token
-func (h *handler) SetLoginToken(ctx *gin.Context, uid int64) error {
+func (h *handler) SetLoginToken(ctx context.Context, uid int64) (string, string, error) {
 	ssid := uuid.New().String()
-	if err := h.setRefreshToken(ctx, uid, ssid); err != nil {
-		return err
+	refreshToken, err := h.setRefreshToken(ctx, uid, ssid)
+	if err != nil {
+		return "", "", err
 	}
-	return h.SetJWTToken(ctx, uid, ssid)
+	jwtToken, err := h.SetJWTToken(ctx, uid, ssid)
+	if err != nil {
+		return "", "", err
+	}
+	return jwtToken, refreshToken, nil
 }
 
 // SetJWTToken 设置短Token
-func (h *handler) SetJWTToken(ctx *gin.Context, uid int64, ssid string) error {
+func (h *handler) SetJWTToken(ctx context.Context, uid int64, ssid string) (string, error) {
+	// 从 Kratos 上下文中获取传输信息
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return "", errors.New("failed to get transport from context")
+	}
 	uc := UserClaims{
 		Uid:         uid,
 		Ssid:        ssid,
-		UserAgent:   ctx.GetHeader("User-Agent"),
-		ContentType: ctx.GetHeader("Content-Type"),
+		UserAgent:   tr.RequestHeader().Get("User-Agent"),
+		ContentType: tr.RequestHeader().Get("Content-Type"),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
 		},
@@ -77,14 +88,13 @@ func (h *handler) SetJWTToken(ctx *gin.Context, uid int64, ssid string) error {
 	// 进行签名
 	signedString, err := token.SignedString(Key1)
 	if err != nil {
-		return err
+		return "", err
 	}
-	ctx.Header("X-JWT-Token", signedString)
-	return nil
+	return signedString, nil
 }
 
 // setRefreshToken 设置长Token
-func (h *handler) setRefreshToken(ctx *gin.Context, uid int64, ssid string) error {
+func (h *handler) setRefreshToken(ctx context.Context, uid int64, ssid string) (string, error) {
 	rc := RefreshClaims{
 		Uid:  uid,
 		Ssid: ssid,
@@ -96,15 +106,19 @@ func (h *handler) setRefreshToken(ctx *gin.Context, uid int64, ssid string) erro
 	t := jwt.NewWithClaims(h.signingMethod, rc)
 	signedString, err := t.SignedString(Key2)
 	if err != nil {
-		return err
+		return "", err
 	}
-	ctx.Header("X-Refresh-Token", signedString)
-	return err
+	return signedString, nil
 }
 
 // ExtractToken 提取 Authorization 头部中的 Token
-func (h *handler) ExtractToken(ctx *gin.Context) string {
-	authCode := ctx.GetHeader("Authorization")
+func (h *handler) ExtractToken(ctx context.Context) string {
+	// 从 Kratos 上下文中获取传输信息
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return ""
+	}
+	authCode := tr.RequestHeader().Get("Authorization")
 	if authCode == "" {
 		return ""
 	}
@@ -117,7 +131,7 @@ func (h *handler) ExtractToken(ctx *gin.Context) string {
 }
 
 // CheckSession 检查会话状态
-func (h *handler) CheckSession(ctx *gin.Context, ssid string) error {
+func (h *handler) CheckSession(ctx context.Context, ssid string) error {
 	// 判断缓存中是否存在指定键
 	c, err := h.client.Exists(ctx, fmt.Sprintf("linkme:user:ssid:%s", ssid)).Result()
 	if err != nil {
@@ -130,13 +144,17 @@ func (h *handler) CheckSession(ctx *gin.Context, ssid string) error {
 }
 
 // ClearToken 清空token
-func (h *handler) ClearToken(ctx *gin.Context) error {
-	ctx.Header("X-Refresh-Token", "")
-	ctx.Header("X-JWT-Token", "")
-	uc := ctx.MustGet("user").(UserClaims)
+func (h *handler) ClearToken(ctx context.Context) error {
+	uc, ok := ctx.Value("user").(UserClaims)
+	if !ok {
+		return errors.New("failed to get user claims from context")
+	}
 	// 获取 refresh token
-	//refreshTokenString := h.ExtractToken(ctx)
-	refreshTokenString := ctx.GetHeader("X-Refresh-Token")
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return errors.New("failed to get transport from context")
+	}
+	refreshTokenString := tr.RequestHeader().Get("X-Refresh-Token")
 	if refreshTokenString == "" {
 		return errors.New("missing refresh token")
 	}
