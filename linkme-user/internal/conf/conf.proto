@@ -34,6 +34,11 @@ message Data {
     string network = 1;
     string addr = 2;
   }
+  message Etcd {
+    repeated string endpoints = 1;
+    google.protobuf.Duration timeout = 2;
+  }
   Database database = 1;
   Redis redis = 2;
+  Etcd etcd = 3;
 }
