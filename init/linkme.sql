@@ -33,7 +33,7 @@ CREATE TABLE `casbin_rule` (
   `v5` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_casbin_rule` (`ptype`,`v0`,`v1`,`v2`,`v3`,`v4`,`v5`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +42,7 @@ CREATE TABLE `casbin_rule` (
 
 LOCK TABLES `casbin_rule` WRITE;
 /*!40000 ALTER TABLE `casbin_rule` DISABLE KEYS */;
-INSERT INTO `casbin_rule` VALUES (2,'p','10308038636343296','/checks/approve','POST','','',''),(4,'p','10308038636343296','/checks/detail','GET','','',''),(1,'p','10308038636343296','/checks/list','GET','','',''),(3,'p','10308038636343296','/checks/reject','POST','','','');
+INSERT INTO `casbin_rule` VALUES (25,'p','10308038636343296','/api/activity/recent','GET','','',''),(2,'p','10308038636343296','/api/checks/approve','POST','','',''),(4,'p','10308038636343296','/api/checks/detail','GET','','',''),(1,'p','10308038636343296','/api/checks/list','POST','','',''),(3,'p','10308038636343296','/api/checks/reject','POST','','',''),(24,'p','10308038636343296','/api/checks/stats','GET','','',''),(5,'p','10308038636343296','/api/permissions/assign','POST','','',''),(13,'p','10308038636343296','/api/permissions/assign_role','POST','','',''),(6,'p','10308038636343296','/api/permissions/list','GET','','',''),(7,'p','10308038636343296','/api/permissions/remove','DELETE','','',''),(16,'p','10308038636343296','/api/permissions/remove_role','DELETE','','',''),(8,'p','10308038636343296','/api/plate/create','POST','','',''),(10,'p','10308038636343296','/api/plate/delete','DELETE','','',''),(9,'p','10308038636343296','/api/plate/list','GET','','',''),(21,'p','10308038636343296','/api/posts/detail_post/:postId','GET','','',''),(19,'p','10308038636343296','/api/posts/list_post','POST','','',''),(23,'p','10308038636343296','/api/posts/stats','GET','','',''),(11,'p','10308038636343296','/api/users/list','POST','','',''),(22,'p','10308038636343296','/api/users/stats','GET','','','');
 /*!40000 ALTER TABLE `casbin_rule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,17 +56,17 @@ DROP TABLE IF EXISTS `checks`;
 CREATE TABLE `checks` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `post_id` bigint NOT NULL,
-  `content` text NOT NULL,
-  `title` varchar(255) NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `author_id` bigint DEFAULT NULL,
-  `status` varchar(20) NOT NULL DEFAULT 'Pending',
-  `remark` text,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pending',
+  `remark` text COLLATE utf8mb4_unicode_ci,
   `created_at` bigint NOT NULL,
   `updated_at` bigint NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_checks_author` (`author_id`),
   KEY `idx_checks_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,6 +110,38 @@ LOCK TABLES `interactives` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `plates`
+--
+
+DROP TABLE IF EXISTS `plates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `plates` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` bigint DEFAULT NULL,
+  `updated_at` bigint DEFAULT NULL,
+  `deleted_at` bigint DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT '0',
+  `uid` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_plates_name` (`name`),
+  KEY `idx_plates_uid` (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `plates`
+--
+
+LOCK TABLES `plates` WRITE;
+/*!40000 ALTER TABLE `plates` DISABLE KEYS */;
+INSERT INTO `plates` VALUES (1,'golang板块','golang学习...',1719917266377,1719917266377,0,0,10308038636343296);
+/*!40000 ALTER TABLE `plates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `posts`
 --
 
@@ -118,25 +150,28 @@ DROP TABLE IF EXISTS `posts`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `posts` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `content` text NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` bigint NOT NULL,
   `updated_at` bigint NOT NULL,
   `deleted_at` bigint DEFAULT NULL,
   `deleted` tinyint(1) DEFAULT '0',
-  `status` varchar(20) DEFAULT 'draft',
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'draft',
   `author_id` bigint DEFAULT NULL,
-  `slug` varchar(100) DEFAULT NULL,
+  `slug` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `category_id` bigint DEFAULT NULL,
-  `tags` varchar(255) DEFAULT '',
+  `plate_id` bigint DEFAULT NULL,
+  `tags` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `comment_count` bigint DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_posts_slug` (`slug`),
-  KEY `idx_posts_category_id` (`category_id`),
+  KEY `idx_posts_plate_id` (`plate_id`),
   KEY `idx_posts_updated_time` (`updated_at`),
   KEY `idx_posts_deleted_time` (`deleted_at`),
-  KEY `idx_posts_author` (`author_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_posts_author` (`author_id`),
+  KEY `idx_posts_category_id` (`category_id`),
+  CONSTRAINT `fk_plates_posts` FOREIGN KEY (`plate_id`) REFERENCES `plates` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,6 +181,61 @@ CREATE TABLE `posts` (
 LOCK TABLES `posts` WRITE;
 /*!40000 ALTER TABLE `posts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `posts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `profiles`
+--
+
+DROP TABLE IF EXISTS `profiles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `profiles` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `nick_name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `about` text COLLATE utf8mb4_unicode_ci,
+  `birthday` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_profiles_user_id` (`user_id`),
+  CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `profiles`
+--
+
+LOCK TABLES `profiles` WRITE;
+/*!40000 ALTER TABLE `profiles` DISABLE KEYS */;
+INSERT INTO `profiles` VALUES (1,10308038636343296,'admin','admin12341','admin','2020-02-02');
+/*!40000 ALTER TABLE `profiles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `recent_activities`
+--
+
+DROP TABLE IF EXISTS `recent_activities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `recent_activities` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `time` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `recent_activities`
+--
+
+LOCK TABLES `recent_activities` WRITE;
+/*!40000 ALTER TABLE `recent_activities` DISABLE KEYS */;
+/*!40000 ALTER TABLE `recent_activities` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -159,7 +249,7 @@ CREATE TABLE `user_collection_bizs` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `uid` bigint DEFAULT NULL,
   `biz_id` bigint DEFAULT NULL,
-  `biz_name` longtext,
+  `biz_name` varchar(255) DEFAULT NULL,
   `status` bigint DEFAULT NULL,
   `collection_id` bigint DEFAULT NULL,
   `updated_at` bigint NOT NULL,
@@ -193,7 +283,7 @@ CREATE TABLE `user_like_bizs` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `uid` bigint DEFAULT NULL,
   `biz_id` bigint DEFAULT NULL,
-  `biz_name` longtext,
+  `biz_name` varchar(255) DEFAULT NULL,
   `status` bigint DEFAULT NULL,
   `updated_at` bigint NOT NULL,
   `created_at` bigint DEFAULT NULL,
@@ -232,11 +322,12 @@ CREATE TABLE `users` (
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `about` longtext,
+  `deleted` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_users_email` (`email`),
   UNIQUE KEY `idx_users_phone` (`phone`),
   KEY `idx_users_deleted_time` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=10308038636343297 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18281565326938146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,7 +336,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (10308038636343296,1718025027925,1718025027925,0,'','$2a$10$LKLuaqEF38fA..XHCfRI.OtCxo58vYub/Fq.40X4CaaV.IqemrUd2',NULL,'admin',NULL,'');
+INSERT INTO `users` VALUES (10308038636343296,1718025027925,1718025027925,0,'Bamboo','$2a$10$LKLuaqEF38fA..XHCfRI.OtCxo58vYub/Fq.40X4CaaV.IqemrUd2','2024-07-03 00:00:00','admin','123456','this is LinkMe',0),(18281565326938132,NULL,1,NULL,'aaa','123',NULL,'adsfasdf','1','asdfasd',0),(18281565326938133,NULL,2,NULL,'bbb','123',NULL,'asdfasdfadsfasdf','2','tgsadgasdf',0),(18281565326938134,NULL,3,NULL,'ccc','123',NULL,'qwereqwr','3','asdfasdfasd',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -292,4 +383,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-10 21:15:52
+-- Dump completed on 2024-07-07 15:51:07
