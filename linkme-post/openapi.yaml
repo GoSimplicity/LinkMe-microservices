@@ -3,19 +3,40 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: Post API
     version: 0.0.1
 paths:
-    /helloworld/{name}:
-        get:
+    /api/posts/collect:
+        post:
             tags:
-                - Greeter
-                - subgroup
-            description: Sends a greeting
-            operationId: Greeter_SayHello
+                - Post
+            operationId: Post_CollectPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CollectPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CollectPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/delete/{postId}:
+        delete:
+            tags:
+                - Post
+            operationId: Post_DeletePost
             parameters:
-                - name: name
+                - name: postId
                   in: path
                   required: true
                   schema:
@@ -26,14 +47,532 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/DeletePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/detail/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/detail_admin/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailAdminPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailAdminPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/detail_pub/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPubPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPubPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/edit:
+        post:
+            tags:
+                - Post
+            operationId: Post_CreatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreatePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/like:
+        post:
+            tags:
+                - Post
+            operationId: Post_LikePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LikePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LikePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/list:
+        post:
+            tags:
+                - Post
+            operationId: Post_ListPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/list_admin:
+        post:
+            tags:
+                - Post
+            operationId: Post_ListAdminPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListAdminPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListAdminPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/list_pub:
+        post:
+            tags:
+                - Post
+            operationId: Post_ListPubPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListPubPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPubPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/publish:
+        post:
+            tags:
+                - Post
+            operationId: Post_PublishPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PublishPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PublishPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/stats:
+        get:
+            tags:
+                - Post
+            operationId: Post_GetPostStats
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetPostStatsReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/update:
+        post:
+            tags:
+                - Post
+            operationId: Post_UpdatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdatePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/posts/withdraw:
+        post:
+            tags:
+                - Post
+            operationId: Post_WithdrawPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WithdrawPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WithdrawPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        CollectPostReply:
             type: object
             properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        CollectPostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                collectId:
+                    type: string
+                collectd:
+                    type: boolean
+        CreatePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        CreatePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
+                    type: string
+        DeletePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        DetailAdminPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        DetailPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        DetailPubPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        GetPostStatsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        LikePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        LikePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                liked:
+                    type: boolean
+        ListAdminPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        ListAdminPostRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
+        ListPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        ListPostRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
+        ListPubPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        ListPubPostRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
+        PublishPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        PublishPostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
                 message:
                     type: string
-            description: The response message containing the greetings
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdatePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        UpdatePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
+                    type: string
+        WithdrawPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/GoogleProtobufAny'
+        WithdrawPostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
 tags:
-    - name: Greeter
+    - name: Post

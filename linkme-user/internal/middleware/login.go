@@ -35,7 +35,6 @@ func (m *JWTMiddleware) CheckLogin() middleware.Middleware {
 			if !ok {
 				return nil, ErrMissingToken
 			}
-
 			// 获取请求路径
 			path := tr.Operation()
 			if path == "/api.user.v1.User/SignUp" ||
@@ -50,7 +49,6 @@ func (m *JWTMiddleware) CheckLogin() middleware.Middleware {
 			if tokenStr == "" {
 				return nil, ErrMissingToken
 			}
-
 			var uc data.UserClaims
 			token, err := jwt.ParseWithClaims(tokenStr, &uc, func(token *jwt.Token) (interface{}, error) {
 				return data.Key1, nil
@@ -61,13 +59,11 @@ func (m *JWTMiddleware) CheckLogin() middleware.Middleware {
 			if uc.UserAgent == "" {
 				return nil, errors.New("missing user agent")
 			}
-
 			// 检查会话
 			err = m.CheckSession(ctx, uc.Ssid)
 			if err != nil {
 				return nil, err
 			}
-
 			// 将用户信息存储到上下文中
 			ctx = context.WithValue(ctx, "user", uc)
 			return handler(ctx, req)
