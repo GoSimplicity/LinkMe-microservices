@@ -6,7 +6,7 @@ info:
     title: User API
     version: 0.0.1
 paths:
-    /users/change_password:
+    /api/users/change_password:
         post:
             tags:
                 - User
@@ -15,7 +15,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.ChangePasswordRequest'
+                            $ref: '#/components/schemas/ChangePasswordRequest'
                 required: true
             responses:
                 "200":
@@ -23,8 +23,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.ChangePasswordReply'
-    /users/login:
+                                $ref: '#/components/schemas/ChangePasswordReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/login:
         post:
             tags:
                 - User
@@ -33,7 +39,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.LoginRequest'
+                            $ref: '#/components/schemas/LoginRequest'
                 required: true
             responses:
                 "200":
@@ -41,8 +47,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.LoginReply'
-    /users/logout:
+                                $ref: '#/components/schemas/LoginReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/logout:
         post:
             tags:
                 - User
@@ -51,7 +63,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.LogoutRequest'
+                            $ref: '#/components/schemas/LogoutRequest'
                 required: true
             responses:
                 "200":
@@ -59,8 +71,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.LogoutReply'
-    /users/profile:
+                                $ref: '#/components/schemas/LogoutReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/profile:
         get:
             tags:
                 - User
@@ -76,8 +94,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.GetProfileReply'
-    /users/refresh_token:
+                                $ref: '#/components/schemas/GetProfileReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/refresh_token:
         put:
             tags:
                 - User
@@ -86,7 +110,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.RefreshTokenRequest'
+                            $ref: '#/components/schemas/RefreshTokenRequest'
                 required: true
             responses:
                 "200":
@@ -94,8 +118,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.RefreshTokenReply'
-    /users/signup:
+                                $ref: '#/components/schemas/RefreshTokenReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/signup:
         post:
             tags:
                 - User
@@ -104,7 +134,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.SignUpRequest'
+                            $ref: '#/components/schemas/SignUpRequest'
                 required: true
             responses:
                 "200":
@@ -112,8 +142,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.SignUpReply'
-    /users/update_profile:
+                                $ref: '#/components/schemas/SignUpReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/update_profile:
         put:
             tags:
                 - User
@@ -122,7 +158,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.UpdateProfileRequest'
+                            $ref: '#/components/schemas/UpdateProfileRequest'
                 required: true
             responses:
                 "200":
@@ -130,8 +166,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.UpdateProfileReply'
-    /users/write_off:
+                                $ref: '#/components/schemas/UpdateProfileReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users/write_off:
         post:
             tags:
                 - User
@@ -140,7 +182,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.v1.WriteOffRequest'
+                            $ref: '#/components/schemas/WriteOffRequest'
                 required: true
             responses:
                 "200":
@@ -148,10 +190,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.v1.WriteOffReply'
+                                $ref: '#/components/schemas/WriteOffReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
-        api.user.v1.ChangePasswordReply:
+        ChangePasswordReply:
             type: object
             properties:
                 code:
@@ -159,7 +207,7 @@ components:
                     format: int32
                 msg:
                     type: string
-        api.user.v1.ChangePasswordRequest:
+        ChangePasswordRequest:
             type: object
             properties:
                 email:
@@ -170,7 +218,7 @@ components:
                     type: string
                 confirmPassword:
                     type: string
-        api.user.v1.GetProfileReply:
+        GetProfileReply:
             type: object
             properties:
                 code:
@@ -179,8 +227,16 @@ components:
                 msg:
                     type: string
                 data:
-                    $ref: '#/components/schemas/api.user.v1.Profile'
-        api.user.v1.LoginReply:
+                    $ref: '#/components/schemas/Profile'
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        LoginReply:
             type: object
             properties:
                 code:
@@ -192,14 +248,14 @@ components:
                     type: string
                 refreshToken:
                     type: string
-        api.user.v1.LoginRequest:
+        LoginRequest:
             type: object
             properties:
                 email:
                     type: string
                 password:
                     type: string
-        api.user.v1.LogoutReply:
+        LogoutReply:
             type: object
             properties:
                 code:
@@ -209,12 +265,12 @@ components:
                     type: string
                 data:
                     type: string
-        api.user.v1.LogoutRequest:
+        LogoutRequest:
             type: object
             properties:
                 token:
                     type: string
-        api.user.v1.Profile:
+        Profile:
             type: object
             properties:
                 nickname:
@@ -225,7 +281,7 @@ components:
                     type: string
                 birthday:
                     type: string
-        api.user.v1.RefreshTokenReply:
+        RefreshTokenReply:
             type: object
             properties:
                 code:
@@ -235,12 +291,12 @@ components:
                     type: string
                 token:
                     type: string
-        api.user.v1.RefreshTokenRequest:
+        RefreshTokenRequest:
             type: object
             properties:
                 token:
                     type: string
-        api.user.v1.SignUpReply:
+        SignUpReply:
             type: object
             properties:
                 code:
@@ -250,7 +306,7 @@ components:
                     type: string
                 data:
                     type: string
-        api.user.v1.SignUpRequest:
+        SignUpRequest:
             type: object
             properties:
                 email:
@@ -259,7 +315,23 @@ components:
                     type: string
                 confirmPassword:
                     type: string
-        api.user.v1.UpdateProfileReply:
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdateProfileReply:
             type: object
             properties:
                 code:
@@ -267,7 +339,7 @@ components:
                     format: int32
                 msg:
                     type: string
-        api.user.v1.UpdateProfileRequest:
+        UpdateProfileRequest:
             type: object
             properties:
                 token:
@@ -280,7 +352,7 @@ components:
                     type: string
                 birthday:
                     type: string
-        api.user.v1.WriteOffReply:
+        WriteOffReply:
             type: object
             properties:
                 code:
@@ -290,7 +362,7 @@ components:
                     type: string
                 data:
                     type: string
-        api.user.v1.WriteOffRequest:
+        WriteOffRequest:
             type: object
             properties:
                 email:

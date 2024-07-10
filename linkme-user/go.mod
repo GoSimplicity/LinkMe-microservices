@@ -4,7 +4,7 @@ go 1.22.3
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/dlclark/regexp2 v1.11.0
+	github.com/dlclark/regexp2 v1.11.1
 	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240627104009-3198e0b83bf2
 	github.com/go-kratos/kratos/v2 v2.7.3
 	github.com/go-sql-driver/mysql v1.7.0

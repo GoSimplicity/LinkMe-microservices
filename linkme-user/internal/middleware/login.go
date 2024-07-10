@@ -43,7 +43,6 @@ func (m *JWTMiddleware) CheckLogin() middleware.Middleware {
 				path == "/api.user.v1.User/ChangePassword" {
 				return handler(ctx, req)
 			}
-
 			// 从请求头中提取 JWT Token
 			tokenStr := m.ExtractToken(ctx)
 			if tokenStr == "" {
