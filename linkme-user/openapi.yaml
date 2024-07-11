@@ -263,8 +263,6 @@ components:
                     format: int32
                 msg:
                     type: string
-                data:
-                    type: string
         LogoutRequest:
             type: object
             properties:
@@ -359,8 +357,6 @@ components:
                     type: integer
                     format: int32
                 msg:
-                    type: string
-                data:
                     type: string
         WriteOffRequest:
             type: object

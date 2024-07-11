@@ -87,7 +87,6 @@ message LogoutRequest {
 message LogoutReply {
   int32 code = 1;
   string msg = 2;
-  string data = 3;
 }
 
 message RefreshTokenRequest {
@@ -120,7 +119,6 @@ message WriteOffRequest {
 message WriteOffReply {
   int32 code = 1;
   string msg = 2;
-  string data = 3;
 }
 
 message GetProfileRequest {

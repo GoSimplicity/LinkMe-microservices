@@ -23,14 +23,14 @@ func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest)
 func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*pb.DeletePostReply, error) {
 	return &pb.DeletePostReply{}, nil
 }
-func (s *PostService) ListPost(ctx context.Context, req *pb.ListPostRequest) (*pb.ListPostReply, error) {
-	return &pb.ListPostReply{}, nil
-}
 func (s *PostService) PublishPost(ctx context.Context, req *pb.PublishPostRequest) (*pb.PublishPostReply, error) {
 	return &pb.PublishPostReply{}, nil
 }
 func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequest) (*pb.WithdrawPostReply, error) {
 	return &pb.WithdrawPostReply{}, nil
+}
+func (s *PostService) ListPost(ctx context.Context, req *pb.ListPostRequest) (*pb.ListPostReply, error) {
+	return &pb.ListPostReply{}, nil
 }
 func (s *PostService) ListPubPost(ctx context.Context, req *pb.ListPubPostRequest) (*pb.ListPubPostReply, error) {
 	return &pb.ListPubPostReply{}, nil
@@ -47,7 +47,7 @@ func (s *PostService) DetailPubPost(ctx context.Context, req *pb.DetailPubPostRe
 func (s *PostService) DetailAdminPost(ctx context.Context, req *pb.DetailAdminPostRequest) (*pb.DetailAdminPostReply, error) {
 	return &pb.DetailAdminPostReply{}, nil
 }
-func (s *PostService) GetPostStats(ctx context.Context, req *pb.GetPostStatsRequest) (*pb.GetPostStatsReply, error) {
+func (s *PostService) GetPostStats(ctx context.Context, req *pb.google_protobuf_Empty) (*pb.GetPostStatsReply, error) {
 	return &pb.GetPostStatsReply{}, nil
 }
 func (s *PostService) LikePost(ctx context.Context, req *pb.LikePostRequest) (*pb.LikePostReply, error) {
