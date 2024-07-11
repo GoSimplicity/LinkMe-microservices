@@ -9,48 +9,48 @@ option go_package = "linkme-user/api/user/v1;v1";
 service User {
   rpc SignUp (SignUpRequest) returns (SignUpReply) {
     option (google.api.http) = {
-      post: "/api/users/signup"
+      post: "/signup"
       body: "*"
     };
   }
   rpc Login (LoginRequest) returns (LoginReply) {
     option (google.api.http) = {
-      post: "/api/users/login"
+      post: "/login"
       body: "*"
     };
   }
   rpc Logout (LogoutRequest) returns (LogoutReply) {
     option (google.api.http) = {
-      post: "/api/users/logout"
+      post: "/logout"
       body: "*"
     };
   }
   rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenReply) {
     option (google.api.http) = {
-      put: "/api/users/refresh_token"
+      put: "/refresh_token"
       body: "*"
     };
   }
   rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordReply) {
     option (google.api.http) = {
-      post: "/api/users/change_password"
+      post: "/change_password"
       body: "*"
     };
   }
   rpc WriteOff (WriteOffRequest) returns (WriteOffReply) {
     option (google.api.http) = {
-      post: "/api/users/write_off"
+      post: "/write_off"
       body: "*"
     };
   }
   rpc GetProfile (GetProfileRequest) returns (GetProfileReply) {
     option (google.api.http) = {
-      get: "/api/users/profile"
+      get: "/profile"
     };
   }
   rpc UpdateProfile (UpdateProfileRequest) returns (UpdateProfileReply) {
     option (google.api.http) = {
-      put: "/api/users/update_profile"
+      put: "/update_profile"
       body: "*"
     };
   }

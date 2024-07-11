@@ -41,14 +41,14 @@ type UserHTTPServer interface {
 
 func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/users/signup", _User_SignUp0_HTTP_Handler(srv))
-	r.POST("/api/users/login", _User_Login0_HTTP_Handler(srv))
-	r.POST("/api/users/logout", _User_Logout0_HTTP_Handler(srv))
-	r.PUT("/api/users/refresh_token", _User_RefreshToken0_HTTP_Handler(srv))
-	r.POST("/api/users/change_password", _User_ChangePassword0_HTTP_Handler(srv))
-	r.POST("/api/users/write_off", _User_WriteOff0_HTTP_Handler(srv))
-	r.GET("/api/users/profile", _User_GetProfile0_HTTP_Handler(srv))
-	r.PUT("/api/users/update_profile", _User_UpdateProfile0_HTTP_Handler(srv))
+	r.POST("/signup", _User_SignUp0_HTTP_Handler(srv))
+	r.POST("/login", _User_Login0_HTTP_Handler(srv))
+	r.POST("/logout", _User_Logout0_HTTP_Handler(srv))
+	r.PUT("/refresh_token", _User_RefreshToken0_HTTP_Handler(srv))
+	r.POST("/change_password", _User_ChangePassword0_HTTP_Handler(srv))
+	r.POST("/write_off", _User_WriteOff0_HTTP_Handler(srv))
+	r.GET("/profile", _User_GetProfile0_HTTP_Handler(srv))
+	r.PUT("/update_profile", _User_UpdateProfile0_HTTP_Handler(srv))
 }
 
 func _User_SignUp0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -245,7 +245,7 @@ func NewUserHTTPClient(client *http.Client) UserHTTPClient {
 
 func (c *UserHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...http.CallOption) (*ChangePasswordReply, error) {
 	var out ChangePasswordReply
-	pattern := "/api/users/change_password"
+	pattern := "/change_password"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserChangePassword))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -258,7 +258,7 @@ func (c *UserHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePassw
 
 func (c *UserHTTPClientImpl) GetProfile(ctx context.Context, in *GetProfileRequest, opts ...http.CallOption) (*GetProfileReply, error) {
 	var out GetProfileReply
-	pattern := "/api/users/profile"
+	pattern := "/profile"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserGetProfile))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -271,7 +271,7 @@ func (c *UserHTTPClientImpl) GetProfile(ctx context.Context, in *GetProfileReque
 
 func (c *UserHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
-	pattern := "/api/users/login"
+	pattern := "/login"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserLogin))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -284,7 +284,7 @@ func (c *UserHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts .
 
 func (c *UserHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutReply, error) {
 	var out LogoutReply
-	pattern := "/api/users/logout"
+	pattern := "/logout"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserLogout))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -297,7 +297,7 @@ func (c *UserHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts
 
 func (c *UserHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...http.CallOption) (*RefreshTokenReply, error) {
 	var out RefreshTokenReply
-	pattern := "/api/users/refresh_token"
+	pattern := "/refresh_token"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserRefreshToken))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -310,7 +310,7 @@ func (c *UserHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenR
 
 func (c *UserHTTPClientImpl) SignUp(ctx context.Context, in *SignUpRequest, opts ...http.CallOption) (*SignUpReply, error) {
 	var out SignUpReply
-	pattern := "/api/users/signup"
+	pattern := "/signup"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserSignUp))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -323,7 +323,7 @@ func (c *UserHTTPClientImpl) SignUp(ctx context.Context, in *SignUpRequest, opts
 
 func (c *UserHTTPClientImpl) UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...http.CallOption) (*UpdateProfileReply, error) {
 	var out UpdateProfileReply
-	pattern := "/api/users/update_profile"
+	pattern := "/update_profile"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserUpdateProfile))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -336,7 +336,7 @@ func (c *UserHTTPClientImpl) UpdateProfile(ctx context.Context, in *UpdateProfil
 
 func (c *UserHTTPClientImpl) WriteOff(ctx context.Context, in *WriteOffRequest, opts ...http.CallOption) (*WriteOffReply, error) {
 	var out WriteOffReply
-	pattern := "/api/users/write_off"
+	pattern := "/write_off"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserWriteOff))
 	opts = append(opts, http.PathTemplate(pattern))

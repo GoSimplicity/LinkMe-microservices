@@ -6,7 +6,7 @@ info:
     title: User API
     version: 0.0.1
 paths:
-    /api/users/change_password:
+    /change_password:
         post:
             tags:
                 - User
@@ -30,7 +30,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/login:
+    /login:
         post:
             tags:
                 - User
@@ -54,7 +54,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/logout:
+    /logout:
         post:
             tags:
                 - User
@@ -78,7 +78,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/profile:
+    /profile:
         get:
             tags:
                 - User
@@ -101,7 +101,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/refresh_token:
+    /refresh_token:
         put:
             tags:
                 - User
@@ -125,7 +125,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/signup:
+    /signup:
         post:
             tags:
                 - User
@@ -149,7 +149,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/update_profile:
+    /update_profile:
         put:
             tags:
                 - User
@@ -173,7 +173,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/users/write_off:
+    /write_off:
         post:
             tags:
                 - User
