@@ -2,20 +2,37 @@ package service
 
 import (
 	"context"
-
-	pb "linkme-post/api/post"
+	"github.com/golang/protobuf/ptypes/empty"
+	pb "linkme-post/api/post/v1"
+	"linkme-post/domain"
+	"linkme-post/internal/biz"
 )
 
 type PostService struct {
 	pb.UnimplementedPostServer
+	biz *biz.PostUsecase
 }
 
-func NewPostService() *PostService {
-	return &PostService{}
+func NewPostService(biz *biz.PostUsecase) *PostService {
+	return &PostService{
+		biz: biz,
+	}
 }
 
 func (s *PostService) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.CreatePostReply, error) {
-	return &pb.CreatePostReply{}, nil
+	post, err := s.biz.CreatePost(ctx, domain.Post{
+		Title:   req.Title,
+		Content: req.Content,
+		Plate:   domain.Plate{ID: req.PlateId},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CreatePostReply{
+		Code: 0,
+		Msg:  "create post success",
+		Data: string(post),
+	}, nil
 }
 func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.UpdatePostReply, error) {
 	return &pb.UpdatePostReply{}, nil
@@ -47,7 +64,7 @@ func (s *PostService) DetailPubPost(ctx context.Context, req *pb.DetailPubPostRe
 func (s *PostService) DetailAdminPost(ctx context.Context, req *pb.DetailAdminPostRequest) (*pb.DetailAdminPostReply, error) {
 	return &pb.DetailAdminPostReply{}, nil
 }
-func (s *PostService) GetPostStats(ctx context.Context, req *pb.google_protobuf_Empty) (*pb.GetPostStatsReply, error) {
+func (s *PostService) GetPostStats(ctx context.Context, req *empty.Empty) (*pb.GetPostStatsReply, error) {
 	return &pb.GetPostStatsReply{}, nil
 }
 func (s *PostService) LikePost(ctx context.Context, req *pb.LikePostRequest) (*pb.LikePostReply, error) {

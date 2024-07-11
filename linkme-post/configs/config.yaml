@@ -1,15 +1,19 @@
 server:
   http:
-    addr: 0.0.0.0:8000
+    addr: 0.0.0.0:8020
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:9000
+    addr: 0.0.0.0:9020
     timeout: 1s
 data:
   database:
-    driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+    source: root:root@tcp(localhost:3306)/test?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
-    read_timeout: 0.2s
-    write_timeout: 0.2s
+  mongo:
+    addr: "mongodb://root:root@localhost:27017"
+service:
+  etcd:
+    addr:
+      - 127.0.0.1:2379
+    timeout: 5s
