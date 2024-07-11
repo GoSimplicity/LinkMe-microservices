@@ -3,7 +3,7 @@ syntax = "proto3";
 package api.post;
 
 import "google/api/annotations.proto";
-import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "linkme-post/api/post;post";
 
@@ -13,80 +13,80 @@ service Post {
 			post: "/api/posts/edit"
 			body: "*"
 		};
-	};
+	}
 	rpc UpdatePost (UpdatePostRequest) returns (UpdatePostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/update"
 			body: "*"
 		};
-	};
+	}
 	rpc DeletePost (DeletePostRequest) returns (DeletePostReply) {
 		option (google.api.http) = {
 			delete: "/api/posts/delete/{postId}"
 		};
-	};
-	rpc ListPost (ListPostRequest) returns (ListPostReply) {
-		option (google.api.http) = {
-			post: "/api/posts/list"
-			body: "*"
-		};
-	};
+	}
 	rpc PublishPost (PublishPostRequest) returns (PublishPostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/publish"
 			body: "*"
 		};
-	};
+	}
 	rpc WithdrawPost (WithdrawPostRequest) returns (WithdrawPostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/withdraw"
 			body: "*"
 		};
-	};
+	}
+	rpc ListPost (ListPostRequest) returns (ListPostReply) {
+		option (google.api.http) = {
+			post: "/api/posts/list"
+			body: "*"
+		};
+	}
 	rpc ListPubPost (ListPubPostRequest) returns (ListPubPostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/list_pub"
 			body: "*"
 		};
-	};
+	}
 	rpc ListAdminPost (ListAdminPostRequest) returns (ListAdminPostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/list_admin"
 			body: "*"
 		};
-	};
+	}
 	rpc DetailPost (DetailPostRequest) returns (DetailPostReply) {
 		option (google.api.http) = {
 			get: "/api/posts/detail/{postId}"
 		};
-	};
+	}
 	rpc DetailPubPost (DetailPubPostRequest) returns (DetailPubPostReply) {
 		option (google.api.http) = {
 			get: "/api/posts/detail_pub/{postId}"
 		};
-	};
+	}
 	rpc DetailAdminPost (DetailAdminPostRequest) returns (DetailAdminPostReply) {
 		option (google.api.http) = {
 			get: "/api/posts/detail_admin/{postId}"
 		};
-	};
-	rpc GetPostStats (GetPostStatsRequest) returns (GetPostStatsReply) {
+	}
+	rpc GetPostStats (google.protobuf.Empty) returns (GetPostStatsReply) {
 		option (google.api.http) = {
 			get: "/api/posts/stats"
 		};
-	};
+	}
 	rpc LikePost (LikePostRequest) returns (LikePostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/like"
 			body: "*"
 		};
-	};
+	}
 	rpc CollectPost (CollectPostRequest) returns (CollectPostReply) {
 		option (google.api.http) = {
 			post: "/api/posts/collect"
 			body: "*"
 		};
-	};
+	}
 }
 
 message CreatePostRequest {
@@ -95,10 +95,11 @@ message CreatePostRequest {
 	string content = 3;
 	int64 plateId = 4;
 }
+
 message CreatePostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	string data = 3;
 }
 
 message UpdatePostRequest {
@@ -107,111 +108,116 @@ message UpdatePostRequest {
 	string content = 3;
 	int64 plateId = 4;
 }
+
 message UpdatePostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
 }
 
 message DeletePostRequest {
 	int64 postId = 1;
 }
+
 message DeletePostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
 }
 
 message ListPostRequest {
 	int32 page = 1;
 	int64 size = 2;
 }
+
 message ListPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	repeated ListPost data = 3;
 }
 
 message PublishPostRequest {
 	int64 postId = 1;
 }
+
 message PublishPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
 }
 
 message WithdrawPostRequest {
 	int64 postId = 1;
 }
+
 message WithdrawPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
 }
 
 message ListPubPostRequest {
 	int32 page = 1;
 	int64 size = 2;
 }
+
 message ListPubPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	repeated ListPost data = 3;
 }
 
 message ListAdminPostRequest {
 	int32 page = 1;
 	int64 size = 2;
 }
+
 message ListAdminPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	repeated ListPost data = 3;
 }
 
 message DetailPostRequest {
 	int64 postId = 1;
 }
+
 message DetailPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	DetailPost data = 3;
 }
 
 message DetailPubPostRequest {
 	int64 postId = 1;
 }
+
 message DetailPubPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	DetailPost data = 3;
 }
 
 message DetailAdminPostRequest {
 	int64 postId = 1;
 }
+
 message DetailAdminPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	DetailPost data = 3;
 }
 
-message GetPostStatsRequest {}
 message GetPostStatsReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+	int64 count = 3;
 }
 
 message LikePostRequest {
 	int64 postId = 1;
 	bool liked = 2;
 }
+
 message LikePostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
 }
 
 message CollectPostRequest {
@@ -219,8 +225,31 @@ message CollectPostRequest {
 	int64 collectId = 2;
 	bool collectd = 3;
 }
+
 message CollectPostReply {
 	int32 code = 1;
 	string msg = 2;
-	google.protobuf.Any data = 3;
+}
+
+message ListPost {
+	int64 id = 1;
+	string title = 2;
+	string content = 3;
+	int64 createdAt = 4;
+	int64 updatedAt = 5;
+	int64 userId = 6;
+	int64 plateId = 7;
+}
+
+message DetailPost {
+	int64 id = 1;
+	string title = 2;
+	string content = 3;
+	int64 createdAt = 4;
+	int64 updatedAt = 5;
+	int64 userId = 6;
+	int64 plateId = 7;
+	int64 likeCount = 8;
+	int64 collectCount = 9;
+	int64 viewCount = 10;
 }
