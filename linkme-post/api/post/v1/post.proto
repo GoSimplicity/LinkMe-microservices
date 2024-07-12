@@ -10,80 +10,80 @@ option go_package = "linkme-post/api/post;post";
 service Post {
 	rpc CreatePost (CreatePostRequest) returns (CreatePostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/edit"
+			post: "/create"
 			body: "*"
 		};
 	}
 	rpc UpdatePost (UpdatePostRequest) returns (UpdatePostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/update"
+			post: "/update"
 			body: "*"
 		};
 	}
 	rpc DeletePost (DeletePostRequest) returns (DeletePostReply) {
 		option (google.api.http) = {
-			delete: "/api/posts/delete/{postId}"
+			delete: "/delete/{postId}"
 		};
 	}
 	rpc PublishPost (PublishPostRequest) returns (PublishPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/publish"
+			post: "/publish"
 			body: "*"
 		};
 	}
 	rpc WithdrawPost (WithdrawPostRequest) returns (WithdrawPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/withdraw"
+			post: "/withdraw"
 			body: "*"
 		};
 	}
 	rpc ListPost (ListPostRequest) returns (ListPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/list"
+			post: "/list"
 			body: "*"
 		};
 	}
 	rpc ListPubPost (ListPubPostRequest) returns (ListPubPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/list_pub"
+			post: "/list_pub"
 			body: "*"
 		};
 	}
 	rpc ListAdminPost (ListAdminPostRequest) returns (ListAdminPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/list_admin"
+			post: "/list_admin"
 			body: "*"
 		};
 	}
 	rpc DetailPost (DetailPostRequest) returns (DetailPostReply) {
 		option (google.api.http) = {
-			get: "/api/posts/detail/{postId}"
+			get: "/detail/{postId}"
 		};
 	}
 	rpc DetailPubPost (DetailPubPostRequest) returns (DetailPubPostReply) {
 		option (google.api.http) = {
-			get: "/api/posts/detail_pub/{postId}"
+			get: "/detail_pub/{postId}"
 		};
 	}
 	rpc DetailAdminPost (DetailAdminPostRequest) returns (DetailAdminPostReply) {
 		option (google.api.http) = {
-			get: "/api/posts/detail_admin/{postId}"
+			get: "/detail_admin/{postId}"
 		};
 	}
 	rpc GetPostStats (google.protobuf.Empty) returns (GetPostStatsReply) {
 		option (google.api.http) = {
-			get: "/api/posts/stats"
+			get: "/stats"
 		};
 	}
 	rpc LikePost (LikePostRequest) returns (LikePostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/like"
+			post: "/like"
 			body: "*"
 		};
 	}
 	rpc CollectPost (CollectPostRequest) returns (CollectPostReply) {
 		option (google.api.http) = {
-			post: "/api/posts/collect"
+			post: "/collect"
 			body: "*"
 		};
 	}
@@ -99,7 +99,7 @@ message CreatePostRequest {
 message CreatePostReply {
 	int32 code = 1;
 	string msg = 2;
-	string data = 3;
+	int64 data = 3;
 }
 
 message UpdatePostRequest {

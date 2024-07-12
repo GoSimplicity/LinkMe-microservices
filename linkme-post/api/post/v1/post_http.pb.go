@@ -54,20 +54,20 @@ type PostHTTPServer interface {
 
 func RegisterPostHTTPServer(s *http.Server, srv PostHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/posts/edit", _Post_CreatePost0_HTTP_Handler(srv))
-	r.POST("/api/posts/update", _Post_UpdatePost0_HTTP_Handler(srv))
-	r.DELETE("/api/posts/delete/{postId}", _Post_DeletePost0_HTTP_Handler(srv))
-	r.POST("/api/posts/publish", _Post_PublishPost0_HTTP_Handler(srv))
-	r.POST("/api/posts/withdraw", _Post_WithdrawPost0_HTTP_Handler(srv))
-	r.POST("/api/posts/list", _Post_ListPost0_HTTP_Handler(srv))
-	r.POST("/api/posts/list_pub", _Post_ListPubPost0_HTTP_Handler(srv))
-	r.POST("/api/posts/list_admin", _Post_ListAdminPost0_HTTP_Handler(srv))
-	r.GET("/api/posts/detail/{postId}", _Post_DetailPost0_HTTP_Handler(srv))
-	r.GET("/api/posts/detail_pub/{postId}", _Post_DetailPubPost0_HTTP_Handler(srv))
-	r.GET("/api/posts/detail_admin/{postId}", _Post_DetailAdminPost0_HTTP_Handler(srv))
-	r.GET("/api/posts/stats", _Post_GetPostStats0_HTTP_Handler(srv))
-	r.POST("/api/posts/like", _Post_LikePost0_HTTP_Handler(srv))
-	r.POST("/api/posts/collect", _Post_CollectPost0_HTTP_Handler(srv))
+	r.POST("/create", _Post_CreatePost0_HTTP_Handler(srv))
+	r.POST("/update", _Post_UpdatePost0_HTTP_Handler(srv))
+	r.DELETE("/delete/{postId}", _Post_DeletePost0_HTTP_Handler(srv))
+	r.POST("/publish", _Post_PublishPost0_HTTP_Handler(srv))
+	r.POST("/withdraw", _Post_WithdrawPost0_HTTP_Handler(srv))
+	r.POST("/list", _Post_ListPost0_HTTP_Handler(srv))
+	r.POST("/list_pub", _Post_ListPubPost0_HTTP_Handler(srv))
+	r.POST("/list_admin", _Post_ListAdminPost0_HTTP_Handler(srv))
+	r.GET("/detail/{postId}", _Post_DetailPost0_HTTP_Handler(srv))
+	r.GET("/detail_pub/{postId}", _Post_DetailPubPost0_HTTP_Handler(srv))
+	r.GET("/detail_admin/{postId}", _Post_DetailAdminPost0_HTTP_Handler(srv))
+	r.GET("/stats", _Post_GetPostStats0_HTTP_Handler(srv))
+	r.POST("/like", _Post_LikePost0_HTTP_Handler(srv))
+	r.POST("/collect", _Post_CollectPost0_HTTP_Handler(srv))
 }
 
 func _Post_CreatePost0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
@@ -402,7 +402,7 @@ func NewPostHTTPClient(client *http.Client) PostHTTPClient {
 
 func (c *PostHTTPClientImpl) CollectPost(ctx context.Context, in *CollectPostRequest, opts ...http.CallOption) (*CollectPostReply, error) {
 	var out CollectPostReply
-	pattern := "/api/posts/collect"
+	pattern := "/collect"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostCollectPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -415,7 +415,7 @@ func (c *PostHTTPClientImpl) CollectPost(ctx context.Context, in *CollectPostReq
 
 func (c *PostHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...http.CallOption) (*CreatePostReply, error) {
 	var out CreatePostReply
-	pattern := "/api/posts/edit"
+	pattern := "/create"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostCreatePost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -428,7 +428,7 @@ func (c *PostHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostReque
 
 func (c *PostHTTPClientImpl) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...http.CallOption) (*DeletePostReply, error) {
 	var out DeletePostReply
-	pattern := "/api/posts/delete/{postId}"
+	pattern := "/delete/{postId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPostDeletePost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -441,7 +441,7 @@ func (c *PostHTTPClientImpl) DeletePost(ctx context.Context, in *DeletePostReque
 
 func (c *PostHTTPClientImpl) DetailAdminPost(ctx context.Context, in *DetailAdminPostRequest, opts ...http.CallOption) (*DetailAdminPostReply, error) {
 	var out DetailAdminPostReply
-	pattern := "/api/posts/detail_admin/{postId}"
+	pattern := "/detail_admin/{postId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPostDetailAdminPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -454,7 +454,7 @@ func (c *PostHTTPClientImpl) DetailAdminPost(ctx context.Context, in *DetailAdmi
 
 func (c *PostHTTPClientImpl) DetailPost(ctx context.Context, in *DetailPostRequest, opts ...http.CallOption) (*DetailPostReply, error) {
 	var out DetailPostReply
-	pattern := "/api/posts/detail/{postId}"
+	pattern := "/detail/{postId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPostDetailPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -467,7 +467,7 @@ func (c *PostHTTPClientImpl) DetailPost(ctx context.Context, in *DetailPostReque
 
 func (c *PostHTTPClientImpl) DetailPubPost(ctx context.Context, in *DetailPubPostRequest, opts ...http.CallOption) (*DetailPubPostReply, error) {
 	var out DetailPubPostReply
-	pattern := "/api/posts/detail_pub/{postId}"
+	pattern := "/detail_pub/{postId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPostDetailPubPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -480,7 +480,7 @@ func (c *PostHTTPClientImpl) DetailPubPost(ctx context.Context, in *DetailPubPos
 
 func (c *PostHTTPClientImpl) GetPostStats(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetPostStatsReply, error) {
 	var out GetPostStatsReply
-	pattern := "/api/posts/stats"
+	pattern := "/stats"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPostGetPostStats))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -493,7 +493,7 @@ func (c *PostHTTPClientImpl) GetPostStats(ctx context.Context, in *emptypb.Empty
 
 func (c *PostHTTPClientImpl) LikePost(ctx context.Context, in *LikePostRequest, opts ...http.CallOption) (*LikePostReply, error) {
 	var out LikePostReply
-	pattern := "/api/posts/like"
+	pattern := "/like"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostLikePost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -506,7 +506,7 @@ func (c *PostHTTPClientImpl) LikePost(ctx context.Context, in *LikePostRequest, 
 
 func (c *PostHTTPClientImpl) ListAdminPost(ctx context.Context, in *ListAdminPostRequest, opts ...http.CallOption) (*ListAdminPostReply, error) {
 	var out ListAdminPostReply
-	pattern := "/api/posts/list_admin"
+	pattern := "/list_admin"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostListAdminPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -519,7 +519,7 @@ func (c *PostHTTPClientImpl) ListAdminPost(ctx context.Context, in *ListAdminPos
 
 func (c *PostHTTPClientImpl) ListPost(ctx context.Context, in *ListPostRequest, opts ...http.CallOption) (*ListPostReply, error) {
 	var out ListPostReply
-	pattern := "/api/posts/list"
+	pattern := "/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostListPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -532,7 +532,7 @@ func (c *PostHTTPClientImpl) ListPost(ctx context.Context, in *ListPostRequest, 
 
 func (c *PostHTTPClientImpl) ListPubPost(ctx context.Context, in *ListPubPostRequest, opts ...http.CallOption) (*ListPubPostReply, error) {
 	var out ListPubPostReply
-	pattern := "/api/posts/list_pub"
+	pattern := "/list_pub"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostListPubPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -545,7 +545,7 @@ func (c *PostHTTPClientImpl) ListPubPost(ctx context.Context, in *ListPubPostReq
 
 func (c *PostHTTPClientImpl) PublishPost(ctx context.Context, in *PublishPostRequest, opts ...http.CallOption) (*PublishPostReply, error) {
 	var out PublishPostReply
-	pattern := "/api/posts/publish"
+	pattern := "/publish"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostPublishPost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -558,7 +558,7 @@ func (c *PostHTTPClientImpl) PublishPost(ctx context.Context, in *PublishPostReq
 
 func (c *PostHTTPClientImpl) UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...http.CallOption) (*UpdatePostReply, error) {
 	var out UpdatePostReply
-	pattern := "/api/posts/update"
+	pattern := "/update"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostUpdatePost))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -571,7 +571,7 @@ func (c *PostHTTPClientImpl) UpdatePost(ctx context.Context, in *UpdatePostReque
 
 func (c *PostHTTPClientImpl) WithdrawPost(ctx context.Context, in *WithdrawPostRequest, opts ...http.CallOption) (*WithdrawPostReply, error) {
 	var out WithdrawPostReply
-	pattern := "/api/posts/withdraw"
+	pattern := "/withdraw"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostWithdrawPost))
 	opts = append(opts, http.PathTemplate(pattern))
