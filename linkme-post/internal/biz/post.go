@@ -2,201 +2,97 @@ package biz
 
 import (
 	"context"
-	"go.uber.org/zap"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"errors"
 	"linkme-post/api/post/v1"
 	"linkme-post/domain"
-	"linkme-post/internal/data"
 )
 
-type PostUsecase struct {
-	repo data.PostRepo
-	l    *zap.Logger
+var (
+	ErrPostNotFound  = errors.New("post not found")
+	ErrInvalidParams = errors.New("invalid parameters")
+	ErrSyncFailed    = errors.New("sync failed")
+)
+
+type PostData interface {
+	CreatePost(ctx context.Context, dp domain.Post) (int64, error)                         // 创建一个新的帖子记录
+	CreatePubPost(ctx context.Context, dp domain.Post) (int64, error)                      // 创建一个新的公开帖子记录
+	DeletePost(ctx context.Context, postId int64, uid int64) error                         // 删除一个帖子
+	UpdatePost(ctx context.Context, dp domain.Post) error                                  // 根据ID更新一个帖子记录
+	UpdatePostStatus(ctx context.Context, dp domain.Post) error                            // 更新帖子的状态
+	GetPost(ctx context.Context, postId int64, uid int64) (domain.Post, error)             // 根据ID获取一个帖子记录
+	GetPubPost(ctx context.Context, id int64) (domain.Post, error)                         // 根据ID获取一个已发布的帖子记录
+	ListPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error)    // 获取个人的帖子记录列表
+	ListPubPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error) // 获取已发布的帖子记录列表
+	SyncPost(ctx context.Context, dp domain.Post) (int64, error)                           // 用于同步帖子记录
 }
 
-func NewPostUsecase(repo data.PostRepo, l *zap.Logger) *PostUsecase {
-	return &PostUsecase{
-		repo: repo,
-		l:    l,
+type PostBiz struct {
+	postData PostData
+}
+
+func NewPostBiz(postData PostData) *PostBiz {
+	return &PostBiz{
+		postData: postData,
 	}
 }
 
-func (uc *PostUsecase) CreatePost(ctx context.Context, dp domain.Post) (int64, error) {
-	postId, err := uc.repo.Insert(ctx, fromDomainPost(dp))
+func (pb *PostBiz) CreatePost(ctx context.Context, dp domain.Post) (int64, error) {
+	dp.Status = domain.Draft
+	postId, err := pb.postData.CreatePost(ctx, dp)
 	if err != nil {
 		return -1, err
 	}
 	return postId, err
 }
 
-func (uc *PostUsecase) UpdatePost(ctx context.Context, req *post.UpdatePostRequest) (*post.UpdatePostReply, error) {
-	// Your logic here
-	return &post.UpdatePostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-func (uc *PostUsecase) DeletePost(ctx context.Context, req *post.DeletePostRequest) (*post.DeletePostReply, error) {
-	// Your logic here
-	return &post.DeletePostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-func (uc *PostUsecase) PublishPost(ctx context.Context, req *post.PublishPostRequest) (*post.PublishPostReply, error) {
-	// Your logic here
-	return &post.PublishPostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-func (uc *PostUsecase) WithdrawPost(ctx context.Context, req *post.WithdrawPostRequest) (*post.WithdrawPostReply, error) {
-	// Your logic here
-	return &post.WithdrawPostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-func (uc *PostUsecase) ListPost(ctx context.Context, req *post.ListPostRequest) (*post.ListPostReply, error) {
-	// Your logic here
-	return &post.ListPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) ListPubPost(ctx context.Context, req *post.ListPubPostRequest) (*post.ListPubPostReply, error) {
-	// Your logic here
-	return &post.ListPubPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) ListAdminPost(ctx context.Context, req *post.ListAdminPostRequest) (*post.ListAdminPostReply, error) {
-	// Your logic here
-	return &post.ListAdminPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) DetailPost(ctx context.Context, req *post.DetailPostRequest) (*post.DetailPostReply, error) {
-	// Your logic here
-	return &post.DetailPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) DetailPubPost(ctx context.Context, req *post.DetailPubPostRequest) (*post.DetailPubPostReply, error) {
-	// Your logic here
-	return &post.DetailPubPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) DetailAdminPost(ctx context.Context, req *post.DetailAdminPostRequest) (*post.DetailAdminPostReply, error) {
-	// Your logic here
-	return &post.DetailAdminPostReply{
-		Code: 0,
-		Msg:  "success",
-		Data: nil, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) GetPostStats(ctx context.Context, _ *emptypb.Empty) (*post.GetPostStatsReply, error) {
-	// Your logic here
-	return &post.GetPostStatsReply{
-		Code:  0,
-		Msg:   "success",
-		Count: 0, // fill this with actual data
-	}, nil
-}
-
-func (uc *PostUsecase) LikePost(ctx context.Context, req *post.LikePostRequest) (*post.LikePostReply, error) {
-	// Your logic here
-	return &post.LikePostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-func (uc *PostUsecase) CollectPost(ctx context.Context, req *post.CollectPostRequest) (*post.CollectPostReply, error) {
-	// Your logic here
-	return &post.CollectPostReply{
-		Code: 0,
-		Msg:  "success",
-	}, nil
-}
-
-// 将领域层对象转为dao层对象
-func fromDomainPost(p domain.Post) data.Post {
-	return data.Post{
-		ID:         p.ID,
-		Title:      p.Title,
-		Content:    p.Content,
-		CreatedAt:  p.CreateAt,
-		UpdatedAt:  p.UpdatedAt,
-		UserID:     p.UserID,
-		Status:     p.Status,
-		PlateID:    p.Plate.ID,
-		LikeNum:    p.LikeNum,
-		CollectNum: p.CollectNum,
-		ViewNum:    p.ViewNum,
-		Deleted:    p.Deleted,
-		DeletedAt:  p.DeletedAt,
+func (pb *PostBiz) UpdatePost(ctx context.Context, dp domain.Post) error {
+	dp.Status = domain.Draft
+	err := pb.postData.UpdatePost(ctx, dp)
+	if err != nil {
+		return err
 	}
+	return err
 }
 
-// 将dao层对象转为领域层对象
-func fromDomainSlicePost(post []data.Post) []domain.Post {
-	domainPosts := make([]domain.Post, len(post)) // 创建与输入切片等长的domain.Post切片
-	for i, repoPost := range post {
-		domainPosts[i] = domain.Post{
-			ID:         repoPost.ID,
-			Title:      repoPost.Title,
-			Content:    repoPost.Content,
-			CreateAt:   repoPost.CreatedAt,
-			UpdatedAt:  repoPost.UpdatedAt,
-			Status:     repoPost.Status,
-			Plate:      domain.Plate{ID: repoPost.PlateID},
-			LikeNum:    repoPost.LikeNum,
-			CollectNum: repoPost.CollectNum,
-			ViewNum:    repoPost.ViewNum,
-			Deleted:    repoPost.Deleted,
-			DeletedAt:  repoPost.DeletedAt,
-			UserID:     repoPost.UserID,
-		}
-	}
-	return domainPosts
+func (pb *PostBiz) UpdatePostStatus(ctx context.Context, dp domain.Post) error {
+	return pb.postData.UpdatePostStatus(ctx, dp)
 }
 
-// 将dao层转化为领域层
-func toDomainPost(post data.Post) domain.Post {
-	return domain.Post{
-		ID:         post.ID,
-		Title:      post.Title,
-		Content:    post.Content,
-		CreateAt:   post.CreatedAt,
-		UpdatedAt:  post.UpdatedAt,
-		Status:     post.Status,
-		Plate:      domain.Plate{ID: post.PlateID},
-		UserID:     post.UserID,
-		LikeNum:    post.LikeNum,
-		CollectNum: post.CollectNum,
-		ViewNum:    post.ViewNum,
-		Deleted:    post.Deleted,
-		DeletedAt:  post.DeletedAt,
-	}
+func (pb *PostBiz) GetPost(ctx context.Context, postId int64, uid int64) (domain.Post, error) {
+	return pb.postData.GetPost(ctx, postId, uid)
+}
+
+func (pb *PostBiz) GetPubPost(ctx context.Context, postId int64) (domain.Post, error) {
+	return pb.postData.GetPubPost(ctx, postId)
+}
+
+func (pb *PostBiz) ListPost(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error) {
+	offset := int64(pagination.Page-1) * *pagination.Size
+	pagination.Offset = &offset
+	return pb.postData.ListPosts(ctx, pagination)
+}
+
+func (pb *PostBiz) ListPubPost(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error) {
+	offset := int64(pagination.Page-1) * *pagination.Size
+	pagination.Offset = &offset
+	return pb.postData.ListPubPosts(ctx, pagination)
+}
+
+func (pb *PostBiz) DeletePost(ctx context.Context, postId int64, uid int64) error {
+	return pb.postData.DeletePost(ctx, postId, uid)
+}
+
+func (pb *PostBiz) CreatePubPost(ctx context.Context, dp domain.Post) (int64, error) {
+	// TODO 暂时保留
+	return 0, nil
+}
+
+func (pb *PostBiz) LikePost(ctx context.Context, req *post.LikePostRequest) (*post.LikePostReply, error) {
+	// TODO 暂时保留
+	return nil, nil
+}
+
+func (pb *PostBiz) CollectPost(ctx context.Context, req *post.CollectPostRequest) (*post.CollectPostReply, error) {
+	// TODO 暂时保留
+	return nil, nil
 }

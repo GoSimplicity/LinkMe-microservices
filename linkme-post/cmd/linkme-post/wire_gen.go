@@ -28,14 +28,20 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	if err != nil {
 		return nil, nil, err
 	}
-	zapLogger := data.NewLogger()
+	cmdable := data.NewRedis(confData)
 	client := data.NewMongoDB(confData)
-	postRepo := data.NewPostRepo(db, zapLogger, client)
-	postUsecase := biz.NewPostUsecase(postRepo, zapLogger)
-	postService := service.NewPostService(postUsecase)
+	dataData, cleanup, err := data.NewData(confData, confService, db, cmdable, logger, client)
+	if err != nil {
+		return nil, nil, err
+	}
+	zapLogger := data.NewLogger()
+	postData := data.NewPostData(dataData, zapLogger)
+	postBiz := biz.NewPostBiz(postData)
+	postService := service.NewPostService(postBiz)
 	grpcServer := server.NewGRPCServer(confServer, postService)
 	httpServer := server.NewHTTPServer(confServer, postService)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }

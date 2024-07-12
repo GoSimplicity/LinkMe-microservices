@@ -16,7 +16,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewDB, NewRedis, NewPostRepo, NewLogger, NewMongoDB)
+var ProviderSet = wire.NewSet(NewData, NewDB, NewRedis, NewLogger, NewMongoDB, NewPostData)
 
 // Data .
 type Data struct {
@@ -27,7 +27,7 @@ type Data struct {
 }
 
 // NewData .
-func NewData(c *conf.Data, cs *conf.Service, db *gorm.DB, redis redis.Cmdable, logger log.Logger) (*Data, func(), error) {
+func NewData(c *conf.Data, cs *conf.Service, db *gorm.DB, redis redis.Cmdable, logger log.Logger, mongo *mongo.Client) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 		sqlDB, err := db.DB()
@@ -38,8 +38,7 @@ func NewData(c *conf.Data, cs *conf.Service, db *gorm.DB, redis redis.Cmdable, l
 			log.NewHelper(logger).Error("failed to close database connection", er)
 		}
 	}
-
-	return &Data{db: db, redis: redis, cs: cs}, cleanup, nil
+	return &Data{db: db, redis: redis, cs: cs, mongo: mongo}, cleanup, nil
 }
 
 // NewDB initializes the database.

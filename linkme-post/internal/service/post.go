@@ -2,74 +2,285 @@ package service
 
 import (
 	"context"
+	"errors"
+	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/golang/protobuf/ptypes/empty"
 	pb "linkme-post/api/post/v1"
 	"linkme-post/domain"
 	"linkme-post/internal/biz"
+	"strconv"
 )
 
 type PostService struct {
 	pb.UnimplementedPostServer
-	biz *biz.PostUsecase
+	biz *biz.PostBiz
 }
 
-func NewPostService(biz *biz.PostUsecase) *PostService {
+func NewPostService(biz *biz.PostBiz) *PostService {
 	return &PostService{
 		biz: biz,
 	}
 }
 
 func (s *PostService) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.CreatePostReply, error) {
-	post, err := s.biz.CreatePost(ctx, domain.Post{
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.CreatePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	postId, err := s.biz.CreatePost(ctx, domain.Post{
 		Title:   req.Title,
 		Content: req.Content,
+		UserID:  userId,
 		Plate:   domain.Plate{ID: req.PlateId},
 	})
 	if err != nil {
-		return nil, err
+		return &pb.CreatePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
 	}
 	return &pb.CreatePostReply{
 		Code: 0,
 		Msg:  "create post success",
-		Data: string(post),
+		Data: postId,
 	}, nil
 }
 func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.UpdatePostReply, error) {
-	return &pb.UpdatePostReply{}, nil
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.UpdatePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	err = s.biz.UpdatePost(ctx, domain.Post{
+		ID:      req.PostId,
+		Title:   req.Title,
+		Content: req.Content,
+		UserID:  userId,
+		Plate:   domain.Plate{ID: req.PlateId},
+	})
+	if err != nil {
+		return &pb.UpdatePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.UpdatePostReply{
+		Code: 0,
+		Msg:  "update post success",
+	}, nil
 }
 func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*pb.DeletePostReply, error) {
-	return &pb.DeletePostReply{}, nil
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.DeletePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	err = s.biz.DeletePost(ctx, req.PostId, userId)
+	if err != nil {
+		return &pb.DeletePostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.DeletePostReply{
+		Code: 0,
+		Msg:  "delete post success",
+	}, nil
 }
 func (s *PostService) PublishPost(ctx context.Context, req *pb.PublishPostRequest) (*pb.PublishPostReply, error) {
-	return &pb.PublishPostReply{}, nil
+	// TODO 暂时保留
+	return &pb.PublishPostReply{
+		Code: 0,
+		Msg:  "publish post success",
+	}, nil
 }
 func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequest) (*pb.WithdrawPostReply, error) {
-	return &pb.WithdrawPostReply{}, nil
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.WithdrawPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	dp := domain.Post{
+		ID:     req.PostId,
+		UserID: userId,
+		Status: domain.Withdrawn,
+	}
+	err = s.biz.UpdatePostStatus(ctx, dp)
+	if err != nil {
+		return &pb.WithdrawPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.WithdrawPostReply{
+		Code: 0,
+		Msg:  "withdraw post success",
+	}, nil
 }
 func (s *PostService) ListPost(ctx context.Context, req *pb.ListPostRequest) (*pb.ListPostReply, error) {
-	return &pb.ListPostReply{}, nil
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.ListPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	pagination := domain.Pagination{
+		Page: int(req.Page),
+		Size: &req.Size,
+		Uid:  userId,
+	}
+	posts, err := s.biz.ListPost(ctx, pagination)
+	if err != nil {
+		return &pb.ListPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	pbPosts := make([]*pb.ListPost, len(posts))
+	for i, post := range posts {
+		pbPosts[i] = &pb.ListPost{
+			Id:        post.ID,
+			Title:     post.Title,
+			Content:   post.Content,
+			CreatedAt: post.CreateAt,
+			UpdatedAt: post.UpdatedAt,
+			UserId:    post.UserID,
+			PlateId:   post.Plate.ID,
+		}
+	}
+	return &pb.ListPostReply{
+		Code: 0,
+		Msg:  "list post success",
+		Data: pbPosts,
+	}, nil
 }
 func (s *PostService) ListPubPost(ctx context.Context, req *pb.ListPubPostRequest) (*pb.ListPubPostReply, error) {
-	return &pb.ListPubPostReply{}, nil
+	pagination := domain.Pagination{
+		Page: int(req.Page),
+		Size: &req.Size,
+	}
+	posts, err := s.biz.ListPubPost(ctx, pagination)
+	if err != nil {
+		return &pb.ListPubPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	pbPosts := make([]*pb.ListPost, len(posts))
+	for i, post := range posts {
+		pbPosts[i] = &pb.ListPost{
+			Id:        post.ID,
+			Title:     post.Title,
+			Content:   post.Content,
+			CreatedAt: post.CreateAt,
+			UpdatedAt: post.UpdatedAt,
+			UserId:    post.UserID,
+			PlateId:   post.Plate.ID,
+		}
+	}
+	return &pb.ListPubPostReply{
+		Code: 0,
+		Msg:  "list post success",
+		Data: pbPosts,
+	}, nil
 }
+
 func (s *PostService) ListAdminPost(ctx context.Context, req *pb.ListAdminPostRequest) (*pb.ListAdminPostReply, error) {
+	// TODO 暂时保留
 	return &pb.ListAdminPostReply{}, nil
 }
 func (s *PostService) DetailPost(ctx context.Context, req *pb.DetailPostRequest) (*pb.DetailPostReply, error) {
-	return &pb.DetailPostReply{}, nil
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return &pb.DetailPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	post, err := s.biz.GetPost(ctx, req.PostId, userId)
+	if err != nil {
+		return &pb.DetailPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.DetailPostReply{
+		Code: 0,
+		Msg:  "get post success",
+		Data: &pb.DetailPost{
+			Id:        post.ID,
+			Title:     post.Title,
+			Content:   post.Content,
+			CreatedAt: post.CreateAt,
+			UpdatedAt: post.UpdatedAt,
+			UserId:    post.UserID,
+			PlateId:   post.Plate.ID,
+		},
+	}, nil
 }
 func (s *PostService) DetailPubPost(ctx context.Context, req *pb.DetailPubPostRequest) (*pb.DetailPubPostReply, error) {
-	return &pb.DetailPubPostReply{}, nil
+	post, err := s.biz.GetPubPost(ctx, req.PostId)
+	if err != nil {
+		return &pb.DetailPubPostReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.DetailPubPostReply{
+		Code: 0,
+		Msg:  "get pub post success",
+		Data: &pb.DetailPost{
+			Id:           post.ID,
+			Title:        post.Title,
+			Content:      post.Content,
+			CreatedAt:    post.CreateAt,
+			UpdatedAt:    post.UpdatedAt,
+			UserId:       post.UserID,
+			PlateId:      post.Plate.ID,
+			LikeCount:    post.LikeNum,
+			CollectCount: post.CollectNum,
+			ViewCount:    post.ViewNum,
+		},
+	}, nil
 }
 func (s *PostService) DetailAdminPost(ctx context.Context, req *pb.DetailAdminPostRequest) (*pb.DetailAdminPostReply, error) {
+	// TODO 暂时保留
 	return &pb.DetailAdminPostReply{}, nil
 }
 func (s *PostService) GetPostStats(ctx context.Context, req *empty.Empty) (*pb.GetPostStatsReply, error) {
+	// TODO 暂时保留
 	return &pb.GetPostStatsReply{}, nil
 }
 func (s *PostService) LikePost(ctx context.Context, req *pb.LikePostRequest) (*pb.LikePostReply, error) {
+	// TODO 暂时保留
 	return &pb.LikePostReply{}, nil
 }
 func (s *PostService) CollectPost(ctx context.Context, req *pb.CollectPostRequest) (*pb.CollectPostReply, error) {
+	// TODO 暂时保留
 	return &pb.CollectPostReply{}, nil
+}
+
+func getUserId(ctx context.Context) (int64, error) {
+	userId := ""
+	if ht, ok := http.RequestFromServerContext(ctx); ok {
+		userId = ht.Header.Get("x-user-id")
+	}
+	if userId == "" {
+		return -1, errors.New("user not found")
+	}
+	parseInt, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		return -1, err
+	}
+	return parseInt, nil
 }
