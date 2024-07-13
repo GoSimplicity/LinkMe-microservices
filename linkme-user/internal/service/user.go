@@ -18,13 +18,13 @@ const (
 
 type UserService struct {
 	pb.UnimplementedUserServer
-	uc       *biz.UserUsecase
+	uc       *biz.UserBiz
 	Email    *regexp.Regexp
 	PassWord *regexp.Regexp
 	ijwt     data.Handler
 }
 
-func NewUserService(uc *biz.UserUsecase, ijwt data.Handler) *UserService {
+func NewUserService(uc *biz.UserBiz, ijwt data.Handler) *UserService {
 	return &UserService{
 		uc:       uc,
 		Email:    regexp.MustCompile(emailRegexPattern, regexp.None),
@@ -75,7 +75,7 @@ func (s *UserService) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.Si
 	})
 	if err != nil {
 		// 检查是否为重复邮箱错误
-		if errors.Is(err, data.ErrDuplicateEmail) {
+		if errors.Is(err, biz.ErrDuplicateEmail) {
 			return &pb.SignUpReply{
 				Code: 1,
 				Msg:  "Email already exists",
@@ -94,7 +94,7 @@ func (s *UserService) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.Si
 func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
 	du, err := s.uc.Login(ctx, req.Email, req.Password)
 	if err != nil {
-		if errors.Is(err, data.ErrInvalidUserOrPassword) {
+		if errors.Is(err, biz.ErrInvalidUserOrPassword) {
 			return &pb.LoginReply{
 				Code: 1,
 				Msg:  "username or password is incorrect",
@@ -136,7 +136,7 @@ func (s *UserService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequ
 	tokenString := s.ijwt.ExtractToken(ctx)
 	// 解析token
 	token, err := jwt.ParseWithClaims(tokenString, &rc, func(token *jwt.Token) (interface{}, error) {
-		return data.Key2, nil
+		return data.Secret2, nil
 	})
 	if err != nil {
 		return &pb.RefreshTokenReply{
@@ -180,7 +180,7 @@ func (s *UserService) ChangePassword(ctx context.Context, req *pb.ChangePassword
 	}
 	err := s.uc.ChangePassword(ctx, req.Email, req.Password, req.NewPassword, req.ConfirmPassword)
 	if err != nil {
-		if errors.Is(err, data.ErrInvalidUserOrPassword) {
+		if errors.Is(err, biz.ErrInvalidUserOrPassword) {
 			return &pb.ChangePasswordReply{
 				Code: 1,
 				Msg:  "username or password is incorrect",
