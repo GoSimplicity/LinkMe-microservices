@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	Key1 = []byte("sadfkhjlkkljKFJDSLAFUDASLFJKLjfj113d1")
-	Key2 = []byte("sadfkhjlkkljKFJDSLAFUDASLFJKLjfj113d2")
+	// Secret 使用Kong生成的密钥和密文信息
+	Secret  = []byte("5DkrvBREmh3Y7JLQzFJAhRvNmjvujZwA")
+	Secret2 = []byte("eBjPE1m8gUxsgtQ706DuHzM23AwrBc8F")
+	Key     = "t4ZG9bnCdTi9BXaUdzh6hipU1BYxKGZf"
 )
 
 type Handler interface {
@@ -82,11 +84,12 @@ func (h *handler) SetJWTToken(ctx context.Context, uid int64, ssid string) (stri
 		ContentType: tr.RequestHeader().Get("Content-Type"),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
+			Issuer:    Key, // 使用Kong生成的key
 		},
 	}
 	token := jwt.NewWithClaims(h.signingMethod, uc)
 	// 进行签名
-	signedString, err := token.SignedString(Key1)
+	signedString, err := token.SignedString(Secret)
 	if err != nil {
 		return "", err
 	}
@@ -101,10 +104,11 @@ func (h *handler) setRefreshToken(ctx context.Context, uid int64, ssid string) (
 		RegisteredClaims: jwt.RegisteredClaims{
 			// 设置刷新时间为一周
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(h.rcExpiration)),
+			Issuer:    Key, // 使用Kong生成的key
 		},
 	}
 	t := jwt.NewWithClaims(h.signingMethod, rc)
-	signedString, err := t.SignedString(Key2)
+	signedString, err := t.SignedString(Secret2)
 	if err != nil {
 		return "", err
 	}
@@ -161,7 +165,7 @@ func (h *handler) ClearToken(ctx context.Context) error {
 	// 解析 refresh token
 	refreshClaims := &RefreshClaims{}
 	refreshToken, err := jwt.ParseWithClaims(refreshTokenString, refreshClaims, func(token *jwt.Token) (interface{}, error) {
-		return Key2, nil
+		return Secret, nil
 	})
 	if err != nil || !refreshToken.Valid {
 		return errors.New("invalid refresh token")

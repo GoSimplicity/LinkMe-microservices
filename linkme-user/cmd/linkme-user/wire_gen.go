@@ -29,17 +29,22 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	if err != nil {
 		return nil, nil, err
 	}
+	cmdable := data.NewRedis(confData)
+	dataData, cleanup, err := data.NewData(confData, confService, db, cmdable, logger)
+	if err != nil {
+		return nil, nil, err
+	}
 	zapLogger := data.NewLogger()
 	node := data.NewSnowflake()
-	userRepo := data.NewUserRepo(db, zapLogger, node)
-	userUsecase := biz.NewUserUsecase(userRepo, zapLogger)
-	cmdable := data.NewRedis(confData)
+	userInteractive := data.NewUserData(dataData, zapLogger, node)
+	userBiz := biz.NewUserBiz(userInteractive, zapLogger)
 	handler := data.NewJWT(cmdable)
-	userService := service.NewUserService(userUsecase, handler)
+	userService := service.NewUserService(userBiz, handler)
 	grpcServer := server.NewGRPCServer(confServer, userService)
 	jwtMiddleware := middleware.NewJWTMiddleware(handler)
 	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }
