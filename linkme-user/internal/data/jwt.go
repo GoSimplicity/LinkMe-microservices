@@ -26,6 +26,7 @@ type Handler interface {
 	CheckSession(ctx context.Context, ssid string) error
 	ClearToken(ctx context.Context) error
 	setRefreshToken(ctx context.Context, uid int64, ssid string) (string, error)
+	GetUserInfo(ctx context.Context, tokenStr string) (*UserClaims, error)
 }
 
 type UserClaims struct {
@@ -176,4 +177,28 @@ func (h *handler) ClearToken(ctx context.Context) error {
 		return er
 	}
 	return nil
+}
+
+func (h *handler) GetUserInfo(ctx context.Context, tokenStr string) (*UserClaims, error) {
+	if tokenStr == "" {
+		return nil, errors.New("token is empty")
+	}
+	var uc UserClaims
+	token, err := jwt.ParseWithClaims(tokenStr, &uc, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return Secret, nil
+	})
+	err = h.CheckSession(ctx, uc.Ssid)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	return &uc, nil
 }

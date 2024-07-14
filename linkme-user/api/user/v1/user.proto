@@ -54,7 +54,9 @@ service User {
       body: "*"
     };
   }
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoReply);
 }
+
 
 message SignUpRequest {
   string email = 1;
@@ -142,6 +144,16 @@ message UpdateProfileRequest {
 message UpdateProfileReply {
   int32 code = 1;
   string msg = 2;
+}
+
+message GetUserInfoRequest {
+  string token = 1;
+}
+
+message GetUserInfoReply {
+  int32 code = 1;
+  string msg = 2;
+  int64 userId = 3;
 }
 
 message Profile {

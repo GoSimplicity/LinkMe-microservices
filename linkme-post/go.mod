@@ -1,8 +1,6 @@
 module linkme-post
 
-go 1.21
-
-toolchain go1.22.3
+go 1.22.3
 
 require (
 	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240627104009-3198e0b83bf2
@@ -14,7 +12,7 @@ require (
 	go.mongodb.org/mongo-driver v1.12.0-prerelease
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/zap v1.27.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157
+	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 	gorm.io/driver/mysql v1.5.7
@@ -22,6 +20,7 @@ require (
 )
 
 require (
+	github.com/GoSimplicity/LinkMe-monorepo v0.0.0-20240714083112-e19e81dce3c2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect

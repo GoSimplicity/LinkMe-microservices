@@ -2,18 +2,21 @@ package service
 
 import (
 	"context"
-	"errors"
-	"github.com/go-kratos/kratos/v2/transport/http"
+	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
+	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	pb "linkme-post/api/post/v1"
 	"linkme-post/domain"
 	"linkme-post/internal/biz"
-	"strconv"
+	"time"
 )
 
 type PostService struct {
 	pb.UnimplementedPostServer
-	biz *biz.PostBiz
+	userClient userpb.UserClient
+	biz        *biz.PostBiz
 }
 
 func NewPostService(biz *biz.PostBiz) *PostService {
@@ -23,7 +26,7 @@ func NewPostService(biz *biz.PostBiz) *PostService {
 }
 
 func (s *PostService) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.CreatePostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.CreatePostReply{
 			Code: 1,
@@ -49,7 +52,7 @@ func (s *PostService) CreatePost(ctx context.Context, req *pb.CreatePostRequest)
 	}, nil
 }
 func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.UpdatePostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.UpdatePostReply{
 			Code: 1,
@@ -75,7 +78,7 @@ func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest)
 	}, nil
 }
 func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*pb.DeletePostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.DeletePostReply{
 			Code: 1,
@@ -102,7 +105,7 @@ func (s *PostService) PublishPost(ctx context.Context, req *pb.PublishPostReques
 	}, nil
 }
 func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequest) (*pb.WithdrawPostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.WithdrawPostReply{
 			Code: 1,
@@ -127,7 +130,7 @@ func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequ
 	}, nil
 }
 func (s *PostService) ListPost(ctx context.Context, req *pb.ListPostRequest) (*pb.ListPostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.ListPostReply{
 			Code: 1,
@@ -200,7 +203,7 @@ func (s *PostService) ListAdminPost(ctx context.Context, req *pb.ListAdminPostRe
 	return &pb.ListAdminPostReply{}, nil
 }
 func (s *PostService) DetailPost(ctx context.Context, req *pb.DetailPostRequest) (*pb.DetailPostReply, error) {
-	userId, err := getUserId(ctx)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.DetailPostReply{
 			Code: 1,
@@ -270,17 +273,38 @@ func (s *PostService) CollectPost(ctx context.Context, req *pb.CollectPostReques
 	return &pb.CollectPostReply{}, nil
 }
 
-func getUserId(ctx context.Context) (int64, error) {
-	userId := ""
-	if ht, ok := http.RequestFromServerContext(ctx); ok {
-		userId = ht.Header.Get("x-user-id")
-	}
-	if userId == "" {
-		return -1, errors.New("user not found")
-	}
-	parseInt, err := strconv.ParseInt(userId, 10, 64)
+func (s *PostService) getUserId(ctx context.Context) (int64, error) {
+	// Initialize etcd client
+	etcdClient, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"127.0.0.1:2379"},
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		return -1, err
 	}
-	return parseInt, nil
+	defer etcdClient.Close()
+	// Initialize etcd registry
+	r := etcd.New(etcdClient)
+	// Initialize gRPC connection with service discovery
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint("discovery:///linkme-user"),
+		grpc.WithDiscovery(r),
+	)
+	if err != nil {
+		return -1, err
+	}
+	defer conn.Close()
+	// Initialize user client
+	userClient := userpb.NewUserClient(conn)
+	token := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0NFpHOWJuQ2RUaTlCWGFVZHpoNmhpcFUxQll4S0daZiIsImV4cCI6MTcyMDk1NjgwMCwiVWlkIjoyMTE0NDE5NDIzMTgzMjU3NiwiU3NpZCI6ImY2NDhlYWM2LWZkODItNDY2MS1hNTZlLWZkNjI0MTJiMmNmYiIsIlVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMjQuMC4wLjAgU2FmYXJpLzUzNy4zNiIsIkNvbnRlbnRUeXBlIjoiYXBwbGljYXRpb24vanNvbiJ9.cOHuBPXVkbgd4vmY9wlEGkWYpFIz4-9y5as5Wp2gwE-BZE1gjXIxsaoAHDDRxVMUQDpeNUfwSXUXqK_Y01dqFg"
+	// Create request to get user info
+	req := &userpb.GetUserInfoRequest{Token: token}
+	// Call GetUserInfo method
+	info, err := userClient.GetUserInfo(ctx, req)
+	if err != nil {
+		return -1, err
+	}
+
+	return info.UserId, nil
 }
