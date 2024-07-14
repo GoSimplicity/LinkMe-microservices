@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"flag"
+	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/uuid"
@@ -80,8 +82,11 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
-
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, logger)
+	userClient, err := initUserClient(bc.Service, logger)
+	if err != nil {
+		panic(err)
+	}
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, logger)
 	if err != nil {
 		panic(err)
 	}
@@ -104,4 +109,26 @@ func initServiceRegistry(c *conf.Service) registry.Registrar {
 	}
 	reg := etcd.New(client)
 	return reg
+}
+
+// 初始化用户客户端
+func initUserClient(c *conf.Service, logger log.Logger) (userpb.UserClient, error) {
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   c.Etcd.Addr,
+		DialTimeout: c.Etcd.Timeout.AsDuration(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	r := etcd.New(client)
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint("discovery:///linkme-user"),
+		grpc.WithDiscovery(r),
+		grpc.WithLogger(logger),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return userpb.NewUserClient(conn), nil
 }

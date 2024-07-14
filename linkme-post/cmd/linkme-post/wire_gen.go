@@ -7,6 +7,7 @@
 package main
 
 import (
+	"github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"linkme-post/internal/biz"
@@ -23,7 +24,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, logger log.Logger) (*kratos.App, func(), error) {
 	db, err := data.NewDB(confData)
 	if err != nil {
 		return nil, nil, err
@@ -37,7 +38,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	zapLogger := data.NewLogger()
 	postData := data.NewPostData(dataData, zapLogger)
 	postBiz := biz.NewPostBiz(postData)
-	postService := service.NewPostService(postBiz)
+	postService := service.NewPostService(postBiz, userClient)
 	grpcServer := server.NewGRPCServer(confServer, postService)
 	httpServer := server.NewHTTPServer(confServer, postService)
 	app := newApp(confService, logger, grpcServer, httpServer)

@@ -3,14 +3,10 @@ package service
 import (
 	"context"
 	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
-	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
-	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/golang/protobuf/ptypes/empty"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	pb "linkme-post/api/post/v1"
 	"linkme-post/domain"
 	"linkme-post/internal/biz"
-	"time"
 )
 
 type PostService struct {
@@ -19,9 +15,10 @@ type PostService struct {
 	biz        *biz.PostBiz
 }
 
-func NewPostService(biz *biz.PostBiz) *PostService {
+func NewPostService(biz *biz.PostBiz, userClient userpb.UserClient) *PostService {
 	return &PostService{
-		biz: biz,
+		biz:        biz,
+		userClient: userClient,
 	}
 }
 
@@ -273,38 +270,12 @@ func (s *PostService) CollectPost(ctx context.Context, req *pb.CollectPostReques
 	return &pb.CollectPostReply{}, nil
 }
 
+// 通过grpc调用linkme-user模块方法，获取userId
 func (s *PostService) getUserId(ctx context.Context) (int64, error) {
-	// Initialize etcd client
-	etcdClient, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"127.0.0.1:2379"},
-		DialTimeout: 5 * time.Second,
-	})
+	token := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0NFpHOWJuQ2RUaTlCWGFVZHpoNmhpcFUxQll4S0daZiIsImV4cCI6MTcyMDk2MTQ3MCwiVWlkIjoyMTE0NDE5NDIzMTgzMjU3NiwiU3NpZCI6IjYyNTYyMzcyLThlZjMtNDAwYS05ZTYwLTllYWIzZTY4ZjQ3OSIsIlVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMjQuMC4wLjAgU2FmYXJpLzUzNy4zNiIsIkNvbnRlbnRUeXBlIjoiYXBwbGljYXRpb24vanNvbiJ9.pHGkc8EzucCq2E6gjS3Q8u2eKwPxyd0ORPvgSP9DvTlRtNjnDMrAUvUkYfFpOiwvV9qnbZnN6bNFJPlX3YKovg"
+	info, err := s.userClient.GetUserInfo(ctx, &userpb.GetUserInfoRequest{Token: token})
 	if err != nil {
 		return -1, err
 	}
-	defer etcdClient.Close()
-	// Initialize etcd registry
-	r := etcd.New(etcdClient)
-	// Initialize gRPC connection with service discovery
-	conn, err := grpc.DialInsecure(
-		context.Background(),
-		grpc.WithEndpoint("discovery:///linkme-user"),
-		grpc.WithDiscovery(r),
-	)
-	if err != nil {
-		return -1, err
-	}
-	defer conn.Close()
-	// Initialize user client
-	userClient := userpb.NewUserClient(conn)
-	token := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0NFpHOWJuQ2RUaTlCWGFVZHpoNmhpcFUxQll4S0daZiIsImV4cCI6MTcyMDk1NjgwMCwiVWlkIjoyMTE0NDE5NDIzMTgzMjU3NiwiU3NpZCI6ImY2NDhlYWM2LWZkODItNDY2MS1hNTZlLWZkNjI0MTJiMmNmYiIsIlVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMjQuMC4wLjAgU2FmYXJpLzUzNy4zNiIsIkNvbnRlbnRUeXBlIjoiYXBwbGljYXRpb24vanNvbiJ9.cOHuBPXVkbgd4vmY9wlEGkWYpFIz4-9y5as5Wp2gwE-BZE1gjXIxsaoAHDDRxVMUQDpeNUfwSXUXqK_Y01dqFg"
-	// Create request to get user info
-	req := &userpb.GetUserInfoRequest{Token: token}
-	// Call GetUserInfo method
-	info, err := userClient.GetUserInfo(ctx, req)
-	if err != nil {
-		return -1, err
-	}
-
 	return info.UserId, nil
 }
