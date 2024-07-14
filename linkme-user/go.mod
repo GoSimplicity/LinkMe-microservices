@@ -24,6 +24,7 @@ require (
 )
 
 require (
+	github.com/GoSimplicity/LinkMe-monorepo v0.0.0-20240708111652-39ce768854cf // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect

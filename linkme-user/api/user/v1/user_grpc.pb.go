@@ -27,6 +27,7 @@ const (
 	User_WriteOff_FullMethodName       = "/api.user.v1.User/WriteOff"
 	User_GetProfile_FullMethodName     = "/api.user.v1.User/GetProfile"
 	User_UpdateProfile_FullMethodName  = "/api.user.v1.User/UpdateProfile"
+	User_GetUserInfo_FullMethodName    = "/api.user.v1.User/GetUserInfo"
 )
 
 // UserClient is the client API for User service.
@@ -41,6 +42,7 @@ type UserClient interface {
 	WriteOff(ctx context.Context, in *WriteOffRequest, opts ...grpc.CallOption) (*WriteOffReply, error)
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileReply, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UpdateProfileReply, error)
+	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoReply, error)
 }
 
 type userClient struct {
@@ -131,6 +133,16 @@ func (c *userClient) UpdateProfile(ctx context.Context, in *UpdateProfileRequest
 	return out, nil
 }
 
+func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserInfoReply)
+	err := c.cc.Invoke(ctx, User_GetUserInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -143,6 +155,7 @@ type UserServer interface {
 	WriteOff(context.Context, *WriteOffRequest) (*WriteOffReply, error)
 	GetProfile(context.Context, *GetProfileRequest) (*GetProfileReply, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileReply, error)
+	GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -173,6 +186,9 @@ func (UnimplementedUserServer) GetProfile(context.Context, *GetProfileRequest) (
 }
 func (UnimplementedUserServer) UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProfile not implemented")
+}
+func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -331,6 +347,24 @@ func _User_UpdateProfile_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetUserInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserInfo(ctx, req.(*GetUserInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -369,6 +403,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateProfile",
 			Handler:    _User_UpdateProfile_Handler,
+		},
+		{
+			MethodName: "GetUserInfo",
+			Handler:    _User_GetUserInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

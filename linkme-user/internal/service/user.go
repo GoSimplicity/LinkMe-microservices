@@ -117,7 +117,7 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	}, nil
 }
 
-func (s *UserService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutReply, error) {
+func (s *UserService) Logout(ctx context.Context, _ *pb.LogoutRequest) (*pb.LogoutReply, error) {
 	// 清除JWT令牌
 	if err := s.ijwt.ClearToken(ctx); err != nil {
 		return &pb.LogoutReply{
@@ -130,7 +130,7 @@ func (s *UserService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 		Msg:  "User logout successful",
 	}, nil
 }
-func (s *UserService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenReply, error) {
+func (s *UserService) RefreshToken(ctx context.Context, _ *pb.RefreshTokenRequest) (*pb.RefreshTokenReply, error) {
 	var rc data.RefreshClaims
 	// 从前端的Authorization中取出token
 	tokenString := s.ijwt.ExtractToken(ctx)
@@ -275,5 +275,20 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *pb.UpdateProfileRe
 	return &pb.UpdateProfileReply{
 		Code: 0,
 		Msg:  "Profile update successful",
+	}, nil
+}
+
+func (s *UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoReply, error) {
+	info, err := s.ijwt.GetUserInfo(ctx, req.Token)
+	if err != nil {
+		return &pb.GetUserInfoReply{
+			Code: 1,
+			Msg:  "User get info failed",
+		}, err
+	}
+	return &pb.GetUserInfoReply{
+		Code:   0,
+		Msg:    "User get info successful",
+		UserId: info.Uid,
 	}, nil
 }
