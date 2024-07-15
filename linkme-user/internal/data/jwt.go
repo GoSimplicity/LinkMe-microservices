@@ -14,9 +14,9 @@ import (
 
 var (
 	// Secret 使用Kong生成的密钥和密文信息
-	Secret  = []byte("5DkrvBREmh3Y7JLQzFJAhRvNmjvujZwA")
+	Secret  = []byte("HvtqM5Exc9QqLKY61fPHuU85nPAJyuoo")
 	Secret2 = []byte("eBjPE1m8gUxsgtQ706DuHzM23AwrBc8F")
-	Key     = "t4ZG9bnCdTi9BXaUdzh6hipU1BYxKGZf"
+	Key     = "wQkDdN53pk2voNJX5scgme8aNaAUh0ct"
 )
 
 type Handler interface {
