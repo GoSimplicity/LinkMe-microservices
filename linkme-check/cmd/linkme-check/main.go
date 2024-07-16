@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/google/uuid"
 	"os"
 
 	"linkme-check/internal/conf"
@@ -20,13 +21,13 @@ import (
 // go build -ldflags "-X main.Version=x.y.z"
 var (
 	// Name is the name of the compiled software.
-	Name string
+	Name = "linkme-check"
 	// Version is the version of the compiled software.
-	Version string
+	Version = "v1.0.0"
 	// flagconf is the config flag.
 	flagconf string
-
-	id, _ = os.Hostname()
+	// id, _ = os.Hostname()
+	id = Name + "-" + uuid.NewString()
 )
 
 func init() {
