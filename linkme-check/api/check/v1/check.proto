@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package api.check.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "linkme-check/api/check/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.check.v1";
+
+service Check {
+	rpc CreateCheck(CreateCheckRequest) returns (CreateCheckReply);
+	rpc DeleteCheck(DeleteCheckRequest) returns (DeleteCheckReply) {
+		option (google.api.http) = {
+			delete: "/delete/{checkId}"
+		};
+	}
+	rpc UpdateCheck(UpdateCheckRequest) returns (UpdateCheckReply) {
+		option (google.api.http) = {
+			post: "/update"
+			body: "*"
+		};
+	}
+	rpc GetCheckById(GetCheckByIdRequest) returns (GetCheckByIdReply) {
+		option (google.api.http) = {
+			get: "/get/{checkId}"
+		};
+	}
+	rpc ListChecks(ListChecksRequest) returns (ListChecksReply) {
+		option (google.api.http) = {
+			get: "/list"
+		};
+	}
+	rpc SubmitCheck(SubmitCheckRequest) returns (SubmitCheckReply) {
+		option (google.api.http) = {
+			post: "/submit"
+			body: "*"
+		};
+	}
+	rpc BatchDeleteChecks(BatchDeleteChecksRequest) returns (BatchDeleteChecksReply) {
+		option (google.api.http) = {
+			post: "/batch_delete"
+			body: "*"
+		};
+	}
+	rpc BatchSubmitChecks(BatchSubmitChecksRequest) returns (BatchSubmitChecksReply) {
+		option (google.api.http) = {
+			post: "/batch_submit"
+			body: "*"
+		};
+	}
+}
+
+message CreateCheckRequest {
+	ListOrGetCheck check = 1;
+}
+
+message CreateCheckReply {
+	int32 code = 1;
+	string msg = 2;
+	int64 checkId = 3;
+}
+
+message DeleteCheckRequest {
+	int64 checkId = 1;
+}
+
+message DeleteCheckReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message UpdateCheckRequest {
+	ListOrGetCheck check = 1;
+}
+
+message UpdateCheckReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message GetCheckByIdRequest {
+	int64 checkId = 1;
+}
+
+message GetCheckByIdReply {
+	int32 code = 1;
+	string msg = 2;
+	ListOrGetCheck data = 3;
+}
+
+message ListChecksRequest {
+	Pagination pagination = 1;
+	string status = 2;
+}
+
+message ListChecksReply {
+	int32 code = 1;
+	string msg = 2;
+	repeated ListOrGetCheck data = 3;
+}
+
+message SubmitCheckRequest {
+	int64 checkId = 1;
+	bool approved = 2;
+}
+
+message SubmitCheckReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message BatchDeleteChecksRequest {
+	repeated int64 checkIds = 1;
+}
+
+message BatchDeleteChecksReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message BatchSubmitChecksRequest {
+	repeated ListOrGetCheck checks = 1;
+}
+
+message BatchSubmitChecksReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message ListOrGetCheck {
+	int64 id = 1;                   // 审核ID
+	int64 post_id = 2;              // 帖子ID
+	string content = 3;             // 审核内容
+	string title = 4;               // 审核标签
+	int64 user_id = 5;              // 提交审核的用户ID
+	string status = 6;              // 审核状态
+	string remark = 7;              // 审核备注
+	int64 created_at = 8;           // 创建时间
+	int64 updated_at = 9;           // 更新时间
+}
+
+message Pagination {
+	int32 page = 1;                 // 当前页码
+	int64 size = 2;                 // 每页数据
+	int64 uid = 3;                  // 用户ID
+	int64 offset = 4;               // 数据偏移量
+	int64 total = 5;                // 总数据量
+}
