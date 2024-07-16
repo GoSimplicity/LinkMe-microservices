@@ -33,27 +33,14 @@ LinkMe 是一个使用 Go 语言开发的论坛项目。它旨在为用户提供
 ## 目录结构
 ```
 .
-├── api             # gRPC API 定义
-├── cmd             # 服务的入口文件
-├── config          # 项目配置文件目录
-├── docs            # API文档目录
+├── api             # proto文件
+├── app             # 核心业务逻辑
+├── deploy          # 集成部署
+├── doc             # 项目文档
 ├── go.mod          # Go模块定义文件
 ├── go.sum          # Go模块依赖校验和
-├── internal        # 项目内部包，含核心业务逻辑
-│   ├── biz         # 业务逻辑层
-│   ├── data        # 数据访问层
-│   ├── service     # 服务层
-│   ├── server      # 服务器启动与路由层
-│   └── middleware  # 中间件
-├── pkg             # 自定义工具包与库
-├── scripts         # 脚本文件
-├── test            # 测试文件
-├── third_party     # 第三方库
 ├── LICENSE         # 开源许可证书
 ├── README.md       # 项目自述文件
-├── wire.go         # Wire 配置，声明依赖注入关系
-├── wire_gen.go     # Wire 工具生成的代码
-└── yaml            # Kubernetes 部署配置文件目录
 ```
 
 ## 如何贡献
