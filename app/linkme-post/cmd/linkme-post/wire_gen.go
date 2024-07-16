@@ -8,13 +8,13 @@ package main
 
 import (
 	"github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/biz"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/data"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/server"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"linkme-post/internal/biz"
-	"linkme-post/internal/conf"
-	"linkme-post/internal/data"
-	"linkme-post/internal/server"
-	"linkme-post/internal/service"
 )
 
 import (

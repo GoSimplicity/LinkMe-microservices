@@ -1,8 +1,8 @@
 package data
 
 import (
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
 	"github.com/IBM/sarama"
-	"linkme-check/internal/conf"
 )
 
 // NewSaramaClient 初始化一个新的 Sarama 客户端

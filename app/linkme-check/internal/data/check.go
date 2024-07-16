@@ -2,10 +2,10 @@ package data
 
 import (
 	"context"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"linkme-check/domain"
-	"linkme-check/internal/biz"
 )
 
 type Check struct {

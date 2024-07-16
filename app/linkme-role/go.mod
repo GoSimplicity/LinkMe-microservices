@@ -1,4 +1,4 @@
-module linkme-role
+module github.com/GoSimplicity/LinkMe/app/linkme-role
 
 go 1.19
 

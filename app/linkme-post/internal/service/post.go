@@ -2,11 +2,11 @@ package service
 
 import (
 	"context"
+	pb "github.com/GoSimplicity/LinkMe-monorepo/api/post/v1"
 	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/domain"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/biz"
 	"github.com/golang/protobuf/ptypes/empty"
-	pb "linkme-post/api/post/v1"
-	"linkme-post/domain"
-	"linkme-post/internal/biz"
 )
 
 type PostService struct {

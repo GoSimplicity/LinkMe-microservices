@@ -1,17 +1,16 @@
 package server
 
 import (
-	v1 "linkme-check/api/check/v1"
-	"linkme-check/internal/conf"
-	"linkme-check/internal/service"
+	v1 "github.com/GoSimplicity/LinkMe-monorepo/api/check/v1"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/service"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, checkSvc *service.CheckService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, checkSvc *service.CheckService) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

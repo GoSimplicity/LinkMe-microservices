@@ -7,13 +7,13 @@
 package main
 
 import (
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/data"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/server"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"linkme-check/internal/biz"
-	"linkme-check/internal/conf"
-	"linkme-check/internal/data"
-	"linkme-check/internal/server"
-	"linkme-check/internal/service"
 )
 
 import (
@@ -32,7 +32,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	checkData := data.NewCheckData(db, zapLogger)
 	checkBiz := biz.NewCheckBiz(checkData)
 	checkService := service.NewCheckService(checkBiz)
-	grpcServer := server.NewGRPCServer(confServer, checkService, logger)
+	grpcServer := server.NewGRPCServer(confServer, checkService)
 	httpServer := server.NewHTTPServer(confServer, checkService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {

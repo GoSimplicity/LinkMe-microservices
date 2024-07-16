@@ -1,4 +1,4 @@
-module linkme-ranking
+module github.com/GoSimplicity/LinkMe/app/linkme-ranking
 
 go 1.19
 

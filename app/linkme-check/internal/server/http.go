@@ -1,9 +1,9 @@
 package server
 
 import (
-	v1 "linkme-check/api/check/v1"
-	"linkme-check/internal/conf"
-	"linkme-check/internal/service"
+	v1 "github.com/GoSimplicity/LinkMe-monorepo/api/check/v1"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"

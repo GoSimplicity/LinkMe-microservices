@@ -1,4 +1,4 @@
-module linkme-interactive
+module github.com/GoSimplicity/LinkMe/app/linkme-interactive
 
 go 1.19
 

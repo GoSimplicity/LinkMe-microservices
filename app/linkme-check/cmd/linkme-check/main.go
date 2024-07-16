@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 	"os"
 
-	"linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"

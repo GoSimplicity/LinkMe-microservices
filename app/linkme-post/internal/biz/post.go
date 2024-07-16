@@ -3,8 +3,8 @@ package biz
 import (
 	"context"
 	"errors"
-	"linkme-post/api/post/v1"
-	"linkme-post/domain"
+	"github.com/GoSimplicity/LinkMe-monorepo/api/post/v1"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/domain"
 )
 
 var (

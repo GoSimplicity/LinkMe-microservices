@@ -2,12 +2,12 @@ package data
 
 import (
 	"fmt"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"linkme-check/internal/conf"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"

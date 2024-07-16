@@ -6,11 +6,11 @@
 package main
 
 import (
-	"linkme-check/internal/biz"
-	"linkme-check/internal/conf"
-	"linkme-check/internal/data"
-	"linkme-check/internal/server"
-	"linkme-check/internal/service"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/data"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/server"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/service"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"

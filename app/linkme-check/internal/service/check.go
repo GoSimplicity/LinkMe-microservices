@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"linkme-check/domain"
-	"linkme-check/internal/biz"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
 
-	pb "linkme-check/api/check/v1"
+	pb "github.com/GoSimplicity/LinkMe-monorepo/api/check/v1"
 )
 
 type CheckService struct {

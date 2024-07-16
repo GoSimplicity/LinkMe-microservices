@@ -2,7 +2,7 @@ package biz
 
 import (
 	"context"
-	"linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
 )
 
 type CheckData interface {

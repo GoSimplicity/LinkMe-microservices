@@ -3,13 +3,13 @@ package data
 import (
 	"context"
 	"fmt"
+	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"linkme-post/internal/conf"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
