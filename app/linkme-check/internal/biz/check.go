@@ -6,14 +6,14 @@ import (
 )
 
 type CheckData interface {
-	CreateCheck(ctx context.Context, check domain.Check) (int64, error)                                   // 创建审核记录
-	DeleteCheck(ctx context.Context, checkId int64) error                                                 // 删除审核记录
-	UpdateCheck(ctx context.Context, check domain.Check) error                                            // 更新审核记录
-	GetCheckById(ctx context.Context, checkId int64) (domain.Check, error)                                // 根据ID获取审核记录
-	ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error) // 获取审核列表，可按状态过滤
-	SubmitCheck(ctx context.Context, checkId int64, approved bool, comments string) error                 // 提交审核，包含通过或拒绝操作
-	BatchDeleteChecks(ctx context.Context, checkIds []int64) error                                        // 批量删除审核记录
-	BatchSubmitChecks(ctx context.Context, checks []domain.Check) error                                   // 批量提交审核记录
+	CreateCheck(ctx context.Context, check domain.Check) (int64, error)
+	DeleteCheck(ctx context.Context, checkId int64) error
+	UpdateCheck(ctx context.Context, check domain.Check) error
+	GetCheckById(ctx context.Context, checkId int64) (domain.Check, error)
+	ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error)
+	SubmitCheck(ctx context.Context, checkId int64, approved bool) error
+	BatchDeleteChecks(ctx context.Context, checkIds []int64) error
+	BatchSubmitChecks(ctx context.Context, checks []domain.Check) error
 }
 
 type CheckBiz struct {
@@ -21,50 +21,47 @@ type CheckBiz struct {
 }
 
 func NewCheckBiz(CheckData CheckData) *CheckBiz {
-	return &CheckBiz{
-		CheckData: CheckData,
-	}
+	return &CheckBiz{CheckData: CheckData}
 }
 
 func (cs *CheckBiz) CreateCheck(ctx context.Context, check domain.Check) (int64, error) {
-	checkId, err := cs.CheckData.CreateCheck(ctx, check)
-	if err != nil {
-		return -1, err
-	}
-	return checkId, nil
+	return cs.CheckData.CreateCheck(ctx, check)
 }
 
 func (cs *CheckBiz) DeleteCheck(ctx context.Context, checkId int64) error {
-	// 实现删除审核记录逻辑
-	return nil
+	return cs.CheckData.DeleteCheck(ctx, checkId)
 }
 
 func (cs *CheckBiz) UpdateCheck(ctx context.Context, check domain.Check) error {
-	// 实现更新审核记录逻辑
-	return nil
+	return cs.CheckData.UpdateCheck(ctx, check)
 }
 
 func (cs *CheckBiz) GetCheckById(ctx context.Context, checkId int64) (domain.Check, error) {
-	// 实现根据ID获取审核记录逻辑
-	return domain.Check{}, nil
+	check, err := cs.CheckData.GetCheckById(ctx, checkId)
+	if err != nil {
+		return domain.Check{}, err
+	}
+	return check, nil
 }
 
 func (cs *CheckBiz) ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error) {
-	// 实现获取审核记录列表逻辑，按状态过滤
-	return nil, nil
+	offset := int64(pagination.Page-1) * *pagination.Size
+	pagination.Offset = &offset
+	checks, err := cs.CheckData.ListChecks(ctx, pagination, status)
+	if err != nil {
+		return nil, err
+	}
+	return checks, nil
 }
 
-func (cs *CheckBiz) SubmitCheck(ctx context.Context, checkId int64, approved bool, comments string) error {
-	// 实现提交审核逻辑，包含通过或拒绝操作
-	return nil
+func (cs *CheckBiz) SubmitCheck(ctx context.Context, checkId int64, approved bool) error {
+	return cs.CheckData.SubmitCheck(ctx, checkId, approved)
 }
 
 func (cs *CheckBiz) BatchDeleteChecks(ctx context.Context, checkIds []int64) error {
-	// 实现批量删除审核记录逻辑
-	return nil
+	return cs.CheckData.BatchDeleteChecks(ctx, checkIds)
 }
 
 func (cs *CheckBiz) BatchSubmitChecks(ctx context.Context, checks []domain.Check) error {
-	// 实现批量提交审核记录逻辑
-	return nil
+	return cs.CheckData.BatchSubmitChecks(ctx, checks)
 }
