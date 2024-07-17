@@ -24,7 +24,7 @@ func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckReque
 		PostID:  req.Check.PostId,
 		Title:   req.Check.Title,
 		Content: req.Check.Content,
-		UserID:  req.Check.UserId,
+		UserId:  req.Check.UserId,
 	})
 	if err != nil {
 		return &pb.CreateCheckReply{
@@ -41,29 +41,144 @@ func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckReque
 }
 
 func (s *CheckService) DeleteCheck(ctx context.Context, req *pb.DeleteCheckRequest) (*pb.DeleteCheckReply, error) {
-	return &pb.DeleteCheckReply{}, nil
+	err := s.biz.DeleteCheck(ctx, req.CheckId)
+	if err != nil {
+		return &pb.DeleteCheckReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.DeleteCheckReply{
+		Code: 0,
+		Msg:  "delete check success",
+	}, nil
 }
 
 func (s *CheckService) UpdateCheck(ctx context.Context, req *pb.UpdateCheckRequest) (*pb.UpdateCheckReply, error) {
-	return &pb.UpdateCheckReply{}, nil
+	err := s.biz.UpdateCheck(ctx, domain.Check{
+		PostID:  req.Check.PostId,
+		Title:   req.Check.Title,
+		Content: req.Check.Content,
+		UserId:  req.Check.UserId,
+	})
+	if err != nil {
+		return &pb.UpdateCheckReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.UpdateCheckReply{
+		Code: 0,
+		Msg:  "update check success",
+	}, nil
 }
 
 func (s *CheckService) GetCheckById(ctx context.Context, req *pb.GetCheckByIdRequest) (*pb.GetCheckByIdReply, error) {
-	return &pb.GetCheckByIdReply{}, nil
+	check, err := s.biz.GetCheckById(ctx, req.CheckId)
+	if err != nil {
+		return &pb.GetCheckByIdReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.GetCheckByIdReply{
+		Code: 0,
+		Msg:  "get check success",
+		Data: &pb.ListOrGetCheck{
+			Id:        check.ID,
+			PostId:    check.PostID,
+			Title:     check.Title,
+			Content:   check.Content,
+			UserId:    check.UserId,
+			Status:    check.Status,
+			Remark:    check.Remark,
+			CreatedAt: check.CreatedAt,
+			UpdatedAt: check.UpdatedAt,
+		},
+	}, nil
 }
 
 func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest) (*pb.ListChecksReply, error) {
-	return &pb.ListChecksReply{}, nil
+	checks, err := s.biz.ListChecks(ctx, domain.Pagination{
+		Page: int(req.Pagination.Page),
+		Size: &req.Pagination.Size,
+		Uid:  req.Pagination.Uid,
+	}, &req.Status)
+	if err != nil {
+		return &pb.ListChecksReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	pbChecks := make([]*pb.ListOrGetCheck, len(checks))
+	for i, check := range checks {
+		pbChecks[i] = &pb.ListOrGetCheck{
+			Id:        check.ID,
+			PostId:    check.PostID,
+			Title:     check.Title,
+			Content:   check.Content,
+			CreatedAt: check.CreatedAt,
+			UpdatedAt: check.UpdatedAt,
+			UserId:    check.UserId,
+			Status:    check.Status,
+			Remark:    check.Remark,
+		}
+	}
+	return &pb.ListChecksReply{
+		Code: 0,
+		Msg:  "list checks success",
+		Data: pbChecks,
+	}, nil
 }
 
 func (s *CheckService) SubmitCheck(ctx context.Context, req *pb.SubmitCheckRequest) (*pb.SubmitCheckReply, error) {
-	return &pb.SubmitCheckReply{}, nil
+	err := s.biz.SubmitCheck(ctx, req.CheckId, req.Approved)
+	if err != nil {
+		return &pb.SubmitCheckReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.SubmitCheckReply{
+		Code: 0,
+		Msg:  "submit check success",
+	}, nil
 }
 
 func (s *CheckService) BatchDeleteChecks(ctx context.Context, req *pb.BatchDeleteChecksRequest) (*pb.BatchDeleteChecksReply, error) {
-	return &pb.BatchDeleteChecksReply{}, nil
+	err := s.biz.BatchDeleteChecks(ctx, req.CheckIds)
+	if err != nil {
+		return &pb.BatchDeleteChecksReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.BatchDeleteChecksReply{
+		Code: 0,
+		Msg:  "batch delete checks success",
+	}, nil
 }
 
 func (s *CheckService) BatchSubmitChecks(ctx context.Context, req *pb.BatchSubmitChecksRequest) (*pb.BatchSubmitChecksReply, error) {
-	return &pb.BatchSubmitChecksReply{}, nil
+	domainChecks := make([]domain.Check, len(req.Checks))
+	for i, check := range req.Checks {
+		domainChecks[i] = domain.Check{
+			PostID:  check.PostId,
+			Title:   check.Title,
+			Content: check.Content,
+			UserId:  check.UserId,
+			Remark:  check.Remark,
+		}
+	}
+	err := s.biz.BatchSubmitChecks(ctx, domainChecks)
+	if err != nil {
+		return &pb.BatchSubmitChecksReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.BatchSubmitChecksReply{
+		Code: 0,
+		Msg:  "batch submit checks success",
+	}, nil
 }
