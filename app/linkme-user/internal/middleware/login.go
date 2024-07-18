@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/data"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/data"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/golang-jwt/jwt/v5"

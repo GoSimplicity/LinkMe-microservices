@@ -3,8 +3,8 @@ package biz
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe-monorepo/api/post/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/domain"
 )
 
 var (
@@ -15,12 +15,12 @@ var (
 
 type PostData interface {
 	CreatePost(ctx context.Context, dp domain.Post) (int64, error)                         // 创建一个新的帖子记录
-	CreatePubPost(ctx context.Context, dp domain.Post) (int64, error)                      // 创建一个新的公开帖子记录
 	DeletePost(ctx context.Context, postId int64, uid int64) error                         // 删除一个帖子
 	UpdatePost(ctx context.Context, dp domain.Post) error                                  // 根据ID更新一个帖子记录
 	UpdatePostStatus(ctx context.Context, dp domain.Post) error                            // 更新帖子的状态
 	GetPost(ctx context.Context, postId int64, uid int64) (domain.Post, error)             // 根据ID获取一个帖子记录
-	GetPubPost(ctx context.Context, id int64) (domain.Post, error)                         // 根据ID获取一个已发布的帖子记录
+	GetPubPost(ctx context.Context, postId int64) (domain.Post, error)                     // 根据ID获取一个已发布的帖子记录
+	GetAdminPost(ctx context.Context, postId int64) (domain.Post, error)                   // 根据ID获取一个已发布的帖子记录
 	ListPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error)    // 获取个人的帖子记录列表
 	ListPubPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error) // 获取已发布的帖子记录列表
 	SyncPost(ctx context.Context, dp domain.Post) (int64, error)                           // 用于同步帖子记录
@@ -62,6 +62,10 @@ func (pb *PostBiz) GetPost(ctx context.Context, postId int64, uid int64) (domain
 	return pb.postData.GetPost(ctx, postId, uid)
 }
 
+func (pb *PostBiz) GetAdminPost(ctx context.Context, postId int64) (domain.Post, error) {
+	return pb.postData.GetAdminPost(ctx, postId)
+}
+
 func (pb *PostBiz) GetPubPost(ctx context.Context, postId int64) (domain.Post, error) {
 	return pb.postData.GetPubPost(ctx, postId)
 }
@@ -82,9 +86,8 @@ func (pb *PostBiz) DeletePost(ctx context.Context, postId int64, uid int64) erro
 	return pb.postData.DeletePost(ctx, postId, uid)
 }
 
-func (pb *PostBiz) CreatePubPost(ctx context.Context, dp domain.Post) (int64, error) {
-	// TODO 暂时保留
-	return 0, nil
+func (pb *PostBiz) SyncPost(ctx context.Context, dp domain.Post) (int64, error) {
+	return pb.postData.SyncPost(ctx, dp)
 }
 
 func (pb *PostBiz) LikePost(ctx context.Context, req *post.LikePostRequest) (*post.LikePostReply, error) {

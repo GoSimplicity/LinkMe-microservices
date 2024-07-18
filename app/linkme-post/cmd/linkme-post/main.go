@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"flag"
-	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
+	checkpb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"os"
 
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -36,7 +37,12 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	// 为了支持调试模式下不同的配置路径
+	if os.Getenv("DEBUG") == "true" {
+		flag.StringVar(&flagconf, "conf", "configs", "config path, eg: -conf config.yaml")
+	} else {
+		flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	}
 }
 
 func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
@@ -86,7 +92,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, logger)
+	checkClient, err := initCheckClient(bc.Service, logger)
+	if err != nil {
+		panic(err)
+	}
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, checkClient, logger)
 	if err != nil {
 		panic(err)
 	}
@@ -131,4 +141,26 @@ func initUserClient(c *conf.Service, logger log.Logger) (userpb.UserClient, erro
 		return nil, err
 	}
 	return userpb.NewUserClient(conn), nil
+}
+
+// 初始化审核客户端
+func initCheckClient(c *conf.Service, logger log.Logger) (checkpb.CheckClient, error) {
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   c.Etcd.Addr,
+		DialTimeout: c.Etcd.Timeout.AsDuration(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	r := etcd.New(client)
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint("discovery:///linkme-check"),
+		grpc.WithDiscovery(r),
+		grpc.WithLogger(logger),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return checkpb.NewCheckClient(conn), nil
 }

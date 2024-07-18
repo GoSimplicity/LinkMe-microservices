@@ -2,7 +2,7 @@ package data
 
 import (
 	"fmt"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/conf"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/driver/mysql"

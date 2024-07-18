@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

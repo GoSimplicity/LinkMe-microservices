@@ -7,12 +7,12 @@
 package main
 
 import (
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/biz"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/conf"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/data"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/middleware"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/server"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/service"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/data"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/middleware"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/server"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )

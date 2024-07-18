@@ -8,7 +8,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"os"
 
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"

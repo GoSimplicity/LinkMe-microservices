@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/domain"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )

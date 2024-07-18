@@ -1,9 +1,9 @@
 package server
 
 import (
-	v1 "github.com/GoSimplicity/LinkMe-monorepo/api/post/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/service"
+	v1 "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/service"
 
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
