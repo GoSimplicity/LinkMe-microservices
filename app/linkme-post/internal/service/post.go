@@ -2,23 +2,29 @@ package service
 
 import (
 	"context"
-	pb "github.com/GoSimplicity/LinkMe-monorepo/api/post/v1"
-	userpb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/biz"
+	"errors"
+	checkpb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	pb "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
+	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/golang/protobuf/ptypes/empty"
+	"strings"
 )
 
 type PostService struct {
 	pb.UnimplementedPostServer
-	userClient userpb.UserClient
-	biz        *biz.PostBiz
+	userClient  userpb.UserClient
+	checkClient checkpb.CheckClient
+	biz         *biz.PostBiz
 }
 
-func NewPostService(biz *biz.PostBiz, userClient userpb.UserClient) *PostService {
+func NewPostService(biz *biz.PostBiz, userClient userpb.UserClient, checkClient checkpb.CheckClient) *PostService {
 	return &PostService{
-		biz:        biz,
-		userClient: userClient,
+		biz:         biz,
+		userClient:  userClient,
+		checkClient: checkClient,
 	}
 }
 
@@ -95,10 +101,20 @@ func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest)
 	}, nil
 }
 func (s *PostService) PublishPost(ctx context.Context, req *pb.PublishPostRequest) (*pb.PublishPostReply, error) {
-	// TODO 暂时保留
+	check, err := s.checkClient.CreateCheck(ctx, &checkpb.CreateCheckRequest{
+		PostId: req.PostId,
+	})
+	if err != nil {
+		return &pb.PublishPostReply{
+			Code:    check.Code,
+			Msg:     check.Msg,
+			CheckId: check.CheckId,
+		}, err
+	}
 	return &pb.PublishPostReply{
-		Code: 0,
-		Msg:  "publish post success",
+		Code:    check.Code,
+		Msg:     check.Msg,
+		CheckId: check.CheckId,
 	}, nil
 }
 func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequest) (*pb.WithdrawPostReply, error) {
@@ -196,8 +212,7 @@ func (s *PostService) ListPubPost(ctx context.Context, req *pb.ListPubPostReques
 }
 
 func (s *PostService) ListAdminPost(ctx context.Context, req *pb.ListAdminPostRequest) (*pb.ListAdminPostReply, error) {
-	// TODO 暂时保留
-	return &pb.ListAdminPostReply{}, nil
+	return nil, nil
 }
 func (s *PostService) DetailPost(ctx context.Context, req *pb.DetailPostRequest) (*pb.DetailPostReply, error) {
 	userId, err := s.getUserId(ctx)
@@ -254,13 +269,34 @@ func (s *PostService) DetailPubPost(ctx context.Context, req *pb.DetailPubPostRe
 	}, nil
 }
 func (s *PostService) DetailAdminPost(ctx context.Context, req *pb.DetailAdminPostRequest) (*pb.DetailAdminPostReply, error) {
-	// TODO 暂时保留
-	return &pb.DetailAdminPostReply{}, nil
+	post, err := s.biz.GetAdminPost(ctx, req.PostId)
+	if err != nil {
+		return &pb.DetailAdminPostReply{
+			Code: -1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.DetailAdminPostReply{
+		Code: 0,
+		Msg:  "get admin post success",
+		Data: &pb.DetailPost{
+			Id:           post.ID,
+			Title:        post.Title,
+			Content:      post.Content,
+			CreatedAt:    post.CreateAt,
+			UpdatedAt:    post.UpdatedAt,
+			UserId:       post.UserID,
+			PlateId:      post.Plate.ID,
+			LikeCount:    post.LikeNum,
+			CollectCount: post.CollectNum,
+		},
+	}, nil
 }
 func (s *PostService) GetPostStats(ctx context.Context, req *empty.Empty) (*pb.GetPostStatsReply, error) {
 	// TODO 暂时保留
 	return &pb.GetPostStatsReply{}, nil
 }
+
 func (s *PostService) LikePost(ctx context.Context, req *pb.LikePostRequest) (*pb.LikePostReply, error) {
 	// TODO 暂时保留
 	return &pb.LikePostReply{}, nil
@@ -272,8 +308,23 @@ func (s *PostService) CollectPost(ctx context.Context, req *pb.CollectPostReques
 
 // 通过grpc调用linkme-user模块方法，获取userId
 func (s *PostService) getUserId(ctx context.Context) (int64, error) {
-	token := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0NFpHOWJuQ2RUaTlCWGFVZHpoNmhpcFUxQll4S0daZiIsImV4cCI6MTcyMDk2MTQ3MCwiVWlkIjoyMTE0NDE5NDIzMTgzMjU3NiwiU3NpZCI6IjYyNTYyMzcyLThlZjMtNDAwYS05ZTYwLTllYWIzZTY4ZjQ3OSIsIlVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMjQuMC4wLjAgU2FmYXJpLzUzNy4zNiIsIkNvbnRlbnRUeXBlIjoiYXBwbGljYXRpb24vanNvbiJ9.pHGkc8EzucCq2E6gjS3Q8u2eKwPxyd0ORPvgSP9DvTlRtNjnDMrAUvUkYfFpOiwvV9qnbZnN6bNFJPlX3YKovg"
-	info, err := s.userClient.GetUserInfo(ctx, &userpb.GetUserInfoRequest{Token: token})
+	// 从 Kratos 上下文中获取传输信息
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return -1, errors.New("failed to get transport from context")
+	}
+	// 获取 Authorization 头
+	token := tr.RequestHeader().Get("Authorization")
+	if token == "" {
+		return -1, errors.New("authorization token not provided")
+	}
+	// 移除 "Bearer " 前缀
+	tokenStr := strings.TrimPrefix(token, "Bearer ")
+	if tokenStr == "" {
+		return -1, errors.New("authorization token is empty after trim")
+	}
+	// 调用 userClient 获取用户信息
+	info, err := s.userClient.GetUserInfo(ctx, &userpb.GetUserInfoRequest{Token: tokenStr})
 	if err != nil {
 		return -1, err
 	}

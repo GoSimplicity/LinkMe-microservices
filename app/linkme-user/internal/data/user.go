@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/biz"
 	sf "github.com/bwmarrin/snowflake"
 	"github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"

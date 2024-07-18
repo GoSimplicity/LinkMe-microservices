@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"errors"
-	pb "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/biz"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/data"
+	pb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/data"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/golang-jwt/jwt/v5"
 )

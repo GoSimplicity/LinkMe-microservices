@@ -2,29 +2,40 @@ package service
 
 import (
 	"context"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
-
-	pb "github.com/GoSimplicity/LinkMe-monorepo/api/check/v1"
+	pb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	postpb "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 )
 
 type CheckService struct {
 	pb.UnimplementedCheckServer
-	biz *biz.CheckBiz
+	postClient postpb.PostClient
+	biz        *biz.CheckBiz
 }
 
-func NewCheckService(biz *biz.CheckBiz) *CheckService {
+func NewCheckService(biz *biz.CheckBiz, postClient postpb.PostClient) *CheckService {
 	return &CheckService{
-		biz: biz,
+		biz:        biz,
+		postClient: postClient,
 	}
 }
 
 func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckRequest) (*pb.CreateCheckReply, error) {
-	userId, err := s.biz.CreateCheck(ctx, domain.Check{
-		PostID:  req.Check.PostId,
-		Title:   req.Check.Title,
-		Content: req.Check.Content,
-		UserId:  req.Check.UserId,
+	post, err := s.postClient.DetailAdminPost(ctx, &postpb.DetailAdminPostRequest{
+		PostId: req.PostId,
+	})
+	if err != nil {
+		return &pb.CreateCheckReply{
+			Code: post.Code,
+			Msg:  post.Msg,
+		}, err
+	}
+	checkId, err := s.biz.CreateCheck(ctx, domain.Check{
+		PostID:  post.Data.Id,
+		Title:   post.Data.Title,
+		Content: post.Data.Content,
+		UserId:  post.Data.UserId,
 	})
 	if err != nil {
 		return &pb.CreateCheckReply{
@@ -36,7 +47,7 @@ func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckReque
 	return &pb.CreateCheckReply{
 		Code:    0,
 		Msg:     "create check success",
-		CheckId: userId,
+		CheckId: checkId,
 	}, nil
 }
 

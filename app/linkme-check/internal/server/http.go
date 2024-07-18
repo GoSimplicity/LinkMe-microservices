@@ -1,17 +1,16 @@
 package server
 
 import (
-	v1 "github.com/GoSimplicity/LinkMe-monorepo/api/check/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/service"
+	v1 "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/service"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, checkSvc *service.CheckService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, checkSvc *service.CheckService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),

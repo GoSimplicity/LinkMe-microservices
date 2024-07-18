@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/conf"
 	"github.com/IBM/sarama"
 )
 

@@ -2,7 +2,7 @@ package biz
 
 import (
 	"context"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
 )
 
 type CheckData interface {
@@ -25,6 +25,7 @@ func NewCheckBiz(CheckData CheckData) *CheckBiz {
 }
 
 func (cs *CheckBiz) CreateCheck(ctx context.Context, check domain.Check) (int64, error) {
+
 	return cs.CheckData.CreateCheck(ctx, check)
 }
 

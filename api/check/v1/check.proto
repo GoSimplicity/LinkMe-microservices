@@ -5,8 +5,6 @@ package api.check.v1;
 import "google/api/annotations.proto";
 
 option go_package = "linkme-check/api/check/v1;v1";
-option java_multiple_files = true;
-option java_package = "api.check.v1";
 
 service Check {
 	rpc CreateCheck(CreateCheckRequest) returns (CreateCheckReply);
@@ -52,7 +50,7 @@ service Check {
 }
 
 message CreateCheckRequest {
-	ListOrGetCheck check = 1;
+	int64 postId = 1;
 }
 
 message CreateCheckReply {

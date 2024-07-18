@@ -2,7 +2,7 @@ package data
 
 import (
 	"fmt"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	"github.com/redis/go-redis/v9"

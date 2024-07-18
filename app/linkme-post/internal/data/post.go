@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -75,10 +75,6 @@ func (p *postData) CreatePost(ctx context.Context, dp domain.Post) (int64, error
 		return -1, err
 	}
 	return post.ID, nil
-}
-func (p *postData) CreatePubPost(ctx context.Context, dp domain.Post) (int64, error) {
-	//TODO implement me
-	panic("implement me")
 }
 
 // UpdatePost 通过PostId更新帖子
@@ -167,6 +163,17 @@ func (p *postData) GetPubPost(ctx context.Context, id int64) (domain.Post, error
 			return domain.Post{}, biz.ErrPostNotFound
 		}
 		p.l.Error("failed to get published post", zap.Error(err))
+		return domain.Post{}, err
+	}
+	return toDomainPost(post), nil
+}
+
+func (p *postData) GetAdminPost(ctx context.Context, postId int64) (domain.Post, error) {
+	var post Post
+	if err := p.data.db.WithContext(ctx).First(&post, "id = ?", postId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domain.Post{}, errors.New("post not found")
+		}
 		return domain.Post{}, err
 	}
 	return toDomainPost(post), nil

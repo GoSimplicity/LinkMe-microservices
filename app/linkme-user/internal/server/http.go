@@ -1,10 +1,10 @@
 package server
 
 import (
-	v1 "github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/conf"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/middleware"
-	"github.com/GoSimplicity/LinkMe/app/linkme-user/internal/service"
+	v1 "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/middleware"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/service"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
 )

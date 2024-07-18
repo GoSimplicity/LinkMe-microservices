@@ -7,12 +7,13 @@
 package main
 
 import (
-	"github.com/GoSimplicity/LinkMe-monorepo/api/user/v1"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/biz"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/conf"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/data"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/server"
-	"github.com/GoSimplicity/LinkMe/app/linkme-post/internal/service"
+	v1_2 "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/data"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/server"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -24,7 +25,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, checkClient v1_2.CheckClient, logger log.Logger) (*kratos.App, func(), error) {
 	db, err := data.NewDB(confData)
 	if err != nil {
 		return nil, nil, err
@@ -38,7 +39,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	zapLogger := data.NewLogger()
 	postData := data.NewPostData(dataData, zapLogger)
 	postBiz := biz.NewPostBiz(postData)
-	postService := service.NewPostService(postBiz, userClient)
+	postService := service.NewPostService(postBiz, userClient, checkClient)
 	grpcServer := server.NewGRPCServer(confServer, postService)
 	httpServer := server.NewHTTPServer(confServer, postService)
 	app := newApp(confService, logger, grpcServer, httpServer)

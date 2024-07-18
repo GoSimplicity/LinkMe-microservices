@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 	"errors"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/domain"
-	"github.com/GoSimplicity/LinkMe/app/linkme-check/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"time"
