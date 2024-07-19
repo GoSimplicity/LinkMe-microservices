@@ -80,6 +80,20 @@ func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest)
 		Msg:  "update post success",
 	}, nil
 }
+
+func (s *PostService) UpdatePostStatus(ctx context.Context, req *pb.UpdatePostStatusRequest) (*pb.UpdatePostStatusReply, error) {
+	err := s.biz.UpdatePostStatus(ctx, req.PostId, req.Status)
+	if err != nil {
+		return &pb.UpdatePostStatusReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.UpdatePostStatusReply{
+		Code: 0,
+		Msg:  "update post status success",
+	}, nil
+}
 func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*pb.DeletePostReply, error) {
 	userId, err := s.getUserId(ctx)
 	if err != nil {
@@ -125,12 +139,7 @@ func (s *PostService) WithdrawPost(ctx context.Context, req *pb.WithdrawPostRequ
 			Msg:  err.Error(),
 		}, err
 	}
-	dp := domain.Post{
-		ID:     req.PostId,
-		UserID: userId,
-		Status: domain.Withdrawn,
-	}
-	err = s.biz.UpdatePostStatus(ctx, dp)
+	err = s.biz.WithdrawPost(ctx, req.PostId, userId)
 	if err != nil {
 		return &pb.WithdrawPostReply{
 			Code: 1,
@@ -292,6 +301,21 @@ func (s *PostService) DetailAdminPost(ctx context.Context, req *pb.DetailAdminPo
 		},
 	}, nil
 }
+
+func (s *PostService) PostSync(ctx context.Context, req *pb.PostSyncRequest) (*pb.PostSyncReply, error) {
+	err := s.biz.SyncPost(ctx, req.PostId)
+	if err != nil {
+		return &pb.PostSyncReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	return &pb.PostSyncReply{
+		Code: 0,
+		Msg:  "sync post success",
+	}, nil
+}
+
 func (s *PostService) GetPostStats(ctx context.Context, req *empty.Empty) (*pb.GetPostStatsReply, error) {
 	// TODO 暂时保留
 	return &pb.GetPostStatsReply{}, nil

@@ -48,11 +48,10 @@ func (cs *CheckBiz) GetCheckById(ctx context.Context, checkId int64) (domain.Che
 func (cs *CheckBiz) ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error) {
 	offset := int64(pagination.Page-1) * *pagination.Size
 	pagination.Offset = &offset
-	checks, err := cs.CheckData.ListChecks(ctx, pagination, status)
-	if err != nil {
-		return nil, err
+	if *status == "" {
+		return cs.CheckData.ListChecks(ctx, pagination, nil)
 	}
-	return checks, nil
+	return cs.CheckData.ListChecks(ctx, pagination, status)
 }
 
 func (cs *CheckBiz) SubmitCheck(ctx context.Context, checkId int64, approved bool) error {

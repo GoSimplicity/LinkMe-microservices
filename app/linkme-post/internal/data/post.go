@@ -118,15 +118,27 @@ func (p *postData) UpdatePost(ctx context.Context, dp domain.Post) error {
 }
 
 // UpdatePostStatus 更新帖子状态
-func (p *postData) UpdatePostStatus(ctx context.Context, dp domain.Post) error {
-	post := toDataPost(dp)
+func (p *postData) UpdatePostStatus(ctx context.Context, postId int64, status string) error {
 	now := p.getCurrentTime()
-	if err := p.data.db.WithContext(ctx).Model(&Post{}).Where("id = ? AND user_id = ?", post.ID, post.UserID).
+	if err := p.data.db.WithContext(ctx).Model(&Post{}).Where("id = ?", postId).
 		Updates(map[string]any{
-			"status":     post.Status,
+			"status":     status,
 			"updated_at": now,
 		}).Error; err != nil {
 		p.l.Error("failed to update post status", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (p *postData) WithdrawPost(ctx context.Context, postId int64, userId int64) error {
+	now := p.getCurrentTime()
+	if err := p.data.db.WithContext(ctx).Model(&Post{}).Where("id = ? AND user_id = ?", postId, userId).
+		Updates(map[string]any{
+			"status":     domain.Withdrawn,
+			"updated_at": now,
+		}).Error; err != nil {
+		p.l.Error("failed to withdraw post", zap.Error(err))
 		return err
 	}
 	return nil
@@ -254,43 +266,40 @@ func (p *postData) DeletePost(ctx context.Context, postId int64, uid int64) erro
 }
 
 // SyncPost 同步线上库(MongoDB)与制作库(MySQL)
-func (p *postData) SyncPost(ctx context.Context, dp domain.Post) (int64, error) {
-	post := toDataPost(dp)
-	// 获取当前时间
-	now := p.getCurrentTime()
-	post.UpdatedAt = now
+func (p *postData) SyncPost(ctx context.Context, postId int64) error {
 	// 获取 MySQL 中的帖子
-	var mysqlPost Post
-	err := p.data.db.WithContext(ctx).Where("id = ?", post.ID).First(&mysqlPost).Error
-	if err != nil {
-		return -1, err
+	var post Post
+	if err := p.data.db.WithContext(ctx).Where("id = ?", postId).First(&post).Error; err != nil {
+		return err
 	}
+	// 获取当前时间并更新帖子更新时间
+	post.UpdatedAt = p.getCurrentTime()
 	// 检查帖子是否已存在于 MongoDB
 	exists, err := p.checkPostExistsInMongoDB(ctx, post.ID)
 	if err != nil {
 		p.l.Error("failed to check post existence in MongoDB", zap.Error(err))
-		return -1, err
+		return err
 	}
 	if post.Status == domain.Published {
 		if exists {
 			// MongoDB 中已存在相同 ID 的文章，不执行同步
-			return -1, biz.ErrSyncFailed
+			return biz.ErrSyncFailed
 		}
 		// 插入帖子到 MongoDB
-		if err := p.insertPostToMongoDB(ctx, mysqlPost); err != nil {
+		if err := p.insertPostToMongoDB(ctx, post); err != nil {
 			p.l.Error("failed to insert post to MongoDB", zap.Error(err))
-			return -1, err
+			return err
 		}
 	} else {
 		if exists {
 			// 删除 MongoDB 中的帖子
 			if err := p.deletePostFromMongoDB(ctx, post.ID); err != nil {
 				p.l.Error("failed to delete post from MongoDB", zap.Error(err))
-				return -1, err
+				return err
 			}
 		}
 	}
-	return mysqlPost.ID, nil
+	return nil
 }
 
 // 获取当前时间的时间戳

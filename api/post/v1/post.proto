@@ -20,6 +20,7 @@ service Post {
 			body: "*"
 		};
 	}
+	rpc UpdatePostStatus (UpdatePostStatusRequest) returns (UpdatePostStatusReply);
 	rpc DeletePost (DeletePostRequest) returns (DeletePostReply) {
 		option (google.api.http) = {
 			delete: "/delete/{postId}"
@@ -87,6 +88,7 @@ service Post {
 			body: "*"
 		};
 	}
+	rpc PostSync (PostSyncRequest) returns (PostSyncReply);
 }
 
 message CreatePostRequest {
@@ -110,6 +112,16 @@ message UpdatePostRequest {
 }
 
 message UpdatePostReply {
+	int32 code = 1;
+	string msg = 2;
+}
+
+message UpdatePostStatusRequest {
+	int64 postId = 1;
+	string status = 2;
+}
+
+message UpdatePostStatusReply {
 	int32 code = 1;
 	string msg = 2;
 }
@@ -253,4 +265,12 @@ message DetailPost {
 	int64 likeCount = 8;
 	int64 collectCount = 9;
 	int64 viewCount = 10;
+}
+
+message PostSyncRequest {
+	int64 postId = 1;
+}
+message PostSyncReply {
+	int32 code = 1;
+	string msg = 2;
 }

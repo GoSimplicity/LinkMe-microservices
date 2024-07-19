@@ -26,7 +26,8 @@ service Check {
 	}
 	rpc ListChecks(ListChecksRequest) returns (ListChecksReply) {
 		option (google.api.http) = {
-			get: "/list"
+			post: "/list"
+			body: "*"
 		};
 	}
 	rpc SubmitCheck(SubmitCheckRequest) returns (SubmitCheckReply) {
@@ -88,8 +89,9 @@ message GetCheckByIdReply {
 }
 
 message ListChecksRequest {
-	Pagination pagination = 1;
-	string status = 2;
+	int32 page = 1;
+	int64 size = 2;
+	string status = 3;
 }
 
 message ListChecksReply {
@@ -100,7 +102,8 @@ message ListChecksReply {
 
 message SubmitCheckRequest {
 	int64 checkId = 1;
-	bool approved = 2;
+	int64 postId = 2;
+	bool approved = 3;
 }
 
 message SubmitCheckReply {
@@ -136,12 +139,4 @@ message ListOrGetCheck {
 	string remark = 7;              // 审核备注
 	int64 created_at = 8;           // 创建时间
 	int64 updated_at = 9;           // 更新时间
-}
-
-message Pagination {
-	int32 page = 1;                 // 当前页码
-	int64 size = 2;                 // 每页数据
-	int64 uid = 3;                  // 用户ID
-	int64 offset = 4;               // 数据偏移量
-	int64 total = 5;                // 总数据量
 }

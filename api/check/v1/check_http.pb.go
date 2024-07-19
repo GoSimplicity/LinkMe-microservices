@@ -42,7 +42,7 @@ func RegisterCheckHTTPServer(s *http.Server, srv CheckHTTPServer) {
 	r.DELETE("/delete/{checkId}", _Check_DeleteCheck0_HTTP_Handler(srv))
 	r.POST("/update", _Check_UpdateCheck0_HTTP_Handler(srv))
 	r.GET("/get/{checkId}", _Check_GetCheckById0_HTTP_Handler(srv))
-	r.GET("/list", _Check_ListChecks0_HTTP_Handler(srv))
+	r.POST("/list", _Check_ListChecks0_HTTP_Handler(srv))
 	r.POST("/submit", _Check_SubmitCheck0_HTTP_Handler(srv))
 	r.POST("/batch_delete", _Check_BatchDeleteChecks0_HTTP_Handler(srv))
 	r.POST("/batch_submit", _Check_BatchSubmitChecks0_HTTP_Handler(srv))
@@ -117,6 +117,9 @@ func _Check_GetCheckById0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Contex
 func _Check_ListChecks0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListChecksRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -272,10 +275,10 @@ func (c *CheckHTTPClientImpl) GetCheckById(ctx context.Context, in *GetCheckById
 func (c *CheckHTTPClientImpl) ListChecks(ctx context.Context, in *ListChecksRequest, opts ...http.CallOption) (*ListChecksReply, error) {
 	var out ListChecksReply
 	pattern := "/list"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCheckListChecks))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
