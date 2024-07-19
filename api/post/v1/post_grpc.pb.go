@@ -20,20 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Post_CreatePost_FullMethodName      = "/api.post.Post/CreatePost"
-	Post_UpdatePost_FullMethodName      = "/api.post.Post/UpdatePost"
-	Post_DeletePost_FullMethodName      = "/api.post.Post/DeletePost"
-	Post_PublishPost_FullMethodName     = "/api.post.Post/PublishPost"
-	Post_WithdrawPost_FullMethodName    = "/api.post.Post/WithdrawPost"
-	Post_ListPost_FullMethodName        = "/api.post.Post/ListPost"
-	Post_ListPubPost_FullMethodName     = "/api.post.Post/ListPubPost"
-	Post_ListAdminPost_FullMethodName   = "/api.post.Post/ListAdminPost"
-	Post_DetailPost_FullMethodName      = "/api.post.Post/DetailPost"
-	Post_DetailPubPost_FullMethodName   = "/api.post.Post/DetailPubPost"
-	Post_DetailAdminPost_FullMethodName = "/api.post.Post/DetailAdminPost"
-	Post_GetPostStats_FullMethodName    = "/api.post.Post/GetPostStats"
-	Post_LikePost_FullMethodName        = "/api.post.Post/LikePost"
-	Post_CollectPost_FullMethodName     = "/api.post.Post/CollectPost"
+	Post_CreatePost_FullMethodName       = "/api.post.Post/CreatePost"
+	Post_UpdatePost_FullMethodName       = "/api.post.Post/UpdatePost"
+	Post_UpdatePostStatus_FullMethodName = "/api.post.Post/UpdatePostStatus"
+	Post_DeletePost_FullMethodName       = "/api.post.Post/DeletePost"
+	Post_PublishPost_FullMethodName      = "/api.post.Post/PublishPost"
+	Post_WithdrawPost_FullMethodName     = "/api.post.Post/WithdrawPost"
+	Post_ListPost_FullMethodName         = "/api.post.Post/ListPost"
+	Post_ListPubPost_FullMethodName      = "/api.post.Post/ListPubPost"
+	Post_ListAdminPost_FullMethodName    = "/api.post.Post/ListAdminPost"
+	Post_DetailPost_FullMethodName       = "/api.post.Post/DetailPost"
+	Post_DetailPubPost_FullMethodName    = "/api.post.Post/DetailPubPost"
+	Post_DetailAdminPost_FullMethodName  = "/api.post.Post/DetailAdminPost"
+	Post_GetPostStats_FullMethodName     = "/api.post.Post/GetPostStats"
+	Post_LikePost_FullMethodName         = "/api.post.Post/LikePost"
+	Post_CollectPost_FullMethodName      = "/api.post.Post/CollectPost"
+	Post_PostSync_FullMethodName         = "/api.post.Post/PostSync"
 )
 
 // PostClient is the client API for Post service.
@@ -42,6 +44,7 @@ const (
 type PostClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostReply, error)
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostReply, error)
+	UpdatePostStatus(ctx context.Context, in *UpdatePostStatusRequest, opts ...grpc.CallOption) (*UpdatePostStatusReply, error)
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostReply, error)
 	PublishPost(ctx context.Context, in *PublishPostRequest, opts ...grpc.CallOption) (*PublishPostReply, error)
 	WithdrawPost(ctx context.Context, in *WithdrawPostRequest, opts ...grpc.CallOption) (*WithdrawPostReply, error)
@@ -54,6 +57,7 @@ type PostClient interface {
 	GetPostStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPostStatsReply, error)
 	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostReply, error)
 	CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*CollectPostReply, error)
+	PostSync(ctx context.Context, in *PostSyncRequest, opts ...grpc.CallOption) (*PostSyncReply, error)
 }
 
 type postClient struct {
@@ -78,6 +82,16 @@ func (c *postClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpdatePostReply)
 	err := c.cc.Invoke(ctx, Post_UpdatePost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postClient) UpdatePostStatus(ctx context.Context, in *UpdatePostStatusRequest, opts ...grpc.CallOption) (*UpdatePostStatusReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePostStatusReply)
+	err := c.cc.Invoke(ctx, Post_UpdatePostStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -204,12 +218,23 @@ func (c *postClient) CollectPost(ctx context.Context, in *CollectPostRequest, op
 	return out, nil
 }
 
+func (c *postClient) PostSync(ctx context.Context, in *PostSyncRequest, opts ...grpc.CallOption) (*PostSyncReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PostSyncReply)
+	err := c.cc.Invoke(ctx, Post_PostSync_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostServer is the server API for Post service.
 // All implementations must embed UnimplementedPostServer
 // for forward compatibility
 type PostServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*CreatePostReply, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostReply, error)
+	UpdatePostStatus(context.Context, *UpdatePostStatusRequest) (*UpdatePostStatusReply, error)
 	DeletePost(context.Context, *DeletePostRequest) (*DeletePostReply, error)
 	PublishPost(context.Context, *PublishPostRequest) (*PublishPostReply, error)
 	WithdrawPost(context.Context, *WithdrawPostRequest) (*WithdrawPostReply, error)
@@ -222,6 +247,7 @@ type PostServer interface {
 	GetPostStats(context.Context, *emptypb.Empty) (*GetPostStatsReply, error)
 	LikePost(context.Context, *LikePostRequest) (*LikePostReply, error)
 	CollectPost(context.Context, *CollectPostRequest) (*CollectPostReply, error)
+	PostSync(context.Context, *PostSyncRequest) (*PostSyncReply, error)
 	mustEmbedUnimplementedPostServer()
 }
 
@@ -234,6 +260,9 @@ func (UnimplementedPostServer) CreatePost(context.Context, *CreatePostRequest) (
 }
 func (UnimplementedPostServer) UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+}
+func (UnimplementedPostServer) UpdatePostStatus(context.Context, *UpdatePostStatusRequest) (*UpdatePostStatusReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePostStatus not implemented")
 }
 func (UnimplementedPostServer) DeletePost(context.Context, *DeletePostRequest) (*DeletePostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
@@ -270,6 +299,9 @@ func (UnimplementedPostServer) LikePost(context.Context, *LikePostRequest) (*Lik
 }
 func (UnimplementedPostServer) CollectPost(context.Context, *CollectPostRequest) (*CollectPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectPost not implemented")
+}
+func (UnimplementedPostServer) PostSync(context.Context, *PostSyncRequest) (*PostSyncReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSync not implemented")
 }
 func (UnimplementedPostServer) mustEmbedUnimplementedPostServer() {}
 
@@ -316,6 +348,24 @@ func _Post_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServer).UpdatePost(ctx, req.(*UpdatePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Post_UpdatePostStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePostStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).UpdatePostStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_UpdatePostStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).UpdatePostStatus(ctx, req.(*UpdatePostStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -536,6 +586,24 @@ func _Post_CollectPost_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Post_PostSync_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostSyncRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).PostSync(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_PostSync_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).PostSync(ctx, req.(*PostSyncRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Post_ServiceDesc is the grpc.ServiceDesc for Post service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -550,6 +618,10 @@ var Post_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePost",
 			Handler:    _Post_UpdatePost_Handler,
+		},
+		{
+			MethodName: "UpdatePostStatus",
+			Handler:    _Post_UpdatePostStatus_Handler,
 		},
 		{
 			MethodName: "DeletePost",
@@ -598,6 +670,10 @@ var Post_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CollectPost",
 			Handler:    _Post_CollectPost_Handler,
+		},
+		{
+			MethodName: "PostSync",
+			Handler:    _Post_PostSync_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

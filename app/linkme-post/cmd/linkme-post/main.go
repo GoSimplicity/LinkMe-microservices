@@ -37,12 +37,8 @@ var (
 )
 
 func init() {
-	// 为了支持调试模式下不同的配置路径
-	if os.Getenv("DEBUG") == "true" {
-		flag.StringVar(&flagconf, "conf", "configs", "config path, eg: -conf config.yaml")
-	} else {
-		flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
-	}
+	//flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
 }
 
 func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {

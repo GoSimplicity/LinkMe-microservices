@@ -14,16 +14,17 @@ var (
 )
 
 type PostData interface {
-	CreatePost(ctx context.Context, dp domain.Post) (int64, error)                         // 创建一个新的帖子记录
-	DeletePost(ctx context.Context, postId int64, uid int64) error                         // 删除一个帖子
-	UpdatePost(ctx context.Context, dp domain.Post) error                                  // 根据ID更新一个帖子记录
-	UpdatePostStatus(ctx context.Context, dp domain.Post) error                            // 更新帖子的状态
+	CreatePost(ctx context.Context, dp domain.Post) (int64, error)           // 创建一个新的帖子记录
+	DeletePost(ctx context.Context, postId int64, uid int64) error           // 删除一个帖子
+	UpdatePost(ctx context.Context, dp domain.Post) error                    // 根据ID更新一个帖子记录
+	UpdatePostStatus(ctx context.Context, postId int64, status string) error // 更新帖子的状态
+	WithdrawPost(ctx context.Context, postId int64, userId int64) error
 	GetPost(ctx context.Context, postId int64, uid int64) (domain.Post, error)             // 根据ID获取一个帖子记录
 	GetPubPost(ctx context.Context, postId int64) (domain.Post, error)                     // 根据ID获取一个已发布的帖子记录
 	GetAdminPost(ctx context.Context, postId int64) (domain.Post, error)                   // 根据ID获取一个已发布的帖子记录
 	ListPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error)    // 获取个人的帖子记录列表
 	ListPubPosts(ctx context.Context, pagination domain.Pagination) ([]domain.Post, error) // 获取已发布的帖子记录列表
-	SyncPost(ctx context.Context, dp domain.Post) (int64, error)                           // 用于同步帖子记录
+	SyncPost(ctx context.Context, postId int64) error                                      // 用于同步帖子记录
 }
 
 type PostBiz struct {
@@ -54,8 +55,12 @@ func (pb *PostBiz) UpdatePost(ctx context.Context, dp domain.Post) error {
 	return err
 }
 
-func (pb *PostBiz) UpdatePostStatus(ctx context.Context, dp domain.Post) error {
-	return pb.postData.UpdatePostStatus(ctx, dp)
+func (pb *PostBiz) UpdatePostStatus(ctx context.Context, postId int64, status string) error {
+	return pb.postData.UpdatePostStatus(ctx, postId, status)
+}
+
+func (pb *PostBiz) WithdrawPost(ctx context.Context, postId int64, userId int64) error {
+	return pb.postData.WithdrawPost(ctx, postId, userId)
 }
 
 func (pb *PostBiz) GetPost(ctx context.Context, postId int64, uid int64) (domain.Post, error) {
@@ -86,8 +91,8 @@ func (pb *PostBiz) DeletePost(ctx context.Context, postId int64, uid int64) erro
 	return pb.postData.DeletePost(ctx, postId, uid)
 }
 
-func (pb *PostBiz) SyncPost(ctx context.Context, dp domain.Post) (int64, error) {
-	return pb.postData.SyncPost(ctx, dp)
+func (pb *PostBiz) SyncPost(ctx context.Context, postId int64) error {
+	return pb.postData.SyncPost(ctx, postId)
 }
 
 func (pb *PostBiz) LikePost(ctx context.Context, req *post.LikePostRequest) (*post.LikePostReply, error) {

@@ -1,5 +1,12 @@
 package domain
 
+const (
+	Draft     = "Draft"     // 草稿状态
+	Published = "Published" // 发布状态
+	Withdrawn = "Withdrawn" // 撤回状态
+	Deleted   = "Deleted"   // 删除状态
+)
+
 type Check struct {
 	ID        int64  // 审核ID
 	PostID    int64  // 帖子ID

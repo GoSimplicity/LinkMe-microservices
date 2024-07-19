@@ -111,9 +111,8 @@ func (s *CheckService) GetCheckById(ctx context.Context, req *pb.GetCheckByIdReq
 
 func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest) (*pb.ListChecksReply, error) {
 	checks, err := s.biz.ListChecks(ctx, domain.Pagination{
-		Page: int(req.Pagination.Page),
-		Size: &req.Pagination.Size,
-		Uid:  req.Pagination.Uid,
+		Page: int(req.Page),
+		Size: &req.Size,
 	}, &req.Status)
 	if err != nil {
 		return &pb.ListChecksReply{
@@ -143,6 +142,41 @@ func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest
 }
 
 func (s *CheckService) SubmitCheck(ctx context.Context, req *pb.SubmitCheckRequest) (*pb.SubmitCheckReply, error) {
+	if req.Approved == true {
+		// 更新帖子状态为已发布
+		status, err := s.postClient.UpdatePostStatus(ctx, &postpb.UpdatePostStatusRequest{
+			PostId: req.PostId,
+			Status: "Published",
+		})
+		if err != nil {
+			return &pb.SubmitCheckReply{
+				Code: status.Code,
+				Msg:  err.Error(),
+			}, err
+		}
+		// 同步帖子
+		sync, err := s.postClient.PostSync(ctx, &postpb.PostSyncRequest{
+			PostId: req.PostId,
+		})
+		if err != nil {
+			// 同步失败时将帖子状态更新为草稿
+			revertStatus, revertErr := s.postClient.UpdatePostStatus(ctx, &postpb.UpdatePostStatusRequest{
+				PostId: req.PostId,
+				Status: domain.Draft,
+			})
+			if revertErr != nil {
+				return &pb.SubmitCheckReply{
+					Code: revertStatus.Code,
+					Msg:  revertErr.Error(),
+				}, revertErr
+			}
+			return &pb.SubmitCheckReply{
+				Code: sync.Code,
+				Msg:  err.Error(),
+			}, err
+		}
+	}
+	// 提交审核
 	err := s.biz.SubmitCheck(ctx, req.CheckId, req.Approved)
 	if err != nil {
 		return &pb.SubmitCheckReply{

@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 	"go.uber.org/zap"
@@ -82,8 +83,8 @@ func (c *checkData) GetCheckById(ctx context.Context, checkId int64) (domain.Che
 
 func (c *checkData) ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error) {
 	var checks []Check
+	fmt.Println(status)
 	query := c.db.WithContext(ctx).Model(&Check{})
-
 	if status != nil {
 		query = query.Where("status = ?", *status)
 	}
