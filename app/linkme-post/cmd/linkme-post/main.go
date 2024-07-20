@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
+
 	checkpb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
-	"os"
 
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 
@@ -37,8 +38,8 @@ var (
 )
 
 func init() {
-	//flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
-	flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	// flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
 }
 
 func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {

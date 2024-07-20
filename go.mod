@@ -3,7 +3,6 @@ module github.com/GoSimplicity/LinkMe-microservices
 go 1.22.3
 
 require (
-	github.com/GoSimplicity/LinkMe-monorepo v0.0.0-20240716095041-9573c5debc06
 	github.com/IBM/sarama v1.43.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dlclark/regexp2 v1.11.2

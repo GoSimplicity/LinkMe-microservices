@@ -3,115 +3,35 @@
 
 openapi: 3.0.3
 info:
-    title: Check API
+    title: Interactive API
     version: 0.0.1
 paths:
-    /batch_delete:
-        post:
-            tags:
-                - Check
-            operationId: Check_BatchDeleteChecks
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/BatchDeleteChecksRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/BatchDeleteChecksReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /batch_submit:
-        post:
-            tags:
-                - Check
-            operationId: Check_BatchSubmitChecks
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/BatchSubmitChecksRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/BatchSubmitChecksReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /delete/{checkId}:
-        delete:
-            tags:
-                - Check
-            operationId: Check_DeleteCheck
-            parameters:
-                - name: checkId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/DeleteCheckReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /get/{checkId}:
+    /v1/interactive:
         get:
             tags:
-                - Check
-            operationId: Check_GetCheckById
-            parameters:
-                - name: checkId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - Interactive
+            operationId: Interactive_GetInteractive
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetCheckByIdReply'
+                                $ref: '#/components/schemas/GetInteractiveReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /list:
+    /v1/interactive/list:
         post:
             tags:
-                - Check
-            operationId: Check_ListChecks
+                - Interactive
+            operationId: Interactive_ListInteractive
             requestBody:
                 content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/ListChecksRequest'
+                    application/json: {}
                 required: true
             responses:
                 "200":
@@ -119,55 +39,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListChecksReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /submit:
-        post:
-            tags:
-                - Check
-            operationId: Check_SubmitCheck
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/SubmitCheckRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SubmitCheckReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /update:
-        post:
-            tags:
-                - Check
-            operationId: Check_UpdateCheck
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateCheckRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UpdateCheckReply'
+                                $ref: '#/components/schemas/ListInteractiveReply'
                 default:
                     description: Default error response
                     content:
@@ -176,45 +48,7 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        BatchDeleteChecksReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        BatchDeleteChecksRequest:
-            type: object
-            properties:
-                checkIds:
-                    type: array
-                    items:
-                        type: string
-        BatchSubmitChecksReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        BatchSubmitChecksRequest:
-            type: object
-            properties:
-                checks:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ListOrGetCheck'
-        DeleteCheckReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        GetCheckByIdReply:
+        GetInteractiveReply:
             type: object
             properties:
                 code:
@@ -223,7 +57,28 @@ components:
                 msg:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ListOrGetCheck'
+                    $ref: '#/components/schemas/GetOrListInteractive'
+        GetOrListInteractive:
+            type: object
+            properties:
+                ID:
+                    type: string
+                BizID:
+                    type: string
+                BizName:
+                    type: string
+                ReadCount:
+                    type: string
+                LikeCount:
+                    type: string
+                CollectCount:
+                    type: string
+                UpdateTime:
+                    type: string
+                CreateTime:
+                    type: string
+                PostId:
+                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -232,7 +87,7 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListChecksReply:
+        ListInteractiveReply:
             type: object
             properties:
                 code:
@@ -243,38 +98,7 @@ components:
                 data:
                     type: array
                     items:
-                        $ref: '#/components/schemas/ListOrGetCheck'
-        ListChecksRequest:
-            type: object
-            properties:
-                page:
-                    type: integer
-                    format: int32
-                size:
-                    type: string
-                status:
-                    type: string
-        ListOrGetCheck:
-            type: object
-            properties:
-                id:
-                    type: string
-                postId:
-                    type: string
-                content:
-                    type: string
-                title:
-                    type: string
-                userId:
-                    type: string
-                status:
-                    type: string
-                remark:
-                    type: string
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
+                        $ref: '#/components/schemas/GetOrListInteractive'
         Status:
             type: object
             properties:
@@ -291,35 +115,5 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        SubmitCheckReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        SubmitCheckRequest:
-            type: object
-            properties:
-                checkId:
-                    type: string
-                postId:
-                    type: string
-                approved:
-                    type: boolean
-        UpdateCheckReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        UpdateCheckRequest:
-            type: object
-            properties:
-                check:
-                    $ref: '#/components/schemas/ListOrGetCheck'
 tags:
-    - name: Check
+    - name: Interactive

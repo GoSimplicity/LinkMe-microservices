@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Check struct {
@@ -98,6 +99,18 @@ func (c *checkData) ListChecks(ctx context.Context, pagination domain.Pagination
 }
 
 func (c *checkData) SubmitCheck(ctx context.Context, checkId int64, approved bool) error {
+	var check Check
+	// 先查询数据库，检查 updated_at 字段
+	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id = ?", checkId).First(&check).Error; err != nil {
+		c.l.Error("failed to retrieve check", zap.Error(err))
+		return err
+	}
+	// 如果 updated_at 字段不为 0，则返回错误
+	if check.UpdatedAt != 0 {
+		err := errors.New("audited or audited information does not exist")
+		c.l.Error("failed to submit check", zap.Error(err))
+		return err
+	}
 	status := "Rejected"
 	if approved {
 		status = "Approved"
