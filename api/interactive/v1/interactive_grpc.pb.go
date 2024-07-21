@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -31,11 +30,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type InteractiveClient interface {
-	GetInteractive(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetInteractiveReply, error)
-	ListInteractive(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListInteractiveReply, error)
-	AddReadCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error)
-	AddLikeCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error)
-	AddCollectCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error)
+	GetInteractive(ctx context.Context, in *GetInteractiveRequest, opts ...grpc.CallOption) (*GetInteractiveReply, error)
+	ListInteractive(ctx context.Context, in *ListInteractiveRequest, opts ...grpc.CallOption) (*ListInteractiveReply, error)
+	AddReadCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error)
+	AddLikeCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error)
+	AddCollectCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error)
 }
 
 type interactiveClient struct {
@@ -46,7 +45,7 @@ func NewInteractiveClient(cc grpc.ClientConnInterface) InteractiveClient {
 	return &interactiveClient{cc}
 }
 
-func (c *interactiveClient) GetInteractive(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetInteractiveReply, error) {
+func (c *interactiveClient) GetInteractive(ctx context.Context, in *GetInteractiveRequest, opts ...grpc.CallOption) (*GetInteractiveReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetInteractiveReply)
 	err := c.cc.Invoke(ctx, Interactive_GetInteractive_FullMethodName, in, out, cOpts...)
@@ -56,7 +55,7 @@ func (c *interactiveClient) GetInteractive(ctx context.Context, in *emptypb.Empt
 	return out, nil
 }
 
-func (c *interactiveClient) ListInteractive(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListInteractiveReply, error) {
+func (c *interactiveClient) ListInteractive(ctx context.Context, in *ListInteractiveRequest, opts ...grpc.CallOption) (*ListInteractiveReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListInteractiveReply)
 	err := c.cc.Invoke(ctx, Interactive_ListInteractive_FullMethodName, in, out, cOpts...)
@@ -66,7 +65,7 @@ func (c *interactiveClient) ListInteractive(ctx context.Context, in *emptypb.Emp
 	return out, nil
 }
 
-func (c *interactiveClient) AddReadCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error) {
+func (c *interactiveClient) AddReadCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AddCountReply)
 	err := c.cc.Invoke(ctx, Interactive_AddReadCount_FullMethodName, in, out, cOpts...)
@@ -76,7 +75,7 @@ func (c *interactiveClient) AddReadCount(ctx context.Context, in *emptypb.Empty,
 	return out, nil
 }
 
-func (c *interactiveClient) AddLikeCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error) {
+func (c *interactiveClient) AddLikeCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AddCountReply)
 	err := c.cc.Invoke(ctx, Interactive_AddLikeCount_FullMethodName, in, out, cOpts...)
@@ -86,7 +85,7 @@ func (c *interactiveClient) AddLikeCount(ctx context.Context, in *emptypb.Empty,
 	return out, nil
 }
 
-func (c *interactiveClient) AddCollectCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AddCountReply, error) {
+func (c *interactiveClient) AddCollectCount(ctx context.Context, in *AddCountRequest, opts ...grpc.CallOption) (*AddCountReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AddCountReply)
 	err := c.cc.Invoke(ctx, Interactive_AddCollectCount_FullMethodName, in, out, cOpts...)
@@ -100,11 +99,11 @@ func (c *interactiveClient) AddCollectCount(ctx context.Context, in *emptypb.Emp
 // All implementations must embed UnimplementedInteractiveServer
 // for forward compatibility
 type InteractiveServer interface {
-	GetInteractive(context.Context, *emptypb.Empty) (*GetInteractiveReply, error)
-	ListInteractive(context.Context, *emptypb.Empty) (*ListInteractiveReply, error)
-	AddReadCount(context.Context, *emptypb.Empty) (*AddCountReply, error)
-	AddLikeCount(context.Context, *emptypb.Empty) (*AddCountReply, error)
-	AddCollectCount(context.Context, *emptypb.Empty) (*AddCountReply, error)
+	GetInteractive(context.Context, *GetInteractiveRequest) (*GetInteractiveReply, error)
+	ListInteractive(context.Context, *ListInteractiveRequest) (*ListInteractiveReply, error)
+	AddReadCount(context.Context, *AddCountRequest) (*AddCountReply, error)
+	AddLikeCount(context.Context, *AddCountRequest) (*AddCountReply, error)
+	AddCollectCount(context.Context, *AddCountRequest) (*AddCountReply, error)
 	mustEmbedUnimplementedInteractiveServer()
 }
 
@@ -112,19 +111,19 @@ type InteractiveServer interface {
 type UnimplementedInteractiveServer struct {
 }
 
-func (UnimplementedInteractiveServer) GetInteractive(context.Context, *emptypb.Empty) (*GetInteractiveReply, error) {
+func (UnimplementedInteractiveServer) GetInteractive(context.Context, *GetInteractiveRequest) (*GetInteractiveReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInteractive not implemented")
 }
-func (UnimplementedInteractiveServer) ListInteractive(context.Context, *emptypb.Empty) (*ListInteractiveReply, error) {
+func (UnimplementedInteractiveServer) ListInteractive(context.Context, *ListInteractiveRequest) (*ListInteractiveReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListInteractive not implemented")
 }
-func (UnimplementedInteractiveServer) AddReadCount(context.Context, *emptypb.Empty) (*AddCountReply, error) {
+func (UnimplementedInteractiveServer) AddReadCount(context.Context, *AddCountRequest) (*AddCountReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddReadCount not implemented")
 }
-func (UnimplementedInteractiveServer) AddLikeCount(context.Context, *emptypb.Empty) (*AddCountReply, error) {
+func (UnimplementedInteractiveServer) AddLikeCount(context.Context, *AddCountRequest) (*AddCountReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddLikeCount not implemented")
 }
-func (UnimplementedInteractiveServer) AddCollectCount(context.Context, *emptypb.Empty) (*AddCountReply, error) {
+func (UnimplementedInteractiveServer) AddCollectCount(context.Context, *AddCountRequest) (*AddCountReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectCount not implemented")
 }
 func (UnimplementedInteractiveServer) mustEmbedUnimplementedInteractiveServer() {}
@@ -141,7 +140,7 @@ func RegisterInteractiveServer(s grpc.ServiceRegistrar, srv InteractiveServer) {
 }
 
 func _Interactive_GetInteractive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetInteractiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -153,13 +152,13 @@ func _Interactive_GetInteractive_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: Interactive_GetInteractive_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InteractiveServer).GetInteractive(ctx, req.(*emptypb.Empty))
+		return srv.(InteractiveServer).GetInteractive(ctx, req.(*GetInteractiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Interactive_ListInteractive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListInteractiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -171,13 +170,13 @@ func _Interactive_ListInteractive_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: Interactive_ListInteractive_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InteractiveServer).ListInteractive(ctx, req.(*emptypb.Empty))
+		return srv.(InteractiveServer).ListInteractive(ctx, req.(*ListInteractiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Interactive_AddReadCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(AddCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -189,13 +188,13 @@ func _Interactive_AddReadCount_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: Interactive_AddReadCount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InteractiveServer).AddReadCount(ctx, req.(*emptypb.Empty))
+		return srv.(InteractiveServer).AddReadCount(ctx, req.(*AddCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Interactive_AddLikeCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(AddCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -207,13 +206,13 @@ func _Interactive_AddLikeCount_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: Interactive_AddLikeCount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InteractiveServer).AddLikeCount(ctx, req.(*emptypb.Empty))
+		return srv.(InteractiveServer).AddLikeCount(ctx, req.(*AddCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Interactive_AddCollectCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(AddCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -225,7 +224,7 @@ func _Interactive_AddCollectCount_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: Interactive_AddCollectCount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InteractiveServer).AddCollectCount(ctx, req.(*emptypb.Empty))
+		return srv.(InteractiveServer).AddCollectCount(ctx, req.(*AddCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

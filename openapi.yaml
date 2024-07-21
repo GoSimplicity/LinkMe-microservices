@@ -6,11 +6,17 @@ info:
     title: Interactive API
     version: 0.0.1
 paths:
-    /v1/interactive:
+    /get/{postId}:
         get:
             tags:
                 - Interactive
             operationId: Interactive_GetInteractive
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -24,14 +30,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/interactive/list:
+    /list:
         post:
             tags:
                 - Interactive
             operationId: Interactive_ListInteractive
             requestBody:
                 content:
-                    application/json: {}
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListInteractiveRequest'
                 required: true
             responses:
                 "200":
@@ -99,6 +107,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/GetOrListInteractive'
+        ListInteractiveRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
         Status:
             type: object
             properties:

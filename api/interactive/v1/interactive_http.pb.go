@@ -10,7 +10,6 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,25 +23,28 @@ const OperationInteractiveGetInteractive = "/api.interactive.v1.Interactive/GetI
 const OperationInteractiveListInteractive = "/api.interactive.v1.Interactive/ListInteractive"
 
 type InteractiveHTTPServer interface {
-	GetInteractive(context.Context, *emptypb.Empty) (*GetInteractiveReply, error)
-	ListInteractive(context.Context, *emptypb.Empty) (*ListInteractiveReply, error)
+	GetInteractive(context.Context, *GetInteractiveRequest) (*GetInteractiveReply, error)
+	ListInteractive(context.Context, *ListInteractiveRequest) (*ListInteractiveReply, error)
 }
 
 func RegisterInteractiveHTTPServer(s *http.Server, srv InteractiveHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/interactive", _Interactive_GetInteractive0_HTTP_Handler(srv))
-	r.POST("/v1/interactive/list", _Interactive_ListInteractive0_HTTP_Handler(srv))
+	r.GET("/get/{postId}", _Interactive_GetInteractive0_HTTP_Handler(srv))
+	r.POST("/list", _Interactive_ListInteractive0_HTTP_Handler(srv))
 }
 
 func _Interactive_GetInteractive0_HTTP_Handler(srv InteractiveHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in emptypb.Empty
+		var in GetInteractiveRequest
 		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationInteractiveGetInteractive)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetInteractive(ctx, req.(*emptypb.Empty))
+			return srv.GetInteractive(ctx, req.(*GetInteractiveRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -55,7 +57,7 @@ func _Interactive_GetInteractive0_HTTP_Handler(srv InteractiveHTTPServer) func(c
 
 func _Interactive_ListInteractive0_HTTP_Handler(srv InteractiveHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in emptypb.Empty
+		var in ListInteractiveRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
@@ -64,7 +66,7 @@ func _Interactive_ListInteractive0_HTTP_Handler(srv InteractiveHTTPServer) func(
 		}
 		http.SetOperation(ctx, OperationInteractiveListInteractive)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ListInteractive(ctx, req.(*emptypb.Empty))
+			return srv.ListInteractive(ctx, req.(*ListInteractiveRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -76,8 +78,8 @@ func _Interactive_ListInteractive0_HTTP_Handler(srv InteractiveHTTPServer) func(
 }
 
 type InteractiveHTTPClient interface {
-	GetInteractive(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetInteractiveReply, err error)
-	ListInteractive(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListInteractiveReply, err error)
+	GetInteractive(ctx context.Context, req *GetInteractiveRequest, opts ...http.CallOption) (rsp *GetInteractiveReply, err error)
+	ListInteractive(ctx context.Context, req *ListInteractiveRequest, opts ...http.CallOption) (rsp *ListInteractiveReply, err error)
 }
 
 type InteractiveHTTPClientImpl struct {
@@ -88,9 +90,9 @@ func NewInteractiveHTTPClient(client *http.Client) InteractiveHTTPClient {
 	return &InteractiveHTTPClientImpl{client}
 }
 
-func (c *InteractiveHTTPClientImpl) GetInteractive(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetInteractiveReply, error) {
+func (c *InteractiveHTTPClientImpl) GetInteractive(ctx context.Context, in *GetInteractiveRequest, opts ...http.CallOption) (*GetInteractiveReply, error) {
 	var out GetInteractiveReply
-	pattern := "/v1/interactive"
+	pattern := "/get/{postId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationInteractiveGetInteractive))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -101,9 +103,9 @@ func (c *InteractiveHTTPClientImpl) GetInteractive(ctx context.Context, in *empt
 	return &out, nil
 }
 
-func (c *InteractiveHTTPClientImpl) ListInteractive(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListInteractiveReply, error) {
+func (c *InteractiveHTTPClientImpl) ListInteractive(ctx context.Context, in *ListInteractiveRequest, opts ...http.CallOption) (*ListInteractiveReply, error) {
 	var out ListInteractiveReply
-	pattern := "/v1/interactive/list"
+	pattern := "/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInteractiveListInteractive))
 	opts = append(opts, http.PathTemplate(pattern))

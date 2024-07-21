@@ -5,23 +5,26 @@ package api.interactive.v1;
 option go_package = "github.com/GoSimplicity/LinkMe-microservices/api/interactive/v1;v1";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 service Interactive {
-  rpc GetInteractive (google.protobuf.Empty) returns (GetInteractiveReply) {
+  rpc GetInteractive (GetInteractiveRequest) returns (GetInteractiveReply) {
     option (google.api.http) = {
-      get: "/v1/interactive"
+      get: "/get/{postId}"
     };
   }
-  rpc ListInteractive (google.protobuf.Empty) returns (ListInteractiveReply) {
+  rpc ListInteractive (ListInteractiveRequest) returns (ListInteractiveReply) {
     option (google.api.http) = {
-      post: "/v1/interactive/list"
+      post: "/list"
       body: "*"
     };
   }
-  rpc AddReadCount (google.protobuf.Empty) returns (AddCountReply);
-  rpc AddLikeCount (google.protobuf.Empty) returns (AddCountReply);
-  rpc AddCollectCount (google.protobuf.Empty) returns (AddCountReply);
+  rpc AddReadCount (AddCountRequest) returns (AddCountReply);
+  rpc AddLikeCount (AddCountRequest) returns (AddCountReply);
+  rpc AddCollectCount (AddCountRequest) returns (AddCountReply);
+}
+
+message GetInteractiveRequest{
+  int64 postId = 1;
 }
 
 message GetInteractiveReply {
@@ -30,10 +33,20 @@ message GetInteractiveReply {
   GetOrListInteractive data = 3;
 }
 
+message ListInteractiveRequest {
+  int32 page = 1;
+	int64 size = 2;
+}
+
 message ListInteractiveReply {
   int32 code = 1;
   string msg = 2;
   repeated GetOrListInteractive data = 3;
+}
+
+message AddCountRequest {
+  int64 postId = 1;
+  string bizName = 2;
 }
 
 message AddCountReply {
