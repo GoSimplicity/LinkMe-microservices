@@ -3,35 +3,21 @@
 
 openapi: 3.0.3
 info:
-    title: Interactive API
+    title: Ranking API
+    description: Ranking 服务定义
     version: 0.0.1
 paths:
-    /v1/interactive:
-        get:
-            tags:
-                - Interactive
-            operationId: Interactive_GetInteractive
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetInteractiveReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /v1/interactive/list:
+    /create:
         post:
             tags:
-                - Interactive
-            operationId: Interactive_ListInteractive
+                - Ranking
+            description: 创建排名 (HTTP POST)
+            operationId: Ranking_CreateRanking
             requestBody:
                 content:
-                    application/json: {}
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRankingRequest'
                 required: true
             responses:
                 "200":
@@ -39,7 +25,118 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListInteractiveReply'
+                                $ref: '#/components/schemas/CreateRankingReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /delete/{id}:
+        delete:
+            tags:
+                - Ranking
+            description: 删除排名 (HTTP DELETE)
+            operationId: Ranking_DeleteRanking
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteRankingReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /get/{id}:
+        get:
+            tags:
+                - Ranking
+            description: 获取单个排名 (HTTP GET)
+            operationId: Ranking_GetRanking
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetRankingReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /list:
+        get:
+            tags:
+                - Ranking
+            description: 列出所有排名 (HTTP GET)
+            operationId: Ranking_ListRanking
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListRankingReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /update/{id}:
+        post:
+            tags:
+                - Ranking
+            description: 更新排名 (HTTP POST)
+            operationId: Ranking_UpdateRanking
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateRankingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateRankingReply'
                 default:
                     description: Default error response
                     content:
@@ -48,37 +145,28 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        GetInteractiveReply:
+        CreateRankingReply:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/GetOrListInteractive'
-        GetOrListInteractive:
+                ranking:
+                    $ref: '#/components/schemas/Rank'
+            description: CreateRanking 响应消息
+        CreateRankingRequest:
             type: object
             properties:
-                ID:
-                    type: string
-                BizID:
-                    type: string
-                BizName:
-                    type: string
-                ReadCount:
-                    type: string
-                LikeCount:
-                    type: string
-                CollectCount:
-                    type: string
-                UpdateTime:
-                    type: string
-                CreateTime:
-                    type: string
-                PostId:
-                    type: string
+                ranking:
+                    $ref: '#/components/schemas/Rank'
+            description: CreateRanking 请求消息
+        DeleteRankingReply:
+            type: object
+            properties: {}
+            description: DeleteRanking 响应消息
+        GetRankingReply:
+            type: object
+            properties:
+                ranking:
+                    $ref: '#/components/schemas/Rank'
+            description: GetRanking 响应消息
         GoogleProtobufAny:
             type: object
             properties:
@@ -87,18 +175,37 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListInteractiveReply:
+        ListRankingReply:
             type: object
             properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-                data:
+                rankings:
                     type: array
                     items:
-                        $ref: '#/components/schemas/GetOrListInteractive'
+                        $ref: '#/components/schemas/Rank'
+            description: ListRanking 响应消息
+        Rank:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                category:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+            description: Rank 消息
         Status:
             type: object
             properties:
@@ -115,5 +222,19 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdateRankingReply:
+            type: object
+            properties:
+                ranking:
+                    $ref: '#/components/schemas/Rank'
+            description: UpdateRanking 响应消息
+        UpdateRankingRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                ranking:
+                    $ref: '#/components/schemas/Rank'
+            description: UpdateRanking 请求消息
 tags:
-    - name: Interactive
+    - name: Ranking
