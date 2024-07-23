@@ -7,79 +7,40 @@ option go_package = "github.com/GoSimplicity/LinkMe-microservices/api/ranking/v1
 import "google/api/annotations.proto";
 
 service Ranking {
-	rpc TopN (TopNRequest) returns (TopNReply);
-	rpc CreateRanking (CreateRankingRequest) returns (CreateRankingReply) {
-		option (google.api.http) = {
-			post: "/create"
-			body: "*"
-		};
-	}
-	rpc UpdateRanking (UpdateRankingRequest) returns (UpdateRankingReply) {
-		option (google.api.http) = {
-			post: "/update/{id}"
-			body: "*"
-		};
-	}
-	rpc DeleteRanking (DeleteRankingRequest) returns (DeleteRankingReply) {
-		option (google.api.http) = {
-			delete: "/delete/{id}"
-		};
-	}
-	rpc GetRanking (GetRankingRequest) returns (GetRankingReply) {
-		option (google.api.http) = {
-			get: "/get/{id}"
-		};
-	}
-	rpc ListRanking (ListRankingRequest) returns (ListRankingReply) {
-		option (google.api.http) = {
-			get: "/list"
-		};
-	}
+  // 获取前 N 个排名
+  rpc TopN (TopNRequest) returns (TopNReply);
+  // 获取分页的前 N 个排名列表
+  rpc ListTopN (ListTopNRequest) returns (ListTopNReply) {
+    option (google.api.http) = {
+      post: "/list"
+	  body: "*"
+    };
+  }
 }
-
 message TopNRequest {
-	int32 number = 1; // 要获取的排名数量
+  int32 count = 1; // 要获取的排名数量
 }
 message TopNReply {
-	repeated Rank ranking = 1; // 排名列表
+  int32 code = 1;
+  string msg = 2; 
 }
-message CreateRankingRequest {
-	Rank ranking = 1; // 要创建的排名信息
+message ListTopNRequest {
+  int32 page = 1;
+  int64 size = 2;
 }
-message CreateRankingReply {
-	Rank ranking = 1; // 创建的排名信息
+message ListTopNReply {
+  int32 code = 1;
+  string msg = 2;
+  repeated GetOrListRanking data = 3; // 排名列表
 }
-message UpdateRankingRequest {
-	int64 id = 1;
-	Rank ranking = 2; // 要更新的排名信息
-}
-message UpdateRankingReply {
-	Rank ranking = 1; // 更新后的排名信息
-}
-message DeleteRankingRequest {
-	int64 id = 1; // 要删除的排名 ID
-}
-message DeleteRankingReply {}
-message GetRankingRequest {
-	int64 id = 1; // 要获取的排名 ID
-}
-message GetRankingReply {
-	Rank ranking = 1; // 获取的排名信息
-}
-message ListRankingRequest {
-	int32 page = 1; // 页码
-	int32 size = 2; // 每页大小
-}
-message ListRankingReply {
-	repeated Rank rankings = 1; // 排名列表
-}
-message Rank {
-	int64 id = 1; // 排名 ID
-	string title = 2; // 排名标题
-	string description = 3; // 排名描述
-	int32 score = 4; // 排名分数
-	string category = 5; // 排名类别
-	repeated string tags = 6; // 排名标签
-	string created_at = 7; // 创建时间
-	string updated_at = 8; // 更新时间
+message GetOrListRanking {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  int64 postId = 4;
+  int64 userId = 5;
+  int64 plateId = 6;
+  int64 likeCount = 7;
+  int64 collectCount = 8;
+  int64 viewCount = 9;
 }
