@@ -6,11 +6,11 @@
 package main
 
 import (
-	"linkme-ranking/internal/biz"
-	"linkme-ranking/internal/conf"
-	"linkme-ranking/internal/data"
-	"linkme-ranking/internal/server"
-	"linkme-ranking/internal/service"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-ranking/internal/biz"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-ranking/internal/conf"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-ranking/internal/data"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-ranking/internal/server"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-ranking/internal/service"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
@@ -18,6 +18,6 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*conf.Server, *conf.Data, log.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Server, *conf.Data, *conf.Service, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
 }

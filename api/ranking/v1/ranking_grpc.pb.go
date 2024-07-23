@@ -19,32 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Ranking_TopN_FullMethodName          = "/api.ranking.v1.Ranking/TopN"
-	Ranking_CreateRanking_FullMethodName = "/api.ranking.v1.Ranking/CreateRanking"
-	Ranking_UpdateRanking_FullMethodName = "/api.ranking.v1.Ranking/UpdateRanking"
-	Ranking_DeleteRanking_FullMethodName = "/api.ranking.v1.Ranking/DeleteRanking"
-	Ranking_GetRanking_FullMethodName    = "/api.ranking.v1.Ranking/GetRanking"
-	Ranking_ListRanking_FullMethodName   = "/api.ranking.v1.Ranking/ListRanking"
+	Ranking_TopN_FullMethodName     = "/api.ranking.v1.Ranking/TopN"
+	Ranking_ListTopN_FullMethodName = "/api.ranking.v1.Ranking/ListTopN"
 )
 
 // RankingClient is the client API for Ranking service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Ranking 服务定义
 type RankingClient interface {
-	// 获取前 N 名排名 (gRPC)
+	// 获取前 N 个排名
 	TopN(ctx context.Context, in *TopNRequest, opts ...grpc.CallOption) (*TopNReply, error)
-	// 创建排名 (HTTP POST)
-	CreateRanking(ctx context.Context, in *CreateRankingRequest, opts ...grpc.CallOption) (*CreateRankingReply, error)
-	// 更新排名 (HTTP POST)
-	UpdateRanking(ctx context.Context, in *UpdateRankingRequest, opts ...grpc.CallOption) (*UpdateRankingReply, error)
-	// 删除排名 (HTTP DELETE)
-	DeleteRanking(ctx context.Context, in *DeleteRankingRequest, opts ...grpc.CallOption) (*DeleteRankingReply, error)
-	// 获取单个排名 (HTTP GET)
-	GetRanking(ctx context.Context, in *GetRankingRequest, opts ...grpc.CallOption) (*GetRankingReply, error)
-	// 列出所有排名 (HTTP GET)
-	ListRanking(ctx context.Context, in *ListRankingRequest, opts ...grpc.CallOption) (*ListRankingReply, error)
+	// 获取分页的前 N 个排名列表
+	ListTopN(ctx context.Context, in *ListTopNRequest, opts ...grpc.CallOption) (*ListTopNReply, error)
 }
 
 type rankingClient struct {
@@ -65,50 +51,10 @@ func (c *rankingClient) TopN(ctx context.Context, in *TopNRequest, opts ...grpc.
 	return out, nil
 }
 
-func (c *rankingClient) CreateRanking(ctx context.Context, in *CreateRankingRequest, opts ...grpc.CallOption) (*CreateRankingReply, error) {
+func (c *rankingClient) ListTopN(ctx context.Context, in *ListTopNRequest, opts ...grpc.CallOption) (*ListTopNReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateRankingReply)
-	err := c.cc.Invoke(ctx, Ranking_CreateRanking_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *rankingClient) UpdateRanking(ctx context.Context, in *UpdateRankingRequest, opts ...grpc.CallOption) (*UpdateRankingReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateRankingReply)
-	err := c.cc.Invoke(ctx, Ranking_UpdateRanking_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *rankingClient) DeleteRanking(ctx context.Context, in *DeleteRankingRequest, opts ...grpc.CallOption) (*DeleteRankingReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteRankingReply)
-	err := c.cc.Invoke(ctx, Ranking_DeleteRanking_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *rankingClient) GetRanking(ctx context.Context, in *GetRankingRequest, opts ...grpc.CallOption) (*GetRankingReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetRankingReply)
-	err := c.cc.Invoke(ctx, Ranking_GetRanking_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *rankingClient) ListRanking(ctx context.Context, in *ListRankingRequest, opts ...grpc.CallOption) (*ListRankingReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListRankingReply)
-	err := c.cc.Invoke(ctx, Ranking_ListRanking_FullMethodName, in, out, cOpts...)
+	out := new(ListTopNReply)
+	err := c.cc.Invoke(ctx, Ranking_ListTopN_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,21 +64,11 @@ func (c *rankingClient) ListRanking(ctx context.Context, in *ListRankingRequest,
 // RankingServer is the server API for Ranking service.
 // All implementations must embed UnimplementedRankingServer
 // for forward compatibility
-//
-// Ranking 服务定义
 type RankingServer interface {
-	// 获取前 N 名排名 (gRPC)
+	// 获取前 N 个排名
 	TopN(context.Context, *TopNRequest) (*TopNReply, error)
-	// 创建排名 (HTTP POST)
-	CreateRanking(context.Context, *CreateRankingRequest) (*CreateRankingReply, error)
-	// 更新排名 (HTTP POST)
-	UpdateRanking(context.Context, *UpdateRankingRequest) (*UpdateRankingReply, error)
-	// 删除排名 (HTTP DELETE)
-	DeleteRanking(context.Context, *DeleteRankingRequest) (*DeleteRankingReply, error)
-	// 获取单个排名 (HTTP GET)
-	GetRanking(context.Context, *GetRankingRequest) (*GetRankingReply, error)
-	// 列出所有排名 (HTTP GET)
-	ListRanking(context.Context, *ListRankingRequest) (*ListRankingReply, error)
+	// 获取分页的前 N 个排名列表
+	ListTopN(context.Context, *ListTopNRequest) (*ListTopNReply, error)
 	mustEmbedUnimplementedRankingServer()
 }
 
@@ -143,20 +79,8 @@ type UnimplementedRankingServer struct {
 func (UnimplementedRankingServer) TopN(context.Context, *TopNRequest) (*TopNReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TopN not implemented")
 }
-func (UnimplementedRankingServer) CreateRanking(context.Context, *CreateRankingRequest) (*CreateRankingReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateRanking not implemented")
-}
-func (UnimplementedRankingServer) UpdateRanking(context.Context, *UpdateRankingRequest) (*UpdateRankingReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRanking not implemented")
-}
-func (UnimplementedRankingServer) DeleteRanking(context.Context, *DeleteRankingRequest) (*DeleteRankingReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteRanking not implemented")
-}
-func (UnimplementedRankingServer) GetRanking(context.Context, *GetRankingRequest) (*GetRankingReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRanking not implemented")
-}
-func (UnimplementedRankingServer) ListRanking(context.Context, *ListRankingRequest) (*ListRankingReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListRanking not implemented")
+func (UnimplementedRankingServer) ListTopN(context.Context, *ListTopNRequest) (*ListTopNReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTopN not implemented")
 }
 func (UnimplementedRankingServer) mustEmbedUnimplementedRankingServer() {}
 
@@ -189,92 +113,20 @@ func _Ranking_TopN_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Ranking_CreateRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRankingRequest)
+func _Ranking_ListTopN_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTopNRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RankingServer).CreateRanking(ctx, in)
+		return srv.(RankingServer).ListTopN(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Ranking_CreateRanking_FullMethodName,
+		FullMethod: Ranking_ListTopN_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RankingServer).CreateRanking(ctx, req.(*CreateRankingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Ranking_UpdateRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRankingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RankingServer).UpdateRanking(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Ranking_UpdateRanking_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RankingServer).UpdateRanking(ctx, req.(*UpdateRankingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Ranking_DeleteRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRankingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RankingServer).DeleteRanking(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Ranking_DeleteRanking_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RankingServer).DeleteRanking(ctx, req.(*DeleteRankingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Ranking_GetRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRankingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RankingServer).GetRanking(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Ranking_GetRanking_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RankingServer).GetRanking(ctx, req.(*GetRankingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Ranking_ListRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListRankingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RankingServer).ListRanking(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Ranking_ListRanking_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RankingServer).ListRanking(ctx, req.(*ListRankingRequest))
+		return srv.(RankingServer).ListTopN(ctx, req.(*ListTopNRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -291,24 +143,8 @@ var Ranking_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Ranking_TopN_Handler,
 		},
 		{
-			MethodName: "CreateRanking",
-			Handler:    _Ranking_CreateRanking_Handler,
-		},
-		{
-			MethodName: "UpdateRanking",
-			Handler:    _Ranking_UpdateRanking_Handler,
-		},
-		{
-			MethodName: "DeleteRanking",
-			Handler:    _Ranking_DeleteRanking_Handler,
-		},
-		{
-			MethodName: "GetRanking",
-			Handler:    _Ranking_GetRanking_Handler,
-		},
-		{
-			MethodName: "ListRanking",
-			Handler:    _Ranking_ListRanking_Handler,
+			MethodName: "ListTopN",
+			Handler:    _Ranking_ListTopN_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
