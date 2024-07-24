@@ -33,8 +33,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	checkData := data.NewCheckData(db, zapLogger)
 	checkBiz := biz.NewCheckBiz(checkData)
 	checkService := service.NewCheckService(checkBiz, postClient)
-	grpcServer := server.NewGRPCServer(confServer, checkService)
-	httpServer := server.NewHTTPServer(confServer, checkService)
+	grpcServer := server.NewGRPCServer(confServer, checkService, logger)
+	httpServer := server.NewHTTPServer(confServer, checkService, logger)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
 	}, nil

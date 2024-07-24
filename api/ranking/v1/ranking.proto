@@ -13,7 +13,7 @@ service Ranking {
   rpc ListTopN (ListTopNRequest) returns (ListTopNReply) {
     option (google.api.http) = {
       post: "/list"
-	  body: "*"
+	    body: "*"
     };
   }
 }

@@ -4,16 +4,20 @@ import (
 	v1 "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/service"
-
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/ratelimit"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, sp *service.PostService) *http.Server {
+func NewHTTPServer(c *conf.Server, sp *service.PostService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
+			ratelimit.Server(),
+			logging.Server(logger),
 		),
 	}
 	if c.Http.Network != "" {
