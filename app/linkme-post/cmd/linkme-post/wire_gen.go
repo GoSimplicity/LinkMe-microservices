@@ -40,8 +40,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	postData := data.NewPostData(dataData, zapLogger)
 	postBiz := biz.NewPostBiz(postData)
 	postService := service.NewPostService(postBiz, userClient, checkClient)
-	grpcServer := server.NewGRPCServer(confServer, postService)
-	httpServer := server.NewHTTPServer(confServer, postService)
+	grpcServer := server.NewGRPCServer(confServer, postService, logger)
+	httpServer := server.NewHTTPServer(confServer, postService, logger)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

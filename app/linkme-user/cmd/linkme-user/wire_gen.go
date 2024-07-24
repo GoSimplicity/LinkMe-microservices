@@ -40,9 +40,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	userBiz := biz.NewUserBiz(userInteractive, zapLogger)
 	handler := data.NewJWT(cmdable)
 	userService := service.NewUserService(userBiz, handler)
-	grpcServer := server.NewGRPCServer(confServer, userService)
+	grpcServer := server.NewGRPCServer(confServer, userService, logger)
 	jwtMiddleware := middleware.NewJWTMiddleware(handler)
-	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware)
+	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware, logger)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
