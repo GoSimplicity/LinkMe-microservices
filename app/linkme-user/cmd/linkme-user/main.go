@@ -2,13 +2,16 @@ package main
 
 import (
 	"flag"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 	"os"
-
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -83,7 +86,22 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, logger)
+	// 设置 Jaeger 追踪导出器，用于收集追踪信息
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(bc.Trace.Endpoint)))
+	if err != nil {
+		panic(err)
+	}
+
+	// 创建 OpenTelemetry 追踪提供者
+	tp := tracesdk.NewTracerProvider(
+		tracesdk.WithBatcher(exp), // 批量处理追踪数据
+		tracesdk.WithResource(resource.NewSchemaless(
+			semconv.ServiceNameKey.String(Name), // 设置服务名称
+		)),
+	)
+
+	// 初始化应用程序
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, logger, tp)
 	if err != nil {
 		panic(err)
 	}

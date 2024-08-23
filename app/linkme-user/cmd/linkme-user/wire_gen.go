@@ -15,6 +15,7 @@ import (
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-user/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 import (
@@ -24,7 +25,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
 	db, err := data.NewDB(confData)
 	if err != nil {
 		return nil, nil, err
@@ -40,9 +41,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	userBiz := biz.NewUserBiz(userInteractive, zapLogger)
 	handler := data.NewJWT(cmdable)
 	userService := service.NewUserService(userBiz, handler)
-	grpcServer := server.NewGRPCServer(confServer, userService, logger)
+	grpcServer := server.NewGRPCServer(confServer, userService, logger, tracerProvider)
 	jwtMiddleware := middleware.NewJWTMiddleware(handler)
-	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware, logger)
+	httpServer := server.NewHTTPServer(confServer, userService, jwtMiddleware, logger, tracerProvider)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
