@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,17 +24,10 @@ const (
 	Post_UpdatePostStatus_FullMethodName = "/api.post.Post/UpdatePostStatus"
 	Post_DeletePost_FullMethodName       = "/api.post.Post/DeletePost"
 	Post_PublishPost_FullMethodName      = "/api.post.Post/PublishPost"
-	Post_WithdrawPost_FullMethodName     = "/api.post.Post/WithdrawPost"
 	Post_ListPost_FullMethodName         = "/api.post.Post/ListPost"
 	Post_ListPubPost_FullMethodName      = "/api.post.Post/ListPubPost"
-	Post_ListAdminPost_FullMethodName    = "/api.post.Post/ListAdminPost"
 	Post_DetailPost_FullMethodName       = "/api.post.Post/DetailPost"
 	Post_DetailPubPost_FullMethodName    = "/api.post.Post/DetailPubPost"
-	Post_DetailAdminPost_FullMethodName  = "/api.post.Post/DetailAdminPost"
-	Post_GetPostStats_FullMethodName     = "/api.post.Post/GetPostStats"
-	Post_LikePost_FullMethodName         = "/api.post.Post/LikePost"
-	Post_CollectPost_FullMethodName      = "/api.post.Post/CollectPost"
-	Post_PostSync_FullMethodName         = "/api.post.Post/PostSync"
 )
 
 // PostClient is the client API for Post service.
@@ -47,17 +39,10 @@ type PostClient interface {
 	UpdatePostStatus(ctx context.Context, in *UpdatePostStatusRequest, opts ...grpc.CallOption) (*UpdatePostStatusReply, error)
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostReply, error)
 	PublishPost(ctx context.Context, in *PublishPostRequest, opts ...grpc.CallOption) (*PublishPostReply, error)
-	WithdrawPost(ctx context.Context, in *WithdrawPostRequest, opts ...grpc.CallOption) (*WithdrawPostReply, error)
 	ListPost(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostReply, error)
 	ListPubPost(ctx context.Context, in *ListPubPostRequest, opts ...grpc.CallOption) (*ListPubPostReply, error)
-	ListAdminPost(ctx context.Context, in *ListAdminPostRequest, opts ...grpc.CallOption) (*ListAdminPostReply, error)
 	DetailPost(ctx context.Context, in *DetailPostRequest, opts ...grpc.CallOption) (*DetailPostReply, error)
 	DetailPubPost(ctx context.Context, in *DetailPubPostRequest, opts ...grpc.CallOption) (*DetailPubPostReply, error)
-	DetailAdminPost(ctx context.Context, in *DetailAdminPostRequest, opts ...grpc.CallOption) (*DetailAdminPostReply, error)
-	GetPostStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPostStatsReply, error)
-	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostReply, error)
-	CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*CollectPostReply, error)
-	PostSync(ctx context.Context, in *PostSyncRequest, opts ...grpc.CallOption) (*PostSyncReply, error)
 }
 
 type postClient struct {
@@ -118,16 +103,6 @@ func (c *postClient) PublishPost(ctx context.Context, in *PublishPostRequest, op
 	return out, nil
 }
 
-func (c *postClient) WithdrawPost(ctx context.Context, in *WithdrawPostRequest, opts ...grpc.CallOption) (*WithdrawPostReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WithdrawPostReply)
-	err := c.cc.Invoke(ctx, Post_WithdrawPost_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *postClient) ListPost(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListPostReply)
@@ -142,16 +117,6 @@ func (c *postClient) ListPubPost(ctx context.Context, in *ListPubPostRequest, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListPubPostReply)
 	err := c.cc.Invoke(ctx, Post_ListPubPost_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postClient) ListAdminPost(ctx context.Context, in *ListAdminPostRequest, opts ...grpc.CallOption) (*ListAdminPostReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListAdminPostReply)
-	err := c.cc.Invoke(ctx, Post_ListAdminPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -178,56 +143,6 @@ func (c *postClient) DetailPubPost(ctx context.Context, in *DetailPubPostRequest
 	return out, nil
 }
 
-func (c *postClient) DetailAdminPost(ctx context.Context, in *DetailAdminPostRequest, opts ...grpc.CallOption) (*DetailAdminPostReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DetailAdminPostReply)
-	err := c.cc.Invoke(ctx, Post_DetailAdminPost_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postClient) GetPostStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPostStatsReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPostStatsReply)
-	err := c.cc.Invoke(ctx, Post_GetPostStats_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postClient) LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LikePostReply)
-	err := c.cc.Invoke(ctx, Post_LikePost_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postClient) CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*CollectPostReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CollectPostReply)
-	err := c.cc.Invoke(ctx, Post_CollectPost_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postClient) PostSync(ctx context.Context, in *PostSyncRequest, opts ...grpc.CallOption) (*PostSyncReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PostSyncReply)
-	err := c.cc.Invoke(ctx, Post_PostSync_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PostServer is the server API for Post service.
 // All implementations must embed UnimplementedPostServer
 // for forward compatibility
@@ -237,17 +152,10 @@ type PostServer interface {
 	UpdatePostStatus(context.Context, *UpdatePostStatusRequest) (*UpdatePostStatusReply, error)
 	DeletePost(context.Context, *DeletePostRequest) (*DeletePostReply, error)
 	PublishPost(context.Context, *PublishPostRequest) (*PublishPostReply, error)
-	WithdrawPost(context.Context, *WithdrawPostRequest) (*WithdrawPostReply, error)
 	ListPost(context.Context, *ListPostRequest) (*ListPostReply, error)
 	ListPubPost(context.Context, *ListPubPostRequest) (*ListPubPostReply, error)
-	ListAdminPost(context.Context, *ListAdminPostRequest) (*ListAdminPostReply, error)
 	DetailPost(context.Context, *DetailPostRequest) (*DetailPostReply, error)
 	DetailPubPost(context.Context, *DetailPubPostRequest) (*DetailPubPostReply, error)
-	DetailAdminPost(context.Context, *DetailAdminPostRequest) (*DetailAdminPostReply, error)
-	GetPostStats(context.Context, *emptypb.Empty) (*GetPostStatsReply, error)
-	LikePost(context.Context, *LikePostRequest) (*LikePostReply, error)
-	CollectPost(context.Context, *CollectPostRequest) (*CollectPostReply, error)
-	PostSync(context.Context, *PostSyncRequest) (*PostSyncReply, error)
 	mustEmbedUnimplementedPostServer()
 }
 
@@ -270,38 +178,17 @@ func (UnimplementedPostServer) DeletePost(context.Context, *DeletePostRequest) (
 func (UnimplementedPostServer) PublishPost(context.Context, *PublishPostRequest) (*PublishPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishPost not implemented")
 }
-func (UnimplementedPostServer) WithdrawPost(context.Context, *WithdrawPostRequest) (*WithdrawPostReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WithdrawPost not implemented")
-}
 func (UnimplementedPostServer) ListPost(context.Context, *ListPostRequest) (*ListPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPost not implemented")
 }
 func (UnimplementedPostServer) ListPubPost(context.Context, *ListPubPostRequest) (*ListPubPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPubPost not implemented")
 }
-func (UnimplementedPostServer) ListAdminPost(context.Context, *ListAdminPostRequest) (*ListAdminPostReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAdminPost not implemented")
-}
 func (UnimplementedPostServer) DetailPost(context.Context, *DetailPostRequest) (*DetailPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetailPost not implemented")
 }
 func (UnimplementedPostServer) DetailPubPost(context.Context, *DetailPubPostRequest) (*DetailPubPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetailPubPost not implemented")
-}
-func (UnimplementedPostServer) DetailAdminPost(context.Context, *DetailAdminPostRequest) (*DetailAdminPostReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DetailAdminPost not implemented")
-}
-func (UnimplementedPostServer) GetPostStats(context.Context, *emptypb.Empty) (*GetPostStatsReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPostStats not implemented")
-}
-func (UnimplementedPostServer) LikePost(context.Context, *LikePostRequest) (*LikePostReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LikePost not implemented")
-}
-func (UnimplementedPostServer) CollectPost(context.Context, *CollectPostRequest) (*CollectPostReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CollectPost not implemented")
-}
-func (UnimplementedPostServer) PostSync(context.Context, *PostSyncRequest) (*PostSyncReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostSync not implemented")
 }
 func (UnimplementedPostServer) mustEmbedUnimplementedPostServer() {}
 
@@ -406,24 +293,6 @@ func _Post_PublishPost_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Post_WithdrawPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WithdrawPostRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).WithdrawPost(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_WithdrawPost_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).WithdrawPost(ctx, req.(*WithdrawPostRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Post_ListPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListPostRequest)
 	if err := dec(in); err != nil {
@@ -456,24 +325,6 @@ func _Post_ListPubPost_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServer).ListPubPost(ctx, req.(*ListPubPostRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Post_ListAdminPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListAdminPostRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).ListAdminPost(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_ListAdminPost_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).ListAdminPost(ctx, req.(*ListAdminPostRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -514,96 +365,6 @@ func _Post_DetailPubPost_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Post_DetailAdminPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DetailAdminPostRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).DetailAdminPost(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_DetailAdminPost_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).DetailAdminPost(ctx, req.(*DetailAdminPostRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Post_GetPostStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).GetPostStats(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_GetPostStats_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).GetPostStats(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Post_LikePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LikePostRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).LikePost(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_LikePost_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).LikePost(ctx, req.(*LikePostRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Post_CollectPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CollectPostRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).CollectPost(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_CollectPost_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).CollectPost(ctx, req.(*CollectPostRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Post_PostSync_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostSyncRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostServer).PostSync(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Post_PostSync_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).PostSync(ctx, req.(*PostSyncRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Post_ServiceDesc is the grpc.ServiceDesc for Post service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -632,10 +393,6 @@ var Post_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Post_PublishPost_Handler,
 		},
 		{
-			MethodName: "WithdrawPost",
-			Handler:    _Post_WithdrawPost_Handler,
-		},
-		{
 			MethodName: "ListPost",
 			Handler:    _Post_ListPost_Handler,
 		},
@@ -644,36 +401,12 @@ var Post_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Post_ListPubPost_Handler,
 		},
 		{
-			MethodName: "ListAdminPost",
-			Handler:    _Post_ListAdminPost_Handler,
-		},
-		{
 			MethodName: "DetailPost",
 			Handler:    _Post_DetailPost_Handler,
 		},
 		{
 			MethodName: "DetailPubPost",
 			Handler:    _Post_DetailPubPost_Handler,
-		},
-		{
-			MethodName: "DetailAdminPost",
-			Handler:    _Post_DetailAdminPost_Handler,
-		},
-		{
-			MethodName: "GetPostStats",
-			Handler:    _Post_GetPostStats_Handler,
-		},
-		{
-			MethodName: "LikePost",
-			Handler:    _Post_LikePost_Handler,
-		},
-		{
-			MethodName: "CollectPost",
-			Handler:    _Post_CollectPost_Handler,
-		},
-		{
-			MethodName: "PostSync",
-			Handler:    _Post_PostSync_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

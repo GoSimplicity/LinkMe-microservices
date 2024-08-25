@@ -35,3 +35,5 @@ package-lock.json
 .DS_Store
 .tmp/
 LinkMe
+main
+Main

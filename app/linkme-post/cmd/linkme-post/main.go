@@ -3,24 +3,26 @@ package main
 import (
 	"context"
 	"flag"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.15.0"
 	"os"
 
 	checkpb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
-	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
-	"github.com/go-kratos/kratos/v2/registry"
-	"github.com/google/uuid"
-	clientv3 "go.etcd.io/etcd/client/v3"
-
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
-
+	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/google/uuid"
+	clientv3 "go.etcd.io/etcd/client/v3"
 
 	_ "go.uber.org/automaxprocs"
 )
@@ -85,6 +87,21 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
+
+	// 设置 Jaeger 追踪导出器，用于收集追踪信息
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(bc.Trace.Endpoint)))
+	if err != nil {
+		panic(err)
+	}
+
+	// 创建 OpenTelemetry 追踪提供者
+	tp := tracesdk.NewTracerProvider(
+		tracesdk.WithBatcher(exp), // 批量处理追踪数据
+		tracesdk.WithResource(resource.NewSchemaless(
+			semconv.ServiceNameKey.String(Name), // 设置服务名称
+		)),
+	)
+
 	userClient, err := initUserClient(bc.Service, logger)
 	if err != nil {
 		panic(err)
@@ -93,7 +110,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, checkClient, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, checkClient, logger, tp)
 	if err != nil {
 		panic(err)
 	}

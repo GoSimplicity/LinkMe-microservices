@@ -1,13 +1,118 @@
-apiVersion: v1
-kind: Pod
+---
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: $Title$
+  name: linkme-jaeger
+  namespace: linkme
   labels:
-    app: $Title$
+    app: jaeger
 spec:
-  containers:
-    - name: $Title$
-      image: $Image$
-      imagePullPolicy: IfNotPresent
-  restartPolicy: Always
-  $END$
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:1.55
+          env:
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: ":9411"
+          ports:
+            - name: udp-6831
+              containerPort: 6831
+              protocol: UDP
+            - name: udp-6832
+              containerPort: 6832
+              protocol: UDP
+            - name: tcp-5778
+              containerPort: 5778
+              protocol: TCP
+            - name: tcp-16686
+              containerPort: 16686
+              protocol: TCP
+            - name: tcp-4317
+              containerPort: 4317
+              protocol: TCP
+            - name: tcp-4318
+              containerPort: 4318
+              protocol: TCP
+            - name: tcp-14250
+              containerPort: 14250
+              protocol: TCP
+            - name: tcp-14268
+              containerPort: 14268
+              protocol: TCP
+            - name: tcp-14269
+              containerPort: 14269
+              protocol: TCP
+            - name: tcp-9411
+              containerPort: 9411
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: linkme-jaeger
+  namespace: linkme
+  labels:
+    app: jaeger
+spec:
+  selector:
+    app: jaeger
+  ports:
+    - name: udp-6831
+      port: 6831
+      protocol: UDP
+      targetPort: 6831
+      nodePort: 30800
+    - name: udp-6832
+      port: 6832
+      protocol: UDP
+      targetPort: 6832
+      nodePort: 30801
+    - name: tcp-5778
+      port: 5778
+      protocol: TCP
+      targetPort: 5778
+      nodePort: 30802
+    - name: tcp-16686
+      port: 16686
+      protocol: TCP
+      targetPort: 16686
+      nodePort: 30803
+    - name: tcp-4317
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+      nodePort: 30804
+    - name: tcp-4318
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+      nodePort: 30805
+    - name: tcp-14250
+      port: 14250
+      protocol: TCP
+      targetPort: 14250
+      nodePort: 30806
+    - name: tcp-14268
+      port: 14268
+      protocol: TCP
+      targetPort: 14268
+      nodePort: 30807
+    - name: tcp-14269
+      port: 14269
+      protocol: TCP
+      targetPort: 14269
+      nodePort: 30808
+    - name: tcp-9411
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
+      nodePort: 30809
+  type: NodePort
