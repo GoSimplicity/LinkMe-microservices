@@ -1,19 +1,24 @@
+trace:
+  endpoint: http://192.168.1.11:30807/api/traces
 server:
   http:
-    addr: 0.0.0.0:8020
+    addr: "0.0.0.0:8020"
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:9020
+    addr: "0.0.0.0:9020"
     timeout: 1s
 data:
   database:
     source: root:root@tcp(localhost:3306)/test?parseTime=True&loc=Local
   redis:
-    addr: 127.0.0.1:6379
+    addr: "127.0.0.1:6379"
   mongo:
     addr: "mongodb://root:root@localhost:27017"
+  kafka:
+    addr:
+      - "192.168.1.11:30880"
 service:
   etcd:
     addr:
-      - 127.0.0.1:2379
+      - "127.0.0.1:2379"
     timeout: 5s

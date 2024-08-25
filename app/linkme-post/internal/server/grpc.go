@@ -4,6 +4,8 @@ import (
 	v1 "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/service"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -12,11 +14,16 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, sp *service.PostService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, sp *service.PostService, logger log.Logger, tp *tracesdk.TracerProvider) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
+			// 恢复中间件：用于捕获服务器中的 panic 并防止服务崩溃
 			recovery.Recovery(),
-			logging.Client(logger),
+			// 追踪中间件：用于分布式追踪，集成 OpenTelemetry
+			tracing.Server(
+				tracing.WithTracerProvider(tp)),
+			// 日志中间件：记录请求的日志信息
+			logging.Server(logger),
 		),
 	}
 	if c.Grpc.Network != "" {

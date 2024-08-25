@@ -3,9 +3,9 @@ syntax = "proto3";
 package api.post;
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
-option go_package = "linkme-post/api/post;post";
+option go_package = "github.com/GoSimplicity/LinkMe-microservices/api/post/v1;post";
 
 service Post {
 	rpc CreatePost (CreatePostRequest) returns (CreatePostReply) {
@@ -32,12 +32,6 @@ service Post {
 			body: "*"
 		};
 	}
-	rpc WithdrawPost (WithdrawPostRequest) returns (WithdrawPostReply) {
-		option (google.api.http) = {
-			post: "/withdraw"
-			body: "*"
-		};
-	}
 	rpc ListPost (ListPostRequest) returns (ListPostReply) {
 		option (google.api.http) = {
 			post: "/list"
@@ -47,12 +41,6 @@ service Post {
 	rpc ListPubPost (ListPubPostRequest) returns (ListPubPostReply) {
 		option (google.api.http) = {
 			post: "/list_pub"
-			body: "*"
-		};
-	}
-	rpc ListAdminPost (ListAdminPostRequest) returns (ListAdminPostReply) {
-		option (google.api.http) = {
-			post: "/list_admin"
 			body: "*"
 		};
 	}
@@ -66,29 +54,6 @@ service Post {
 			get: "/detail_pub/{postId}"
 		};
 	}
-	rpc DetailAdminPost (DetailAdminPostRequest) returns (DetailAdminPostReply) {
-		option (google.api.http) = {
-			get: "/detail_admin/{postId}"
-		};
-	}
-	rpc GetPostStats (google.protobuf.Empty) returns (GetPostStatsReply) {
-		option (google.api.http) = {
-			get: "/stats"
-		};
-	}
-	rpc LikePost (LikePostRequest) returns (LikePostReply) {
-		option (google.api.http) = {
-			post: "/like"
-			body: "*"
-		};
-	}
-	rpc CollectPost (CollectPostRequest) returns (CollectPostReply) {
-		option (google.api.http) = {
-			post: "/collect"
-			body: "*"
-		};
-	}
-	rpc PostSync (PostSyncRequest) returns (PostSyncReply);
 }
 
 message CreatePostRequest {
@@ -118,7 +83,7 @@ message UpdatePostReply {
 
 message UpdatePostStatusRequest {
 	int64 postId = 1;
-	string status = 2;
+	uint32 status = 2;
 }
 
 message UpdatePostStatusReply {
@@ -156,32 +121,12 @@ message PublishPostReply {
 	int64 checkId = 3;
 }
 
-message WithdrawPostRequest {
-	int64 postId = 1;
-}
-
-message WithdrawPostReply {
-	int32 code = 1;
-	string msg = 2;
-}
-
 message ListPubPostRequest {
 	int32 page = 1;
 	int64 size = 2;
 }
 
 message ListPubPostReply {
-	int32 code = 1;
-	string msg = 2;
-	repeated ListPost data = 3;
-}
-
-message ListAdminPostRequest {
-	int32 page = 1;
-	int64 size = 2;
-}
-
-message ListAdminPostReply {
 	int32 code = 1;
 	string msg = 2;
 	repeated ListPost data = 3;
@@ -207,22 +152,6 @@ message DetailPubPostReply {
 	DetailPost data = 3;
 }
 
-message DetailAdminPostRequest {
-	int64 postId = 1;
-}
-
-message DetailAdminPostReply {
-	int32 code = 1;
-	string msg = 2;
-	DetailPost data = 3;
-}
-
-message GetPostStatsReply {
-	int32 code = 1;
-	string msg = 2;
-	int64 count = 3;
-}
-
 message LikePostRequest {
 	int64 postId = 1;
 	bool liked = 2;
@@ -233,23 +162,12 @@ message LikePostReply {
 	string msg = 2;
 }
 
-message CollectPostRequest {
-	int64 postId = 1;
-	int64 collectId = 2;
-	bool collectd = 3;
-}
-
-message CollectPostReply {
-	int32 code = 1;
-	string msg = 2;
-}
-
 message ListPost {
 	int64 id = 1;
 	string title = 2;
 	string content = 3;
-	int64 createdAt = 4;
-	int64 updatedAt = 5;
+	google.protobuf.Timestamp createdAt = 4;
+	google.protobuf.Timestamp updatedAt = 5;
 	int64 userId = 6;
 	int64 plateId = 7;
 }
@@ -258,19 +176,8 @@ message DetailPost {
 	int64 id = 1;
 	string title = 2;
 	string content = 3;
-	int64 createdAt = 4;
-	int64 updatedAt = 5;
+	google.protobuf.Timestamp createdAt = 4;
+	google.protobuf.Timestamp updatedAt = 5;
 	int64 userId = 6;
 	int64 plateId = 7;
-	int64 likeCount = 8;
-	int64 collectCount = 9;
-	int64 viewCount = 10;
-}
-
-message PostSyncRequest {
-	int64 postId = 1;
-}
-message PostSyncReply {
-	int32 code = 1;
-	string msg = 2;
 }

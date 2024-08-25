@@ -3,20 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Ranking API
+    title: Post API
     version: 0.0.1
 paths:
-    /list:
+    /create:
         post:
             tags:
-                - Ranking
-            description: 获取分页的前 N 个排名列表
-            operationId: Ranking_ListTopN
+                - Post
+            operationId: Post_CreatePost
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ListTopNRequest'
+                            $ref: '#/components/schemas/CreatePostRequest'
                 required: true
             responses:
                 "200":
@@ -24,7 +23,175 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListTopNReply'
+                                $ref: '#/components/schemas/CreatePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /delete/{postId}:
+        delete:
+            tags:
+                - Post
+            operationId: Post_DeletePost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeletePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /detail/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /detail_pub/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPubPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPubPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /list:
+        post:
+            tags:
+                - Post
+            operationId: Post_ListPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /list_pub:
+        post:
+            tags:
+                - Post
+            operationId: Post_ListPubPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListPubPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPubPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /publish:
+        post:
+            tags:
+                - Post
+            operationId: Post_PublishPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PublishPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PublishPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /update:
+        post:
+            tags:
+                - Post
+            operationId: Post_UpdatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdatePostReply'
                 default:
                     description: Default error response
                     content:
@@ -33,7 +200,36 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        GetOrListRanking:
+        CreatePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    type: string
+        CreatePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
+                    type: string
+        DeletePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+        DetailPost:
             type: object
             properties:
                 id:
@@ -42,18 +238,36 @@ components:
                     type: string
                 content:
                     type: string
-                postId:
+                createdAt:
                     type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
                 userId:
                     type: string
                 plateId:
                     type: string
-                likeCount:
+        DetailPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
                     type: string
-                collectCount:
+                data:
+                    $ref: '#/components/schemas/DetailPost'
+        DetailPubPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
                     type: string
-                viewCount:
-                    type: string
+                data:
+                    $ref: '#/components/schemas/DetailPost'
         GoogleProtobufAny:
             type: object
             properties:
@@ -62,7 +276,26 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListTopNReply:
+        ListPost:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                plateId:
+                    type: string
+        ListPostReply:
             type: object
             properties:
                 code:
@@ -73,14 +306,49 @@ components:
                 data:
                     type: array
                     items:
-                        $ref: '#/components/schemas/GetOrListRanking'
-        ListTopNRequest:
+                        $ref: '#/components/schemas/ListPost'
+        ListPostRequest:
             type: object
             properties:
                 page:
                     type: integer
                     format: int32
                 size:
+                    type: string
+        ListPubPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ListPost'
+        ListPubPostRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
+        PublishPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                checkId:
+                    type: string
+        PublishPostRequest:
+            type: object
+            properties:
+                postId:
                     type: string
         Status:
             type: object
@@ -98,5 +366,24 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UpdatePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+        UpdatePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
+                    type: string
 tags:
-    - name: Ranking
+    - name: Post
