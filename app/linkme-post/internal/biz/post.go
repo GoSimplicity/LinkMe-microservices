@@ -99,6 +99,7 @@ func NewPostBiz(postData PostData, l *zap.Logger, publishProducer publish.Produc
 func (pb *PostBiz) CreatePost(ctx context.Context, post Post) (int64, error) {
 	post.Slug = uuid.New().String()
 	post.Status = Draft // 默认状态为草稿
+
 	return pb.postData.Insert(ctx, post)
 }
 
