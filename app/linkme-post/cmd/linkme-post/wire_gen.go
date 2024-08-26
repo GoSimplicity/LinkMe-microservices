@@ -7,7 +7,7 @@
 package main
 
 import (
-	v1_2 "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
@@ -27,7 +27,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, checkClient v1_2.CheckClient, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, checkClient check.CheckClient, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
 	db, err := data.NewDB(confData)
 	if err != nil {
 		return nil, nil, err

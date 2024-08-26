@@ -2,228 +2,189 @@ package service
 
 import (
 	"context"
+	"errors"
 	pb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
-	postpb "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
+	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
+	"github.com/go-kratos/kratos/v2/transport"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"strings"
+	"time"
 )
 
 type CheckService struct {
 	pb.UnimplementedCheckServer
-	postClient postpb.PostClient
+	userClient userpb.UserClient
 	biz        *biz.CheckBiz
 }
 
-func NewCheckService(biz *biz.CheckBiz, postClient postpb.PostClient) *CheckService {
+func NewCheckService(userClient userpb.UserClient, biz *biz.CheckBiz) *CheckService {
 	return &CheckService{
+		userClient: userClient,
 		biz:        biz,
-		postClient: postClient,
 	}
 }
 
 func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckRequest) (*pb.CreateCheckReply, error) {
-	post, err := s.postClient.DetailAdminPost(ctx, &postpb.DetailAdminPostRequest{
-		PostId: req.PostId,
+	userId, err := s.getUserId(ctx)
+	if err != nil {
+		return &pb.CreateCheckReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+
+	checkId, err := s.biz.CreateCheck(ctx, biz.Check{
+		PostID:    req.PostId,
+		UserID:    userId,
+		CreatedAt: time.Now(),
+		Status:    biz.UnderReview,
 	})
 	if err != nil {
 		return &pb.CreateCheckReply{
-			Code: post.Code,
-			Msg:  post.Msg,
+			Code: 1,
+			Msg:  err.Error(),
 		}, err
 	}
-	checkId, err := s.biz.CreateCheck(ctx, domain.Check{
-		PostID:  post.Data.Id,
-		Title:   post.Data.Title,
-		Content: post.Data.Content,
-		UserId:  post.Data.UserId,
-	})
-	if err != nil {
-		return &pb.CreateCheckReply{
-			Code:    1,
-			Msg:     err.Error(),
-			CheckId: -1,
-		}, err
-	}
+
 	return &pb.CreateCheckReply{
 		Code:    0,
-		Msg:     "create check success",
+		Msg:     "success",
 		CheckId: checkId,
 	}, nil
 }
 
 func (s *CheckService) DeleteCheck(ctx context.Context, req *pb.DeleteCheckRequest) (*pb.DeleteCheckReply, error) {
-	err := s.biz.DeleteCheck(ctx, req.CheckId)
+	userId, err := s.getUserId(ctx)
 	if err != nil {
 		return &pb.DeleteCheckReply{
 			Code: 1,
 			Msg:  err.Error(),
 		}, err
 	}
+
+	err = s.biz.DeleteCheck(ctx, req.CheckId, userId)
+	if err != nil {
+		return &pb.DeleteCheckReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+
 	return &pb.DeleteCheckReply{
 		Code: 0,
 		Msg:  "delete check success",
 	}, nil
 }
 
-func (s *CheckService) UpdateCheck(ctx context.Context, req *pb.UpdateCheckRequest) (*pb.UpdateCheckReply, error) {
-	err := s.biz.UpdateCheck(ctx, domain.Check{
-		PostID:  req.Check.PostId,
-		Title:   req.Check.Title,
-		Content: req.Check.Content,
-		UserId:  req.Check.UserId,
-	})
-	if err != nil {
-		return &pb.UpdateCheckReply{
-			Code: 1,
-			Msg:  err.Error(),
-		}, err
-	}
-	return &pb.UpdateCheckReply{
-		Code: 0,
-		Msg:  "update check success",
-	}, nil
-}
-
 func (s *CheckService) GetCheckById(ctx context.Context, req *pb.GetCheckByIdRequest) (*pb.GetCheckByIdReply, error) {
-	check, err := s.biz.GetCheckById(ctx, req.CheckId)
+	check, err := s.biz.GetCheck(ctx, req.CheckId)
 	if err != nil {
 		return &pb.GetCheckByIdReply{
 			Code: 1,
 			Msg:  err.Error(),
 		}, err
 	}
+
 	return &pb.GetCheckByIdReply{
 		Code: 0,
-		Msg:  "get check success",
 		Data: &pb.ListOrGetCheck{
 			Id:        check.ID,
+			UserId:    check.UserID,
 			PostId:    check.PostID,
 			Title:     check.Title,
 			Content:   check.Content,
-			UserId:    check.UserId,
-			Status:    check.Status,
+			Status:    uint32(check.Status),
 			Remark:    check.Remark,
-			CreatedAt: check.CreatedAt,
-			UpdatedAt: check.UpdatedAt,
+			CreatedAt: timestamppb.New(check.CreatedAt),
+			UpdatedAt: timestamppb.New(check.UpdatedAt),
 		},
 	}, nil
 }
 
 func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest) (*pb.ListChecksReply, error) {
-	checks, err := s.biz.ListChecks(ctx, domain.Pagination{
+	checks, err := s.biz.ListChecks(ctx, biz.Pagination{
 		Page: int(req.Page),
 		Size: &req.Size,
-	}, &req.Status)
+	})
 	if err != nil {
 		return &pb.ListChecksReply{
 			Code: 1,
 			Msg:  err.Error(),
 		}, err
 	}
-	pbChecks := make([]*pb.ListOrGetCheck, len(checks))
-	for i, check := range checks {
-		pbChecks[i] = &pb.ListOrGetCheck{
+
+	listChecks := make([]*pb.ListOrGetCheck, 0, len(checks))
+
+	for _, check := range checks {
+		listChecks = append(listChecks, &pb.ListOrGetCheck{
 			Id:        check.ID,
+			UserId:    check.UserID,
 			PostId:    check.PostID,
 			Title:     check.Title,
 			Content:   check.Content,
-			CreatedAt: check.CreatedAt,
-			UpdatedAt: check.UpdatedAt,
-			UserId:    check.UserId,
-			Status:    check.Status,
+			Status:    uint32(check.Status),
 			Remark:    check.Remark,
-		}
+			CreatedAt: timestamppb.New(check.CreatedAt),
+			UpdatedAt: timestamppb.New(check.UpdatedAt),
+		})
 	}
+
 	return &pb.ListChecksReply{
 		Code: 0,
-		Msg:  "list checks success",
-		Data: pbChecks,
+		Msg:  "success",
+		Data: listChecks,
 	}, nil
 }
 
 func (s *CheckService) SubmitCheck(ctx context.Context, req *pb.SubmitCheckRequest) (*pb.SubmitCheckReply, error) {
-	if req.Approved == true {
-		// 更新帖子状态为已发布
-		status, err := s.postClient.UpdatePostStatus(ctx, &postpb.UpdatePostStatusRequest{
-			PostId: req.PostId,
-			Status: "Published",
-		})
-		if err != nil {
-			return &pb.SubmitCheckReply{
-				Code: status.Code,
-				Msg:  err.Error(),
-			}, err
-		}
-		// 同步帖子
-		sync, err := s.postClient.PostSync(ctx, &postpb.PostSyncRequest{
-			PostId: req.PostId,
-		})
-		if err != nil {
-			// 同步失败时将帖子状态更新为草稿
-			revertStatus, revertErr := s.postClient.UpdatePostStatus(ctx, &postpb.UpdatePostStatusRequest{
-				PostId: req.PostId,
-				Status: domain.Draft,
-			})
-			if revertErr != nil {
-				return &pb.SubmitCheckReply{
-					Code: revertStatus.Code,
-					Msg:  revertErr.Error(),
-				}, revertErr
-			}
-			return &pb.SubmitCheckReply{
-				Code: sync.Code,
-				Msg:  err.Error(),
-			}, err
-		}
-	}
-	// 提交审核
-	err := s.biz.SubmitCheck(ctx, req.CheckId, req.Approved)
+	err := s.biz.UpdateStatus(ctx, req.CheckId, req.Remark, uint8(req.Status))
 	if err != nil {
 		return &pb.SubmitCheckReply{
 			Code: 1,
 			Msg:  err.Error(),
 		}, err
 	}
+
 	return &pb.SubmitCheckReply{
 		Code: 0,
 		Msg:  "submit check success",
 	}, nil
 }
 
-func (s *CheckService) BatchDeleteChecks(ctx context.Context, req *pb.BatchDeleteChecksRequest) (*pb.BatchDeleteChecksReply, error) {
-	err := s.biz.BatchDeleteChecks(ctx, req.CheckIds)
-	if err != nil {
-		return &pb.BatchDeleteChecksReply{
-			Code: 1,
-			Msg:  err.Error(),
-		}, err
+// 通过grpc调用linkme-user模块方法，获取userId
+func (s *CheckService) getUserId(ctx context.Context) (int64, error) {
+	// 从 Kratos 上下文中获取传输信息
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return -1, errors.New("failed to get transport from context")
 	}
-	return &pb.BatchDeleteChecksReply{
-		Code: 0,
-		Msg:  "batch delete checks success",
-	}, nil
-}
 
-func (s *CheckService) BatchSubmitChecks(ctx context.Context, req *pb.BatchSubmitChecksRequest) (*pb.BatchSubmitChecksReply, error) {
-	domainChecks := make([]domain.Check, len(req.Checks))
-	for i, check := range req.Checks {
-		domainChecks[i] = domain.Check{
-			PostID:  check.PostId,
-			Title:   check.Title,
-			Content: check.Content,
-			UserId:  check.UserId,
-			Remark:  check.Remark,
-		}
+	// 获取 Authorization 头
+	token := tr.RequestHeader().Get("Authorization")
+	if token == "" {
+		return -1, errors.New("authorization token not provided")
 	}
-	err := s.biz.BatchSubmitChecks(ctx, domainChecks)
+
+	// 移除 "Bearer " 前缀
+	tokenStr := strings.TrimPrefix(token, "Bearer ")
+	if tokenStr == "" {
+		return -1, errors.New("authorization token is empty after trim")
+	}
+
+	// 为 userClient.GetUserInfo 设置超时时间
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel() // 确保在函数退出时取消上下文，释放资源
+
+	// 调用 userClient 获取用户信息
+	info, err := s.userClient.GetUserInfo(timeoutCtx, &userpb.GetUserInfoRequest{Token: tokenStr})
 	if err != nil {
-		return &pb.BatchSubmitChecksReply{
-			Code: 1,
-			Msg:  err.Error(),
-		}, err
+		if errors.Is(err, context.DeadlineExceeded) {
+			// 如果超时，返回具体的超时错误信息
+			return -1, errors.New("getUserInfo request timed out")
+		}
+		return -1, err
 	}
-	return &pb.BatchSubmitChecksReply{
-		Code: 0,
-		Msg:  "batch submit checks success",
-	}, nil
+
+	return info.UserId, nil
 }

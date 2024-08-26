@@ -4,7 +4,7 @@
 // - protoc             v5.27.1
 // source: api/check/v1/check.proto
 
-package v1
+package check
 
 import (
 	context "context"
@@ -19,33 +19,24 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationCheckBatchDeleteChecks = "/api.check.v1.Check/BatchDeleteChecks"
-const OperationCheckBatchSubmitChecks = "/api.check.v1.Check/BatchSubmitChecks"
 const OperationCheckDeleteCheck = "/api.check.v1.Check/DeleteCheck"
 const OperationCheckGetCheckById = "/api.check.v1.Check/GetCheckById"
 const OperationCheckListChecks = "/api.check.v1.Check/ListChecks"
 const OperationCheckSubmitCheck = "/api.check.v1.Check/SubmitCheck"
-const OperationCheckUpdateCheck = "/api.check.v1.Check/UpdateCheck"
 
 type CheckHTTPServer interface {
-	BatchDeleteChecks(context.Context, *BatchDeleteChecksRequest) (*BatchDeleteChecksReply, error)
-	BatchSubmitChecks(context.Context, *BatchSubmitChecksRequest) (*BatchSubmitChecksReply, error)
 	DeleteCheck(context.Context, *DeleteCheckRequest) (*DeleteCheckReply, error)
 	GetCheckById(context.Context, *GetCheckByIdRequest) (*GetCheckByIdReply, error)
 	ListChecks(context.Context, *ListChecksRequest) (*ListChecksReply, error)
 	SubmitCheck(context.Context, *SubmitCheckRequest) (*SubmitCheckReply, error)
-	UpdateCheck(context.Context, *UpdateCheckRequest) (*UpdateCheckReply, error)
 }
 
 func RegisterCheckHTTPServer(s *http.Server, srv CheckHTTPServer) {
 	r := s.Route("/")
 	r.DELETE("/delete/{checkId}", _Check_DeleteCheck0_HTTP_Handler(srv))
-	r.POST("/update", _Check_UpdateCheck0_HTTP_Handler(srv))
 	r.GET("/get/{checkId}", _Check_GetCheckById0_HTTP_Handler(srv))
 	r.POST("/list", _Check_ListChecks0_HTTP_Handler(srv))
 	r.POST("/submit", _Check_SubmitCheck0_HTTP_Handler(srv))
-	r.POST("/batch_delete", _Check_BatchDeleteChecks0_HTTP_Handler(srv))
-	r.POST("/batch_submit", _Check_BatchSubmitChecks0_HTTP_Handler(srv))
 }
 
 func _Check_DeleteCheck0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context) error {
@@ -66,28 +57,6 @@ func _Check_DeleteCheck0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context
 			return err
 		}
 		reply := out.(*DeleteCheckReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Check_UpdateCheck0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in UpdateCheckRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationCheckUpdateCheck)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateCheck(ctx, req.(*UpdateCheckRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*UpdateCheckReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -158,58 +127,11 @@ func _Check_SubmitCheck0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context
 	}
 }
 
-func _Check_BatchDeleteChecks0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in BatchDeleteChecksRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationCheckBatchDeleteChecks)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.BatchDeleteChecks(ctx, req.(*BatchDeleteChecksRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*BatchDeleteChecksReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Check_BatchSubmitChecks0_HTTP_Handler(srv CheckHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in BatchSubmitChecksRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationCheckBatchSubmitChecks)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.BatchSubmitChecks(ctx, req.(*BatchSubmitChecksRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*BatchSubmitChecksReply)
-		return ctx.Result(200, reply)
-	}
-}
-
 type CheckHTTPClient interface {
-	BatchDeleteChecks(ctx context.Context, req *BatchDeleteChecksRequest, opts ...http.CallOption) (rsp *BatchDeleteChecksReply, err error)
-	BatchSubmitChecks(ctx context.Context, req *BatchSubmitChecksRequest, opts ...http.CallOption) (rsp *BatchSubmitChecksReply, err error)
 	DeleteCheck(ctx context.Context, req *DeleteCheckRequest, opts ...http.CallOption) (rsp *DeleteCheckReply, err error)
 	GetCheckById(ctx context.Context, req *GetCheckByIdRequest, opts ...http.CallOption) (rsp *GetCheckByIdReply, err error)
 	ListChecks(ctx context.Context, req *ListChecksRequest, opts ...http.CallOption) (rsp *ListChecksReply, err error)
 	SubmitCheck(ctx context.Context, req *SubmitCheckRequest, opts ...http.CallOption) (rsp *SubmitCheckReply, err error)
-	UpdateCheck(ctx context.Context, req *UpdateCheckRequest, opts ...http.CallOption) (rsp *UpdateCheckReply, err error)
 }
 
 type CheckHTTPClientImpl struct {
@@ -218,32 +140,6 @@ type CheckHTTPClientImpl struct {
 
 func NewCheckHTTPClient(client *http.Client) CheckHTTPClient {
 	return &CheckHTTPClientImpl{client}
-}
-
-func (c *CheckHTTPClientImpl) BatchDeleteChecks(ctx context.Context, in *BatchDeleteChecksRequest, opts ...http.CallOption) (*BatchDeleteChecksReply, error) {
-	var out BatchDeleteChecksReply
-	pattern := "/batch_delete"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationCheckBatchDeleteChecks))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func (c *CheckHTTPClientImpl) BatchSubmitChecks(ctx context.Context, in *BatchSubmitChecksRequest, opts ...http.CallOption) (*BatchSubmitChecksReply, error) {
-	var out BatchSubmitChecksReply
-	pattern := "/batch_submit"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationCheckBatchSubmitChecks))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
 }
 
 func (c *CheckHTTPClientImpl) DeleteCheck(ctx context.Context, in *DeleteCheckRequest, opts ...http.CallOption) (*DeleteCheckReply, error) {
@@ -290,19 +186,6 @@ func (c *CheckHTTPClientImpl) SubmitCheck(ctx context.Context, in *SubmitCheckRe
 	pattern := "/submit"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCheckSubmitCheck))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func (c *CheckHTTPClientImpl) UpdateCheck(ctx context.Context, in *UpdateCheckRequest, opts ...http.CallOption) (*UpdateCheckReply, error) {
-	var out UpdateCheckReply
-	pattern := "/update"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationCheckUpdateCheck))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

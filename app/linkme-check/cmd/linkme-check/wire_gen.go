@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	"github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/conf"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/data"
@@ -15,6 +15,7 @@ import (
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 import (
@@ -24,7 +25,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, postClient post.PostClient, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Service, userClient v1.UserClient, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
 	db, err := data.NewDB(confData)
 	if err != nil {
 		return nil, nil, err
@@ -32,9 +33,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	zapLogger := data.NewLogger()
 	checkData := data.NewCheckData(db, zapLogger)
 	checkBiz := biz.NewCheckBiz(checkData)
-	checkService := service.NewCheckService(checkBiz, postClient)
-	grpcServer := server.NewGRPCServer(confServer, checkService, logger)
-	httpServer := server.NewHTTPServer(confServer, checkService, logger)
+	checkService := service.NewCheckService(userClient, checkBiz)
+	grpcServer := server.NewGRPCServer(confServer, checkService, logger, tracerProvider)
+	httpServer := server.NewHTTPServer(confServer, checkService, logger, tracerProvider)
 	app := newApp(confService, logger, grpcServer, httpServer)
 	return app, func() {
 	}, nil

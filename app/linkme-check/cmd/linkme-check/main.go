@@ -3,11 +3,15 @@ package main
 import (
 	"context"
 	"flag"
-	postpb "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
+	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.16.0"
 	"os"
 
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/conf"
@@ -82,14 +86,35 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
-	postClient, err := initPostClient(bc.Service, logger)
+
+	// 设置 Jaeger 追踪导出器，用于收集追踪信息
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(bc.Trace.Endpoint)))
 	if err != nil {
 		panic(err)
 	}
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, postClient, logger)
+
+	// 创建 OpenTelemetry 追踪提供者
+	tp := tracesdk.NewTracerProvider(
+		tracesdk.WithBatcher(exp), // 批量处理追踪数据
+		tracesdk.WithResource(resource.NewSchemaless(
+			semconv.ServiceNameKey.String(Name), // 设置服务名称
+		)),
+	)
+
+	userClient, err := initUserClient(bc.Service, logger)
 	if err != nil {
 		panic(err)
 	}
+
+	if err != nil {
+		panic(err)
+	}
+
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, logger, tp)
+	if err != nil {
+		panic(err)
+	}
+
 	defer cleanup()
 
 	// start and wait for stop signal
@@ -111,8 +136,8 @@ func initServiceRegistry(c *conf.Service) registry.Registrar {
 	return reg
 }
 
-// 初始化帖子客户端
-func initPostClient(c *conf.Service, logger log.Logger) (postpb.PostClient, error) {
+// 初始化用户客户端
+func initUserClient(c *conf.Service, logger log.Logger) (userpb.UserClient, error) {
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.Etcd.Addr,
 		DialTimeout: c.Etcd.Timeout.AsDuration(),
@@ -123,12 +148,12 @@ func initPostClient(c *conf.Service, logger log.Logger) (postpb.PostClient, erro
 	r := etcd.New(client)
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint("discovery:///linkme-post"),
+		grpc.WithEndpoint("discovery:///linkme-user"),
 		grpc.WithDiscovery(r),
 		grpc.WithLogger(logger),
 	)
 	if err != nil {
 		return nil, err
 	}
-	return postpb.NewPostClient(conn), nil
+	return userpb.NewUserClient(conn), nil
 }

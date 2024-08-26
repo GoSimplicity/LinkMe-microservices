@@ -38,7 +38,7 @@ type Post struct {
 	CreatedAt    time.Time    `mapstructure:"created_at"`
 	UpdatedAt    time.Time    `mapstructure:"updated_at"`
 	DeletedAt    sql.NullTime `mapstructure:"deleted_at"`
-	AuthorID     int64        `mapstructure:"author_id"`
+	UserID       int64        `mapstructure:"user_id"`
 	Status       uint8        `mapstructure:"status"`
 	PlateID      int64        `mapstructure:"plate_id"`
 	Slug         string       `mapstructure:"slug"`

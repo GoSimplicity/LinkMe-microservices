@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"time"
 )
@@ -24,7 +25,7 @@ type Post struct {
 	Title        string       `gorm:"size:255;not null"`            // 文章标题
 	Content      string       `gorm:"type:text;not null"`           // 文章内容
 	Status       uint8        `gorm:"default:0"`                    // 文章状态，如草稿、发布等
-	AuthorID     int64        `gorm:"column:author_id;index"`       // 用户uid
+	UserID       int64        `gorm:"column:user_id;index"`         // 用户uid
 	Slug         string       `gorm:"size:100;uniqueIndex"`         // 文章的唯一标识，用于生成友好URL
 	CategoryID   int64        `gorm:"index"`                        // 关联分类表的外键
 	PlateID      int64        `gorm:"index"`                        // 关联板块表的外键
@@ -40,7 +41,7 @@ type ListPubPost struct {
 	Title        string    `bson:"title"`        // 文章标题
 	Content      string    `bson:"content"`      // 文章内容
 	Status       uint8     `bson:"status"`       // 文章状态，如草稿、发布等
-	AuthorID     int64     `bson:"authorid"`     // 用户uid
+	UserID       int64     `bson:"userid"`       // 用户uid
 	Slug         string    `bson:"slug"`         // 文章的唯一标识，用于生成友好URL
 	CategoryID   int64     `bson:"categoryid"`   // 关联分类表的外键
 	PlateID      int64     `bson:"plateid"`      // 关联板块表的外键
@@ -96,7 +97,9 @@ func NewPostBiz(postData PostData, l *zap.Logger, publishProducer publish.Produc
 }
 
 func (pb *PostBiz) CreatePost(ctx context.Context, post Post) (int64, error) {
+	post.Slug = uuid.New().String()
 	post.Status = Draft // 默认状态为草稿
+
 	return pb.postData.Insert(ctx, post)
 }
 
@@ -134,7 +137,7 @@ func (pb *PostBiz) ListPubPost(ctx context.Context, pagination Pagination) ([]Li
 }
 
 func (pb *PostBiz) PublishPost(ctx context.Context, post Post) error {
-	pd, err := pb.postData.GetById(ctx, post.ID, post.AuthorID)
+	pd, err := pb.postData.GetById(ctx, post.ID, post.UserID)
 	if err != nil {
 		return fmt.Errorf("get post failed: %w", err)
 	}
@@ -146,10 +149,10 @@ func (pb *PostBiz) PublishPost(ctx context.Context, post Post) error {
 	// 使用装饰器封装 goroutine 逻辑
 	asyncPublish := pb.withAsyncCancel(ctx, cancel, func() error {
 		if err := pb.publishProducer.ProducePublishEvent(publish.PublishEvent{
-			PostId:   pd.ID,
-			Content:  pd.Content,
-			Title:    pd.Title,
-			AuthorID: pd.AuthorID,
+			PostId:  pd.ID,
+			Content: pd.Content,
+			Title:   pd.Title,
+			UserID:  pd.UserID,
 		}); err != nil {
 			return fmt.Errorf("failed to produce publish event: %w", err)
 		}
