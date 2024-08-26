@@ -4,7 +4,7 @@
 // - protoc             v5.27.1
 // source: api/check/v1/check.proto
 
-package v1
+package check
 
 import (
 	context "context"
@@ -19,14 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Check_CreateCheck_FullMethodName       = "/api.check.v1.Check/CreateCheck"
-	Check_DeleteCheck_FullMethodName       = "/api.check.v1.Check/DeleteCheck"
-	Check_UpdateCheck_FullMethodName       = "/api.check.v1.Check/UpdateCheck"
-	Check_GetCheckById_FullMethodName      = "/api.check.v1.Check/GetCheckById"
-	Check_ListChecks_FullMethodName        = "/api.check.v1.Check/ListChecks"
-	Check_SubmitCheck_FullMethodName       = "/api.check.v1.Check/SubmitCheck"
-	Check_BatchDeleteChecks_FullMethodName = "/api.check.v1.Check/BatchDeleteChecks"
-	Check_BatchSubmitChecks_FullMethodName = "/api.check.v1.Check/BatchSubmitChecks"
+	Check_CreateCheck_FullMethodName  = "/api.check.v1.Check/CreateCheck"
+	Check_DeleteCheck_FullMethodName  = "/api.check.v1.Check/DeleteCheck"
+	Check_GetCheckById_FullMethodName = "/api.check.v1.Check/GetCheckById"
+	Check_ListChecks_FullMethodName   = "/api.check.v1.Check/ListChecks"
+	Check_SubmitCheck_FullMethodName  = "/api.check.v1.Check/SubmitCheck"
 )
 
 // CheckClient is the client API for Check service.
@@ -35,12 +32,9 @@ const (
 type CheckClient interface {
 	CreateCheck(ctx context.Context, in *CreateCheckRequest, opts ...grpc.CallOption) (*CreateCheckReply, error)
 	DeleteCheck(ctx context.Context, in *DeleteCheckRequest, opts ...grpc.CallOption) (*DeleteCheckReply, error)
-	UpdateCheck(ctx context.Context, in *UpdateCheckRequest, opts ...grpc.CallOption) (*UpdateCheckReply, error)
 	GetCheckById(ctx context.Context, in *GetCheckByIdRequest, opts ...grpc.CallOption) (*GetCheckByIdReply, error)
 	ListChecks(ctx context.Context, in *ListChecksRequest, opts ...grpc.CallOption) (*ListChecksReply, error)
 	SubmitCheck(ctx context.Context, in *SubmitCheckRequest, opts ...grpc.CallOption) (*SubmitCheckReply, error)
-	BatchDeleteChecks(ctx context.Context, in *BatchDeleteChecksRequest, opts ...grpc.CallOption) (*BatchDeleteChecksReply, error)
-	BatchSubmitChecks(ctx context.Context, in *BatchSubmitChecksRequest, opts ...grpc.CallOption) (*BatchSubmitChecksReply, error)
 }
 
 type checkClient struct {
@@ -65,16 +59,6 @@ func (c *checkClient) DeleteCheck(ctx context.Context, in *DeleteCheckRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteCheckReply)
 	err := c.cc.Invoke(ctx, Check_DeleteCheck_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *checkClient) UpdateCheck(ctx context.Context, in *UpdateCheckRequest, opts ...grpc.CallOption) (*UpdateCheckReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateCheckReply)
-	err := c.cc.Invoke(ctx, Check_UpdateCheck_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -111,38 +95,15 @@ func (c *checkClient) SubmitCheck(ctx context.Context, in *SubmitCheckRequest, o
 	return out, nil
 }
 
-func (c *checkClient) BatchDeleteChecks(ctx context.Context, in *BatchDeleteChecksRequest, opts ...grpc.CallOption) (*BatchDeleteChecksReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BatchDeleteChecksReply)
-	err := c.cc.Invoke(ctx, Check_BatchDeleteChecks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *checkClient) BatchSubmitChecks(ctx context.Context, in *BatchSubmitChecksRequest, opts ...grpc.CallOption) (*BatchSubmitChecksReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BatchSubmitChecksReply)
-	err := c.cc.Invoke(ctx, Check_BatchSubmitChecks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CheckServer is the server API for Check service.
 // All implementations must embed UnimplementedCheckServer
 // for forward compatibility
 type CheckServer interface {
 	CreateCheck(context.Context, *CreateCheckRequest) (*CreateCheckReply, error)
 	DeleteCheck(context.Context, *DeleteCheckRequest) (*DeleteCheckReply, error)
-	UpdateCheck(context.Context, *UpdateCheckRequest) (*UpdateCheckReply, error)
 	GetCheckById(context.Context, *GetCheckByIdRequest) (*GetCheckByIdReply, error)
 	ListChecks(context.Context, *ListChecksRequest) (*ListChecksReply, error)
 	SubmitCheck(context.Context, *SubmitCheckRequest) (*SubmitCheckReply, error)
-	BatchDeleteChecks(context.Context, *BatchDeleteChecksRequest) (*BatchDeleteChecksReply, error)
-	BatchSubmitChecks(context.Context, *BatchSubmitChecksRequest) (*BatchSubmitChecksReply, error)
 	mustEmbedUnimplementedCheckServer()
 }
 
@@ -156,9 +117,6 @@ func (UnimplementedCheckServer) CreateCheck(context.Context, *CreateCheckRequest
 func (UnimplementedCheckServer) DeleteCheck(context.Context, *DeleteCheckRequest) (*DeleteCheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCheck not implemented")
 }
-func (UnimplementedCheckServer) UpdateCheck(context.Context, *UpdateCheckRequest) (*UpdateCheckReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateCheck not implemented")
-}
 func (UnimplementedCheckServer) GetCheckById(context.Context, *GetCheckByIdRequest) (*GetCheckByIdReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCheckById not implemented")
 }
@@ -167,12 +125,6 @@ func (UnimplementedCheckServer) ListChecks(context.Context, *ListChecksRequest) 
 }
 func (UnimplementedCheckServer) SubmitCheck(context.Context, *SubmitCheckRequest) (*SubmitCheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitCheck not implemented")
-}
-func (UnimplementedCheckServer) BatchDeleteChecks(context.Context, *BatchDeleteChecksRequest) (*BatchDeleteChecksReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BatchDeleteChecks not implemented")
-}
-func (UnimplementedCheckServer) BatchSubmitChecks(context.Context, *BatchSubmitChecksRequest) (*BatchSubmitChecksReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BatchSubmitChecks not implemented")
 }
 func (UnimplementedCheckServer) mustEmbedUnimplementedCheckServer() {}
 
@@ -219,24 +171,6 @@ func _Check_DeleteCheck_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CheckServer).DeleteCheck(ctx, req.(*DeleteCheckRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Check_UpdateCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateCheckRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CheckServer).UpdateCheck(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Check_UpdateCheck_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CheckServer).UpdateCheck(ctx, req.(*UpdateCheckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -295,42 +229,6 @@ func _Check_SubmitCheck_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Check_BatchDeleteChecks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchDeleteChecksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CheckServer).BatchDeleteChecks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Check_BatchDeleteChecks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CheckServer).BatchDeleteChecks(ctx, req.(*BatchDeleteChecksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Check_BatchSubmitChecks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchSubmitChecksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CheckServer).BatchSubmitChecks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Check_BatchSubmitChecks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CheckServer).BatchSubmitChecks(ctx, req.(*BatchSubmitChecksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Check_ServiceDesc is the grpc.ServiceDesc for Check service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -347,10 +245,6 @@ var Check_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Check_DeleteCheck_Handler,
 		},
 		{
-			MethodName: "UpdateCheck",
-			Handler:    _Check_UpdateCheck_Handler,
-		},
-		{
 			MethodName: "GetCheckById",
 			Handler:    _Check_GetCheckById_Handler,
 		},
@@ -361,14 +255,6 @@ var Check_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitCheck",
 			Handler:    _Check_SubmitCheck_Handler,
-		},
-		{
-			MethodName: "BatchDeleteChecks",
-			Handler:    _Check_BatchDeleteChecks_Handler,
-		},
-		{
-			MethodName: "BatchSubmitChecks",
-			Handler:    _Check_BatchSubmitChecks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

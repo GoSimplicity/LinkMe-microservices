@@ -1,239 +1,57 @@
 syntax = "proto3";
+package kratos.api;
 
-package api.post;
+option go_package = "linkme-post/internal/conf;conf";
 
-import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 
-option go_package = "linkme-post/api/post;post";
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Service service = 3;
+  Trace trace = 4;
+}
 
-service Post {
-  rpc CreatePost (CreatePostRequest) returns (CreatePostReply) {
-    option (google.api.http) = {
-      post: "/create"
-      body: "*"
-    };
+message Trace {
+  string endpoint = 1;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
   }
-  rpc UpdatePost (UpdatePostRequest) returns (UpdatePostReply) {
-    option (google.api.http) = {
-      post: "/update"
-      body: "*"
-    };
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
   }
-  rpc UpdatePostStatus (UpdatePostStatusRequest) returns (UpdatePostStatusReply);
-  rpc DeletePost (DeletePostRequest) returns (DeletePostReply) {
-    option (google.api.http) = {
-      delete: "/delete/{postId}"
-    };
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
   }
-  rpc PublishPost (PublishPostRequest) returns (PublishPostReply) {
-    option (google.api.http) = {
-      post: "/publish"
-      body: "*"
-    };
+  message Redis {
+    string network = 1;
+    string addr = 2;
   }
-  rpc WithdrawPost (WithdrawPostRequest) returns (WithdrawPostReply) {
-    option (google.api.http) = {
-      post: "/withdraw"
-      body: "*"
-    };
+  message Kafka {
+    repeated string addr = 1;
   }
-  rpc ListPost (ListPostRequest) returns (ListPostReply) {
-    option (google.api.http) = {
-      post: "/list"
-      body: "*"
-    };
+  Database database = 1;
+  Redis redis = 2;
+  Kafka kafka = 3;
+}
+
+message Service {
+  message Etcd {
+    repeated string addr = 1;
+    google.protobuf.Duration timeout = 2;
   }
-  rpc ListPubPost (ListPubPostRequest) returns (ListPubPostReply) {
-    option (google.api.http) = {
-      post: "/list_pub"
-      body: "*"
-    };
-  }
-  rpc DetailPost (DetailPostRequest) returns (DetailPostReply) {
-    option (google.api.http) = {
-      get: "/detail/{postId}"
-    };
-  }
-  rpc DetailPubPost (DetailPubPostRequest) returns (DetailPubPostReply) {
-    option (google.api.http) = {
-      get: "/detail_pub/{postId}"
-    };
-  }
-  rpc GetPostStats (google.protobuf.Empty) returns (GetPostStatsReply) {
-    option (google.api.http) = {
-      get: "/stats"
-    };
-  }
-  rpc LikePost (LikePostRequest) returns (LikePostReply) {
-    option (google.api.http) = {
-      post: "/like"
-      body: "*"
-    };
-  }
-  rpc CollectPost (CollectPostRequest) returns (CollectPostReply) {
-    option (google.api.http) = {
-      post: "/collect"
-      body: "*"
-    };
-  }
-  rpc PostSync (PostSyncRequest) returns (PostSyncReply);
-}
-
-message CreatePostRequest {
-  string title = 1;
-  string content = 2;
-  int64 plateId = 3;
-}
-
-message CreatePostReply {
-  int32 code = 1;
-  string msg = 2;
-  int64 data = 3;
-}
-
-message UpdatePostRequest {
-  int64 postId = 1;
-  string title = 2;
-  string content = 3;
-  int64 plateId = 4;
-}
-
-message UpdatePostReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message UpdatePostStatusRequest {
-  int64 postId = 1;
-  uint32 status = 2;
-}
-
-message UpdatePostStatusReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message DeletePostRequest {
-  int64 postId = 1;
-}
-
-message DeletePostReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message ListPostRequest {
-  int32 page = 1;
-  int64 size = 2;
-}
-
-message ListPostReply {
-  int32 code = 1;
-  string msg = 2;
-  repeated ListPost data = 3;
-}
-
-message PublishPostRequest {
-  int64 postId = 1;
-}
-
-message PublishPostReply {
-  int32 code = 1;
-  string msg = 2;
-  int64 checkId = 3;
-}
-
-message WithdrawPostRequest {
-  int64 postId = 1;
-}
-
-message WithdrawPostReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message ListPubPostRequest {
-  int32 page = 1;
-  int64 size = 2;
-}
-
-message ListPubPostReply {
-  int32 code = 1;
-  string msg = 2;
-  repeated ListPost data = 3;
-}
-
-message DetailPostRequest {
-  int64 postId = 1;
-}
-
-message DetailPostReply {
-  int32 code = 1;
-  string msg = 2;
-  DetailPost data = 3;
-}
-
-message DetailPubPostRequest {
-  int64 postId = 1;
-}
-
-message DetailPubPostReply {
-  int32 code = 1;
-  string msg = 2;
-  DetailPost data = 3;
-}
-
-message GetPostStatsReply {
-  int32 code = 1;
-  string msg = 2;
-  int64 count = 3;
-}
-
-message LikePostRequest {
-  int64 postId = 1;
-  bool liked = 2;
-}
-
-message LikePostReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message CollectPostRequest {
-  int64 postId = 1;
-  int64 collectId = 2;
-  bool collected = 3;
-}
-
-message CollectPostReply {
-  int32 code = 1;
-  string msg = 2;
-}
-
-message ListPost {
-  int64 id = 1;
-  string title = 2;
-  int64 createdAt = 3;
-  int64 updatedAt = 4;
-  int64 authorId = 5;
-  int64 plateId = 6;
-}
-
-message DetailPost {
-  int64 id = 1;
-  string title = 2;
-  string content = 3;
-  int64 createdAt = 4;
-  int64 updatedAt = 5;
-  int64 authorId = 6;
-  int64 plateId = 7;
-}
-
-message PostSyncRequest {
-  int64 postId = 1;
-}
-message PostSyncReply {
-  int32 code = 1;
-  string msg = 2;
+  Etcd etcd = 1;
 }

@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
+
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.15.0"
-	"os"
 
 	checkpb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
@@ -106,14 +107,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	checkClient, err := initCheckClient(bc.Service, logger)
 	if err != nil {
 		panic(err)
 	}
+
 	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Service, userClient, checkClient, logger, tp)
 	if err != nil {
 		panic(err)
 	}
+
 	defer cleanup()
 
 	// start and wait for stop signal

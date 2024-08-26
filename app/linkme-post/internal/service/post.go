@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
+	"time"
+
 	pb "github.com/GoSimplicity/LinkMe-microservices/api/post/v1"
 	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
 	"github.com/go-kratos/kratos/v2/transport"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"strings"
-	"time"
 )
 
 type PostService struct {
@@ -35,10 +36,10 @@ func (s *PostService) CreatePost(ctx context.Context, req *pb.CreatePostRequest)
 	}
 
 	post, err := s.biz.CreatePost(ctx, biz.Post{
-		AuthorID: userId,
-		Content:  req.Content,
-		PlateID:  req.PlateId,
-		Title:    req.Title,
+		UserID:  userId,
+		Content: req.Content,
+		PlateID: req.PlateId,
+		Title:   req.Title,
 	})
 
 	if err != nil {
@@ -65,11 +66,11 @@ func (s *PostService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest)
 	}
 
 	err = s.biz.UpdatePost(ctx, biz.Post{
-		ID:       req.PostId,
-		AuthorID: userId,
-		Content:  req.Content,
-		PlateID:  req.PlateId,
-		Title:    req.Title,
+		ID:      req.PostId,
+		UserID:  userId,
+		Content: req.Content,
+		PlateID: req.PlateId,
+		Title:   req.Title,
 	})
 	if err != nil {
 		return &pb.UpdatePostReply{
@@ -94,9 +95,9 @@ func (s *PostService) UpdatePostStatus(ctx context.Context, req *pb.UpdatePostSt
 	}
 
 	err = s.biz.UpdatePostStatus(ctx, biz.Post{
-		ID:       req.PostId,
-		AuthorID: userId,
-		Status:   uint8(req.Status),
+		ID:     req.PostId,
+		UserID: userId,
+		Status: uint8(req.Status),
 	})
 	if err != nil {
 		return &pb.UpdatePostStatusReply{
@@ -121,8 +122,8 @@ func (s *PostService) DeletePost(ctx context.Context, req *pb.DeletePostRequest)
 	}
 
 	err = s.biz.DeletePost(ctx, biz.Post{
-		ID:       req.PostId,
-		AuthorID: userId,
+		ID:     req.PostId,
+		UserID: userId,
 	})
 	if err != nil {
 		return &pb.DeletePostReply{
@@ -147,8 +148,8 @@ func (s *PostService) PublishPost(ctx context.Context, req *pb.PublishPostReques
 	}
 
 	err = s.biz.PublishPost(ctx, biz.Post{
-		ID:       req.PostId,
-		AuthorID: userId,
+		ID:     req.PostId,
+		UserID: userId,
 	})
 	if err != nil {
 		return &pb.PublishPostReply{
@@ -192,7 +193,7 @@ func (s *PostService) ListPost(ctx context.Context, req *pb.ListPostRequest) (*p
 			Id:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
-			UserId:    post.AuthorID,
+			UserId:    post.UserID,
 			PlateId:   post.PlateID,
 			CreatedAt: timestamppb.New(post.CreatedAt),
 			UpdatedAt: timestamppb.New(post.UpdatedAt),
@@ -237,7 +238,7 @@ func (s *PostService) ListPubPost(ctx context.Context, req *pb.ListPubPostReques
 			Id:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
-			UserId:    post.AuthorID,
+			UserId:    post.UserID,
 			PlateId:   post.PlateID,
 			CreatedAt: timestamppb.New(post.CreatedAt),
 			UpdatedAt: timestamppb.New(post.UpdatedAt),
@@ -276,7 +277,7 @@ func (s *PostService) DetailPost(ctx context.Context, req *pb.DetailPostRequest)
 			Id:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
-			UserId:    post.AuthorID,
+			UserId:    post.UserID,
 			PlateId:   post.PlateID,
 			CreatedAt: timestamppb.New(post.CreatedAt),
 			UpdatedAt: timestamppb.New(post.UpdatedAt),
@@ -300,7 +301,7 @@ func (s *PostService) DetailPubPost(ctx context.Context, req *pb.DetailPubPostRe
 			Id:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
-			UserId:    post.AuthorID,
+			UserId:    post.UserID,
 			PlateId:   post.PlateID,
 			CreatedAt: timestamppb.New(post.CreatedAt),
 			UpdatedAt: timestamppb.New(post.UpdatedAt),

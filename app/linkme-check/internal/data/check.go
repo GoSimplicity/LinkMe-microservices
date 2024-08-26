@@ -3,26 +3,10 @@ package data
 import (
 	"context"
 	"errors"
-	"fmt"
-	"time"
-
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/domain"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
-
-type Check struct {
-	ID        int64  `gorm:"primaryKey;autoIncrement"`
-	PostID    int64  `gorm:"not null"`
-	Content   string `gorm:"type:text;not null"`
-	Title     string `gorm:"size:255;not null"`
-	UserId    int64  `gorm:"column:user_id;index"`
-	Status    string `gorm:"size:20;not null;default:'Pending'"`
-	Remark    string `gorm:"type:text"`
-	CreatedAt int64  `gorm:"column:created_at;type:bigint;not null"`
-	UpdatedAt int64  `gorm:"column:updated_at;type:bigint;not null;index"`
-}
 
 type checkData struct {
 	db *gorm.DB
@@ -36,163 +20,137 @@ func NewCheckData(db *gorm.DB, l *zap.Logger) biz.CheckData {
 	}
 }
 
-func (c *checkData) getCurrentTime() int64 {
-	return time.Now().UnixMilli()
-}
+func (c *checkData) Create(ctx context.Context, check biz.Check) (int64, error) {
+	// 参数验证
+	if check.PostID == 0 || check.Content == "" || check.Title == "" || check.UserID == 0 {
+		return 0, errors.New("invalid input: missing required fields")
+	}
 
-func (c *checkData) CreateCheck(ctx context.Context, check domain.Check) (int64, error) {
-	check.CreatedAt = c.getCurrentTime()
-	check.UpdatedAt = c.getCurrentTime()
-	dc := toDataCheck(check)
-	if err := c.db.WithContext(ctx).Create(&dc).Error; err != nil {
-		c.l.Error("failed to create check", zap.Error(err))
-		return 0, err
-	}
-	return dc.ID, nil
-}
-
-func (c *checkData) DeleteCheck(ctx context.Context, checkId int64) error {
-	now := c.getCurrentTime()
-	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id = ?", checkId).Update("deleted_at", now).Error; err != nil {
-		c.l.Error("failed to delete check", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (c *checkData) UpdateCheck(ctx context.Context, check domain.Check) error {
-	check.UpdatedAt = c.getCurrentTime()
-	dc := toDataCheck(check)
-	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id = ?", check.ID).Updates(dc).Error; err != nil {
-		c.l.Error("failed to update check", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (c *checkData) GetCheckById(ctx context.Context, checkId int64) (domain.Check, error) {
-	var check Check
-	if err := c.db.WithContext(ctx).First(&check, checkId).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.Check{}, nil
-		}
-		c.l.Error("failed to get check by id", zap.Error(err))
-		return domain.Check{}, err
-	}
-	return toDomainCheck(check), nil
-}
-
-func (c *checkData) ListChecks(ctx context.Context, pagination domain.Pagination, status *string) ([]domain.Check, error) {
-	var checks []Check
-	fmt.Println(status)
-	query := c.db.WithContext(ctx).Model(&Check{})
-	if status != nil {
-		query = query.Where("status = ?", *status)
-	}
-	intSize := int(*pagination.Size)
-	intOffset := int(*pagination.Offset)
-	if err := query.Limit(intSize).Offset(intOffset).Find(&checks).Error; err != nil {
-		c.l.Error("failed to list checks", zap.Error(err))
-		return nil, err
-	}
-	return toDomainSliceCheck(checks), nil
-}
-
-func (c *checkData) SubmitCheck(ctx context.Context, checkId int64, approved bool) error {
-	var check Check
-	// 先查询数据库，检查 updated_at 字段
-	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id = ?", checkId).First(&check).Error; err != nil {
-		c.l.Error("failed to retrieve check", zap.Error(err))
-		return err
-	}
-	// 如果 updated_at 字段不为 0，则返回错误
-	if check.UpdatedAt != 0 {
-		err := errors.New("audited or audited information does not exist")
-		c.l.Error("failed to submit check", zap.Error(err))
-		return err
-	}
-	status := "Rejected"
-	if approved {
-		status = "Approved"
-	}
-	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id = ?", checkId).Update("status", status).Error; err != nil {
-		c.l.Error("failed to submit check", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (c *checkData) BatchDeleteChecks(ctx context.Context, checkIds []int64) error {
-	now := c.getCurrentTime()
-	if err := c.db.WithContext(ctx).Model(&Check{}).Where("id IN ?", checkIds).Update("deleted_at", now).Error; err != nil {
-		c.l.Error("failed to batch delete checks", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (c *checkData) BatchSubmitChecks(ctx context.Context, checks []domain.Check) error {
-	tx := c.db.WithContext(ctx).Begin()
-	for _, check := range checks {
-		status := "Rejected"
-		if check.Status == "Approved" {
-			status = "Approved"
-		}
-		if err := tx.Model(&Check{}).Where("id = ?", check.ID).Update("status", status).Error; err != nil {
-			tx.Rollback()
-			c.l.Error("failed to batch submit checks", zap.Error(err))
+	// 使用事务处理以确保数据一致性
+	err := c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&check).Error; err != nil {
+			c.l.Error("failed to create check", zap.Error(err))
 			return err
 		}
+		return nil
+	})
+
+	if err != nil {
+		return 0, err
 	}
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		c.l.Error("failed to commit transaction", zap.Error(err))
+
+	return check.ID, nil
+}
+
+func (c *checkData) UpdateStatus(ctx context.Context, check biz.Check) error {
+	if check.ID == 0 {
+		return errors.New("invalid input: missing required fields")
+	}
+
+	// 使用事务处理更新操作
+	err := c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		result := tx.Model(&biz.Check{}).Where("id = ?", check.ID).Update("status", check.Status)
+		if result.Error != nil {
+			c.l.Error("failed to update check status", zap.Error(result.Error))
+			return result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return errors.New("no records updated")
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (c *checkData) Delete(ctx context.Context, checkId int64, uid int64) error {
+	// 验证 checkId 是否有效
+	if checkId == 0 {
+		return errors.New("invalid input: missing check ID")
+	}
+
+	err := c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 执行软删除操作
+		result := tx.Where("id = ? AND user_id = ?", checkId, uid).Delete(&biz.Check{})
+		if result.Error != nil {
+			c.l.Error("failed to soft delete check", zap.Error(result.Error))
+			return result.Error
+		}
+
+		// 检查是否有记录被删除
+		if result.RowsAffected == 0 {
+			return errors.New("no records deleted")
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-// 转换函数
-func toDomainCheck(check Check) domain.Check {
-	return domain.Check{
-		ID:        check.ID,
-		PostID:    check.PostID,
-		Status:    check.Status,
-		Content:   check.Content,
-		Title:     check.Title,
-		Remark:    check.Remark,
-		UserId:    check.UserId,
-		CreatedAt: check.CreatedAt,
-		UpdatedAt: check.UpdatedAt,
+func (c *checkData) ListChecks(ctx context.Context, pagination biz.Pagination) ([]biz.Check, error) {
+	var checks []biz.Check
+
+	// 在查询时，避免将 Size 或 Offset 的指针传递为空值导致的 panic
+	size := int(*pagination.Size)
+	offset := int(*pagination.Offset)
+
+	err := c.db.WithContext(ctx).
+		Limit(size).
+		Offset(offset).
+		Find(&checks).Error
+
+	if err != nil {
+		c.l.Error("failed to find all checks", zap.Error(err))
+		return nil, err
 	}
+
+	return checks, nil
 }
 
-func toDataCheck(check domain.Check) Check {
-	return Check{
-		ID:        check.ID,
-		PostID:    check.PostID,
-		Status:    check.Status,
-		Content:   check.Content,
-		Title:     check.Title,
-		Remark:    check.Remark,
-		UserId:    check.UserId,
-		CreatedAt: check.CreatedAt,
-		UpdatedAt: check.UpdatedAt,
+func (c *checkData) FindByID(ctx context.Context, checkId int64) (biz.Check, error) {
+	var check biz.Check
+
+	err := c.db.WithContext(ctx).Where("id = ?", checkId).First(&check).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return biz.Check{}, nil
+		}
+		c.l.Error("failed to find check by ID", zap.Error(err))
+		return biz.Check{}, err
 	}
+
+	return check, nil
 }
 
-func toDomainSliceCheck(checks []Check) []domain.Check {
-	domainChecks := make([]domain.Check, len(checks))
-	for i, check := range checks {
-		domainChecks[i] = toDomainCheck(check)
+func (c *checkData) FindByPostId(ctx context.Context, postId uint) (biz.Check, error) {
+	var check biz.Check
+
+	err := c.db.WithContext(ctx).Where("post_id = ?", postId).First(&check).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return biz.Check{}, nil
+		}
+		c.l.Error("failed to find check by post ID", zap.Error(err))
+		return biz.Check{}, err
 	}
-	return domainChecks
+
+	return check, nil
 }
 
-func toDataSliceCheck(checks []domain.Check) []Check {
-	dataChecks := make([]Check, len(checks))
-	for i, check := range checks {
-		dataChecks[i] = toDataCheck(check)
+func (c *checkData) GetCheckCount(ctx context.Context) (int64, error) {
+	var count int64
+
+	err := c.db.WithContext(ctx).Model(&biz.Check{}).Where("status = ?", biz.UnderReview).Count(&count).Error
+	if err != nil {
+		c.l.Error("failed to get check count", zap.Error(err))
+		return -1, err
 	}
-	return dataChecks
+
+	return count, nil
 }

@@ -9,6 +9,11 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Service service = 3;
+  Trace trace = 4;
+}
+
+message Trace {
+  string endpoint = 1;
 }
 
 message Server {
@@ -44,9 +49,5 @@ message Service {
     repeated string addr = 1;
     google.protobuf.Duration timeout = 2;
   }
-  message Kafka {
-    repeated string addr = 1;
-  }
   Etcd etcd = 1;
-  Kafka kafka = 2;
 }

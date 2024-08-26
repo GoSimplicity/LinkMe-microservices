@@ -62,11 +62,11 @@ func (p *postData) Insert(ctx context.Context, post biz.Post) (int64, error) {
 
 // UpdateById 通过Id更新帖子
 func (p *postData) UpdateById(ctx context.Context, post biz.Post) error {
-	if post.ID == 0 || post.AuthorID == 0 {
+	if post.ID == 0 || post.UserID == 0 {
 		return ErrInvalidParams
 	}
 
-	res := p.data.db.WithContext(ctx).Model(&biz.Post{}).Where("id = ? AND author_id = ?", post.ID, post.AuthorID).Updates(map[string]interface{}{
+	res := p.data.db.WithContext(ctx).Model(&biz.Post{}).Where("id = ? AND user_id = ?", post.ID, post.UserID).Updates(map[string]interface{}{
 		"title":    post.Title,
 		"content":  post.Content,
 		"plate_id": post.PlateID,
@@ -107,14 +107,14 @@ func (p *postData) UpdateStatus(ctx context.Context, post biz.Post) error {
 func (p *postData) GetById(ctx context.Context, postId int64, uid int64) (biz.Post, error) {
 	var post biz.Post
 
-	err := p.data.db.WithContext(ctx).Where("author_id = ? AND id = ?", uid, postId).First(&post).Error
+	err := p.data.db.WithContext(ctx).Where("user_id = ? AND id = ?", uid, postId).First(&post).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			p.l.Debug("post not found", zap.Int64("id", postId), zap.Int64("author_id", uid))
+			p.l.Debug("post not found", zap.Int64("id", postId), zap.Int64("user_id", uid))
 			return biz.Post{}, ErrPostNotFound
 		}
 
-		p.l.Error("failed to get post", zap.Error(err), zap.Int64("id", postId), zap.Int64("author_id", uid))
+		p.l.Error("failed to get post", zap.Error(err), zap.Int64("id", postId), zap.Int64("user_id", uid))
 
 		return biz.Post{}, err
 	}
@@ -195,7 +195,7 @@ func (p *postData) ListPub(ctx context.Context, pagination biz.Pagination) ([]bi
 func (p *postData) List(ctx context.Context, pagination biz.Pagination) ([]biz.Post, error) {
 	var posts []biz.Post
 
-	if err := p.data.db.WithContext(ctx).Where("author_id = ?", pagination.Uid).
+	if err := p.data.db.WithContext(ctx).Where("user_id = ?", pagination.Uid).
 		Limit(int(*pagination.Size)).Offset(int(*pagination.Offset)).Find(&posts).Error; err != nil {
 
 		p.l.Error("find post list failed", zap.Error(err))
