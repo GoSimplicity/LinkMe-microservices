@@ -51,7 +51,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	postService := service.NewPostService(postBiz, userClient)
 	grpcServer := server.NewGRPCServer(confServer, postService, logger, tracerProvider)
 	httpServer := server.NewHTTPServer(confServer, postService, logger, tracerProvider)
-	app := newApp(confService, logger, grpcServer, httpServer)
+	publishPostEventConsumer := publish.NewPublishPostEventConsumer(checkClient, saramaClient, zapLogger)
+	app := newApp(confService, logger, grpcServer, httpServer, publishPostEventConsumer)
 	return app, func() {
 		cleanup()
 	}, nil

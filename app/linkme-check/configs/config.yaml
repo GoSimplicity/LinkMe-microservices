@@ -1,5 +1,5 @@
 trace:
-  endpoint: http://192.168.1.11:30807/api/traces
+  endpoint: http://100.64.1.1:30807/api/traces
 server:
   http:
     addr: 0.0.0.0:8030
@@ -10,9 +10,9 @@ server:
 data:
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+    source: root:root@tcp(100.64.1.1:30882)/linkme_microservices?parseTime=True&loc=Local
   redis:
-    addr: 127.0.0.1:6379
+    addr: 100.64.1.1:30884
     read_timeout: 0.2s
     write_timeout: 0.2s
 service:

@@ -73,7 +73,7 @@ func (r *SyncConsumer) Start(_ context.Context) error {
 
 	go func() {
 		for {
-			if err := cg.Consume(context.Background(), []string{"linkme_binlog"}, &consumerGroupHandler{r: r}); err != nil {
+			if err := cg.Consume(context.Background(), []string{"linkme_binlog_microservices"}, &consumerGroupHandler{r: r}); err != nil {
 				r.l.Error("退出了消费循环异常", zap.Error(err))
 				time.Sleep(time.Second * 5)
 			}
@@ -104,7 +104,7 @@ func (r *SyncConsumer) Consume(sess sarama.ConsumerGroupSession, msg *sarama.Con
 		return
 	}
 
-	if e.Table != "posts" {
+	if e.Database != "linkme_microservices" && e.Table != "posts" {
 		return
 	}
 
@@ -160,7 +160,7 @@ func decodeEventDataToPosts(data interface{}, posts *[]Post) error {
 func (r *SyncConsumer) pushOrUpdateMongo(ctx context.Context, post Post) error {
 	post.UpdatedAt = time.Now()
 
-	collection := r.mongoClient.Database("linkme").Collection("posts")
+	collection := r.mongoClient.Database("linkme_microservices").Collection("posts")
 	filter := bson.M{"id": post.ID}
 
 	// 尝试查询并更新文档，如果文档不存在则插入
@@ -178,7 +178,7 @@ func (r *SyncConsumer) pushOrUpdateMongo(ctx context.Context, post Post) error {
 
 // 删除数据
 func (r *SyncConsumer) deleteMongo(ctx context.Context, post Post) error {
-	collection := r.mongoClient.Database("linkme").Collection("posts")
+	collection := r.mongoClient.Database("linkme_microservices").Collection("posts")
 	filter := bson.M{"id": post.ID}
 
 	// 尝试删除文档

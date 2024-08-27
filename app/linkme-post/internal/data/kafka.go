@@ -2,9 +2,6 @@ package data
 
 import (
 	"fmt"
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events"
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
-	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/sync"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 	"github.com/IBM/sarama"
 )
@@ -32,8 +29,9 @@ func NewSyncProducer(c sarama.Client) sarama.SyncProducer {
 	return p
 }
 
-// NewConsumers 初始化并返回一个事件消费者
-func NewConsumers(publishConsumer *publish.PublishPostEventConsumer, syncConsumer *sync.SyncConsumer) []events.Consumer {
-	// 返回消费者切片
-	return []events.Consumer{publishConsumer, syncConsumer}
-}
+//
+//// NewConsumers 初始化并返回一个事件消费者
+//func NewConsumers(publishConsumer *publish.PublishPostEventConsumer, syncConsumer *sync.SyncConsumer) []events.Consumer {
+//	// 返回消费者切片
+//	return []events.Consumer{publishConsumer, syncConsumer}
+//}

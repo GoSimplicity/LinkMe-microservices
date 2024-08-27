@@ -98,17 +98,15 @@ func (p *PublishPostEventConsumer) processMessage(ctx context.Context, msg *sara
 	}
 
 	// 创建检查记录
-	check := Check{
+	check := &checkClient.CreateCheckRequest{
 		Content: event.Content,
-		PostID:  event.PostId,
+		PostId:  event.PostId,
 		Title:   event.Title,
-		UserID:  event.UserID,
+		UserId:  event.UserID,
 	}
 
 	// 使用传递的上下文来调用 checkClient
-	checkId, err := p.checkClient.CreateCheck(ctx, &checkClient.CreateCheckRequest{
-		PostId: check.PostID,
-	})
+	checkId, err := p.checkClient.CreateCheck(ctx, check)
 
 	if err != nil {
 		p.l.Error("Failed to create check", zap.Error(err))

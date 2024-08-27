@@ -118,7 +118,6 @@ message PublishPostRequest {
 message PublishPostReply {
 	int32 code = 1;
 	string msg = 2;
-	int64 checkId = 3;
 }
 
 message ListPubPostRequest {

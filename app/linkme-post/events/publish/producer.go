@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const TopicPublishEvent = "linkme_publish_events"
+const TopicPublishEvent = "linkme_microservices_publish_events"
 
 type Producer interface {
 	ProducePublishEvent(evt PublishEvent) error

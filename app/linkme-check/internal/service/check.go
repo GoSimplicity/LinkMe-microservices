@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	pb "github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	userpb "github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-check/internal/biz"
@@ -26,17 +27,11 @@ func NewCheckService(userClient userpb.UserClient, biz *biz.CheckBiz) *CheckServ
 }
 
 func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckRequest) (*pb.CreateCheckReply, error) {
-	userId, err := s.getUserId(ctx)
-	if err != nil {
-		return &pb.CreateCheckReply{
-			Code: 1,
-			Msg:  err.Error(),
-		}, err
-	}
-
-	checkId, err := s.biz.CreateCheck(ctx, biz.Check{
+	err := s.biz.CreateCheck(ctx, biz.Check{
 		PostID:    req.PostId,
-		UserID:    userId,
+		Title:     req.Title,
+		Content:   req.Content,
+		UserID:    req.UserId,
 		CreatedAt: time.Now(),
 		Status:    biz.UnderReview,
 	})
@@ -48,9 +43,8 @@ func (s *CheckService) CreateCheck(ctx context.Context, req *pb.CreateCheckReque
 	}
 
 	return &pb.CreateCheckReply{
-		Code:    0,
-		Msg:     "success",
-		CheckId: checkId,
+		Code: 0,
+		Msg:  "success",
 	}, nil
 }
 
@@ -103,6 +97,15 @@ func (s *CheckService) GetCheckById(ctx context.Context, req *pb.GetCheckByIdReq
 }
 
 func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest) (*pb.ListChecksReply, error) {
+	userId, err := s.getUserId(ctx)
+	if err != nil {
+		return &pb.ListChecksReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+	fmt.Println(userId)
+
 	checks, err := s.biz.ListChecks(ctx, biz.Pagination{
 		Page: int(req.Page),
 		Size: &req.Size,
@@ -158,6 +161,12 @@ func (s *CheckService) getUserId(ctx context.Context) (int64, error) {
 	tr, ok := transport.FromServerContext(ctx)
 	if !ok {
 		return -1, errors.New("failed to get transport from context")
+	}
+
+	// 打印所有请求头
+	fmt.Println("Request Headers:")
+	for k, v := range tr.RequestHeader().Keys() {
+		fmt.Printf("%s: %s\n", k, tr.RequestHeader().Get(v))
 	}
 
 	// 获取 Authorization 头

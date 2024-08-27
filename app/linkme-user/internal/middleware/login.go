@@ -8,7 +8,6 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/wire"
-	"log"
 )
 
 var ProviderSet = wire.NewSet(NewJWTMiddleware)
@@ -36,10 +35,6 @@ func (m *JWTMiddleware) CheckLogin() middleware.Middleware {
 			if !ok {
 				return nil, ErrMissingToken
 			}
-			// 打印所有请求头
-			headers := tr.RequestHeader()
-			res := headers.Get("test")
-			log.Println(res)
 			// 获取请求路径
 			path := tr.Operation()
 			if path == "/api.user.v1.User/SignUp" ||

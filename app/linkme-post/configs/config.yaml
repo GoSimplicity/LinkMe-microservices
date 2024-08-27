@@ -1,5 +1,5 @@
 trace:
-  endpoint: http://192.168.1.11:30807/api/traces
+  endpoint: http://100.64.1.1:30807/api/traces
 server:
   http:
     addr: "0.0.0.0:8020"
@@ -9,14 +9,14 @@ server:
     timeout: 1s
 data:
   database:
-    source: root:root@tcp(localhost:3306)/test?parseTime=True&loc=Local
+    source: root:root@tcp(100.64.1.1:30882)/linkme_microservices?parseTime=True&loc=Local
   redis:
-    addr: "127.0.0.1:6379"
+    addr: "100.64.1.1:30884"
   mongo:
-    addr: "mongodb://root:root@localhost:27017"
+    addr: "mongodb://root:root@100.64.1.1:30883"
   kafka:
     addr:
-      - "192.168.1.11:30880"
+      - "100.64.1.1:30880"
 service:
   etcd:
     addr:
