@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -42,12 +45,26 @@ var (
 
 func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
-	// flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
+	//flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
 }
 
-func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server, consumer *publish.PublishPostEventConsumer) *kratos.App {
 	// 在New前完成初始化调用
 	reg := initServiceRegistry(cs)
+
+	// 启动 Kafka 消费者
+	go func() {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		consumer.Start(ctx)
+
+		sigterm := make(chan os.Signal, 1)
+		signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
+		<-sigterm
+		cancel()
+	}()
+
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),

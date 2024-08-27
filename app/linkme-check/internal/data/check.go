@@ -20,10 +20,10 @@ func NewCheckData(db *gorm.DB, l *zap.Logger) biz.CheckData {
 	}
 }
 
-func (c *checkData) Create(ctx context.Context, check biz.Check) (int64, error) {
+func (c *checkData) Create(ctx context.Context, check biz.Check) error {
 	// 参数验证
-	if check.PostID == 0 || check.Content == "" || check.Title == "" || check.UserID == 0 {
-		return 0, errors.New("invalid input: missing required fields")
+	if check.PostID == 0 || check.Content == "" || check.Title == "" {
+		return errors.New("invalid input: missing required fields")
 	}
 
 	// 使用事务处理以确保数据一致性
@@ -32,14 +32,15 @@ func (c *checkData) Create(ctx context.Context, check biz.Check) (int64, error) 
 			c.l.Error("failed to create check", zap.Error(err))
 			return err
 		}
+
 		return nil
 	})
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return check.ID, nil
+	return nil
 }
 
 func (c *checkData) UpdateStatus(ctx context.Context, check biz.Check) error {

@@ -3,40 +3,40 @@
 
 openapi: 3.0.3
 info:
-    title: Check API
+    title: Post API
     version: 0.0.1
 paths:
-    /delete/{checkId}:
-        delete:
+    /create:
+        post:
             tags:
-                - Check
-            operationId: Check_DeleteCheck
-            parameters:
-                - name: checkId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - Post
+            operationId: Post_CreatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePostRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DeleteCheckReply'
+                                $ref: '#/components/schemas/CreatePostReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /get/{checkId}:
-        get:
+    /delete/{postId}:
+        delete:
             tags:
-                - Check
-            operationId: Check_GetCheckById
+                - Post
+            operationId: Post_DeletePost
             parameters:
-                - name: checkId
+                - name: postId
                   in: path
                   required: true
                   schema:
@@ -47,7 +47,55 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/GetCheckByIdReply'
+                                $ref: '#/components/schemas/DeletePostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /detail/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /detail_pub/{postId}:
+        get:
+            tags:
+                - Post
+            operationId: Post_DetailPubPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DetailPubPostReply'
                 default:
                     description: Default error response
                     content:
@@ -57,13 +105,13 @@ paths:
     /list:
         post:
             tags:
-                - Check
-            operationId: Check_ListChecks
+                - Post
+            operationId: Post_ListPost
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ListChecksRequest'
+                            $ref: '#/components/schemas/ListPostRequest'
                 required: true
             responses:
                 "200":
@@ -71,23 +119,23 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListChecksReply'
+                                $ref: '#/components/schemas/ListPostReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /submit:
+    /list_pub:
         post:
             tags:
-                - Check
-            operationId: Check_SubmitCheck
+                - Post
+            operationId: Post_ListPubPost
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/SubmitCheckRequest'
+                            $ref: '#/components/schemas/ListPubPostRequest'
                 required: true
             responses:
                 "200":
@@ -95,7 +143,55 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SubmitCheckReply'
+                                $ref: '#/components/schemas/ListPubPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /publish:
+        post:
+            tags:
+                - Post
+            operationId: Post_PublishPost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PublishPostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PublishPostReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /update:
+        post:
+            tags:
+                - Post
+            operationId: Post_UpdatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdatePostReply'
                 default:
                     description: Default error response
                     content:
@@ -104,15 +200,7 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        DeleteCheckReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                msg:
-                    type: string
-        GetCheckByIdReply:
+        CreatePostReply:
             type: object
             properties:
                 code:
@@ -121,7 +209,65 @@ components:
                 msg:
                     type: string
                 data:
-                    $ref: '#/components/schemas/ListOrGetCheck'
+                    type: string
+        CreatePostRequest:
+            type: object
+            properties:
+                postId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
+                    type: string
+        DeletePostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+        DetailPost:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                plateId:
+                    type: string
+        DetailPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DetailPost'
+        DetailPubPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/DetailPost'
         GoogleProtobufAny:
             type: object
             properties:
@@ -130,7 +276,26 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListChecksReply:
+        ListPost:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                plateId:
+                    type: string
+        ListPostReply:
             type: object
             properties:
                 code:
@@ -141,8 +306,8 @@ components:
                 data:
                     type: array
                     items:
-                        $ref: '#/components/schemas/ListOrGetCheck'
-        ListChecksRequest:
+                        $ref: '#/components/schemas/ListPost'
+        ListPostRequest:
             type: object
             properties:
                 page:
@@ -150,33 +315,39 @@ components:
                     format: int32
                 size:
                     type: string
-                status:
-                    type: integer
-                    format: uint32
-        ListOrGetCheck:
+        ListPubPostReply:
             type: object
             properties:
-                id:
+                code:
+                    type: integer
+                    format: int32
+                msg:
                     type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ListPost'
+        ListPubPostRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                size:
+                    type: string
+        PublishPostReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
+        PublishPostRequest:
+            type: object
+            properties:
                 postId:
                     type: string
-                content:
-                    type: string
-                title:
-                    type: string
-                userId:
-                    type: string
-                status:
-                    type: integer
-                    format: uint32
-                remark:
-                    type: string
-                createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
-                    type: string
-                    format: date-time
         Status:
             type: object
             properties:
@@ -193,7 +364,7 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        SubmitCheckReply:
+        UpdatePostReply:
             type: object
             properties:
                 code:
@@ -201,17 +372,16 @@ components:
                     format: int32
                 msg:
                     type: string
-        SubmitCheckRequest:
+        UpdatePostRequest:
             type: object
             properties:
-                checkId:
-                    type: string
                 postId:
                     type: string
-                status:
-                    type: integer
-                    format: uint32
-                remark:
+                title:
+                    type: string
+                content:
+                    type: string
+                plateId:
                     type: string
 tags:
-    - name: Check
+    - name: Post

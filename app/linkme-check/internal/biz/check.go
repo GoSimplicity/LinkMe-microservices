@@ -9,7 +9,7 @@ import (
 )
 
 type CheckData interface {
-	Create(ctx context.Context, check Check) (int64, error)                 // 创建审核记录
+	Create(ctx context.Context, check Check) error                          // 创建审核记录
 	UpdateStatus(ctx context.Context, check Check) error                    // 更新审核状态
 	Delete(ctx context.Context, checkId int64, uid int64) error             // 更新审核状态
 	ListChecks(ctx context.Context, pagination Pagination) ([]Check, error) // 获取审核列表
@@ -30,7 +30,6 @@ type Check struct {
 	Content   string       `gorm:"type:text;not null"`               // 审核内容
 	Title     string       `gorm:"size:255;not null"`                // 审核标签
 	UserID    int64        `gorm:"column:user_id;index"`             // 提交审核的用户ID
-	CheckUser int64        `gorm:"column:check_user_id;index"`       // 审核人ID
 	Status    uint8        `gorm:"default:0"`                        // 审核状态
 	Remark    string       `gorm:"type:text"`                        // 审核备注
 	CreatedAt time.Time    `gorm:"column:created_at;autoCreateTime"` // 创建时间
@@ -55,7 +54,7 @@ func NewCheckBiz(CheckData CheckData) *CheckBiz {
 	return &CheckBiz{CheckData: CheckData}
 }
 
-func (c *CheckBiz) CreateCheck(ctx context.Context, check Check) (int64, error) {
+func (c *CheckBiz) CreateCheck(ctx context.Context, check Check) error {
 	check.Status = UnderReview
 	return c.CheckData.Create(ctx, check)
 }

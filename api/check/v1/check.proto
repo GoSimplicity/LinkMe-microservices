@@ -35,12 +35,14 @@ service Check {
 
 message CreateCheckRequest {
 	int64 postId = 1;
+	string content = 2;
+	string title = 3;
+	int64 userId = 4;
 }
 
 message CreateCheckReply {
 	int32 code = 1;
 	string msg = 2;
-	int64 checkId = 3;
 }
 
 message DeleteCheckRequest {
@@ -76,7 +78,6 @@ message ListChecksReply {
 
 message SubmitCheckRequest {
 	int64 checkId = 1;
-	int64 postId = 2;
 	uint32 status = 3;
 	string remark = 4;
 }
