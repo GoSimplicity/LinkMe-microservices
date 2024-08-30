@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/sync"
 	"os"
 	"os/signal"
 	"syscall"
@@ -44,11 +45,11 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
-	//flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
+	//flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "./configs", "config path, eg: -conf config.yaml")
 }
 
-func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server, consumer *publish.PublishPostEventConsumer) *kratos.App {
+func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Server, publishConsumer *publish.PublishPostEventConsumer, syncConsumer *sync.SyncConsumer) *kratos.App {
 	// 在New前完成初始化调用
 	reg := initServiceRegistry(cs)
 
@@ -57,7 +58,19 @@ func newApp(cs *conf.Service, logger log.Logger, gs *grpc.Server, hs *http.Serve
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		consumer.Start(ctx)
+		publishConsumer.Start(ctx)
+
+		sigterm := make(chan os.Signal, 1)
+		signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
+		<-sigterm
+		cancel()
+	}()
+
+	go func() {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		syncConsumer.Start(ctx)
 
 		sigterm := make(chan os.Signal, 1)
 		signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)

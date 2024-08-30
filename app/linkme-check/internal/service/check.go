@@ -97,15 +97,6 @@ func (s *CheckService) GetCheckById(ctx context.Context, req *pb.GetCheckByIdReq
 }
 
 func (s *CheckService) ListChecks(ctx context.Context, req *pb.ListChecksRequest) (*pb.ListChecksReply, error) {
-	userId, err := s.getUserId(ctx)
-	if err != nil {
-		return &pb.ListChecksReply{
-			Code: 1,
-			Msg:  err.Error(),
-		}, err
-	}
-	fmt.Println(userId)
-
 	checks, err := s.biz.ListChecks(ctx, biz.Pagination{
 		Page: int(req.Page),
 		Size: &req.Size,
