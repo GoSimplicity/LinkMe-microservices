@@ -10,6 +10,7 @@ import (
 	"github.com/GoSimplicity/LinkMe-microservices/api/check/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/api/user/v1"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/publish"
+	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/events/sync"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/conf"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/data"
@@ -52,7 +53,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confService *conf.Ser
 	grpcServer := server.NewGRPCServer(confServer, postService, logger, tracerProvider)
 	httpServer := server.NewHTTPServer(confServer, postService, logger, tracerProvider)
 	publishPostEventConsumer := publish.NewPublishPostEventConsumer(checkClient, saramaClient, zapLogger)
-	app := newApp(confService, logger, grpcServer, httpServer, publishPostEventConsumer)
+	syncConsumer := sync.NewSyncConsumer(saramaClient, zapLogger, db, client, postData)
+	app := newApp(confService, logger, grpcServer, httpServer, publishPostEventConsumer, syncConsumer)
 	return app, func() {
 		cleanup()
 	}, nil
