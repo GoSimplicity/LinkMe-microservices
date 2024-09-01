@@ -80,6 +80,10 @@ type PostData interface {
 	ListPub(ctx context.Context, pagination Pagination) ([]ListPubPost, error) // 获取已发布的帖子记录列表
 	List(ctx context.Context, pagination Pagination) ([]Post, error)           // 获取个人的帖子记录列表
 	DeleteById(ctx context.Context, post Post) error
+	CreatePlate(ctx context.Context, plate Plate) error
+	ListPlates(ctx context.Context, pagination Pagination) ([]Plate, error)
+	UpdatePlate(ctx context.Context, plate Plate) error
+	DeletePlate(ctx context.Context, plateId int64) error
 }
 
 type PostBiz struct {
@@ -162,6 +166,24 @@ func (pb *PostBiz) PublishPost(ctx context.Context, post Post) error {
 	asyncPublish()
 
 	return nil
+}
+
+func (pb *PostBiz) ListPlates(ctx context.Context, pagination Pagination) ([]Plate, error) {
+	offset := int64(pagination.Page-1) * *pagination.Size
+	pagination.Offset = &offset
+	return pb.postData.ListPlates(ctx, pagination)
+}
+
+func (pb *PostBiz) CreatePlate(ctx context.Context, plate Plate) error {
+	return pb.postData.CreatePlate(ctx, plate)
+}
+
+func (pb *PostBiz) UpdatePlate(ctx context.Context, plate Plate) error {
+	return pb.postData.UpdatePlate(ctx, plate)
+}
+
+func (pb *PostBiz) DeletePlate(ctx context.Context, plateId int64) error {
+	return pb.postData.DeletePlate(ctx, plateId)
 }
 
 // withAsyncCancel 装饰器函数，用来封装 goroutine 逻辑并处理错误和取消操作

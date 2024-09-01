@@ -28,6 +28,10 @@ const (
 	Post_ListPubPost_FullMethodName      = "/api.post.Post/ListPubPost"
 	Post_DetailPost_FullMethodName       = "/api.post.Post/DetailPost"
 	Post_DetailPubPost_FullMethodName    = "/api.post.Post/DetailPubPost"
+	Post_CreatePlate_FullMethodName      = "/api.post.Post/CreatePlate"
+	Post_UpdatePlate_FullMethodName      = "/api.post.Post/UpdatePlate"
+	Post_ListPlate_FullMethodName        = "/api.post.Post/ListPlate"
+	Post_DeletePlate_FullMethodName      = "/api.post.Post/DeletePlate"
 )
 
 // PostClient is the client API for Post service.
@@ -43,6 +47,10 @@ type PostClient interface {
 	ListPubPost(ctx context.Context, in *ListPubPostRequest, opts ...grpc.CallOption) (*ListPubPostReply, error)
 	DetailPost(ctx context.Context, in *DetailPostRequest, opts ...grpc.CallOption) (*DetailPostReply, error)
 	DetailPubPost(ctx context.Context, in *DetailPubPostRequest, opts ...grpc.CallOption) (*DetailPubPostReply, error)
+	CreatePlate(ctx context.Context, in *CreatePlateRequest, opts ...grpc.CallOption) (*CreatePlateReply, error)
+	UpdatePlate(ctx context.Context, in *UpdatePlateRequest, opts ...grpc.CallOption) (*UpdatePlateReply, error)
+	ListPlate(ctx context.Context, in *ListPlateRequest, opts ...grpc.CallOption) (*ListPlateReply, error)
+	DeletePlate(ctx context.Context, in *DeletePlateRequest, opts ...grpc.CallOption) (*DeletePlateReply, error)
 }
 
 type postClient struct {
@@ -143,6 +151,46 @@ func (c *postClient) DetailPubPost(ctx context.Context, in *DetailPubPostRequest
 	return out, nil
 }
 
+func (c *postClient) CreatePlate(ctx context.Context, in *CreatePlateRequest, opts ...grpc.CallOption) (*CreatePlateReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePlateReply)
+	err := c.cc.Invoke(ctx, Post_CreatePlate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postClient) UpdatePlate(ctx context.Context, in *UpdatePlateRequest, opts ...grpc.CallOption) (*UpdatePlateReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePlateReply)
+	err := c.cc.Invoke(ctx, Post_UpdatePlate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postClient) ListPlate(ctx context.Context, in *ListPlateRequest, opts ...grpc.CallOption) (*ListPlateReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPlateReply)
+	err := c.cc.Invoke(ctx, Post_ListPlate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postClient) DeletePlate(ctx context.Context, in *DeletePlateRequest, opts ...grpc.CallOption) (*DeletePlateReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletePlateReply)
+	err := c.cc.Invoke(ctx, Post_DeletePlate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostServer is the server API for Post service.
 // All implementations must embed UnimplementedPostServer
 // for forward compatibility
@@ -156,6 +204,10 @@ type PostServer interface {
 	ListPubPost(context.Context, *ListPubPostRequest) (*ListPubPostReply, error)
 	DetailPost(context.Context, *DetailPostRequest) (*DetailPostReply, error)
 	DetailPubPost(context.Context, *DetailPubPostRequest) (*DetailPubPostReply, error)
+	CreatePlate(context.Context, *CreatePlateRequest) (*CreatePlateReply, error)
+	UpdatePlate(context.Context, *UpdatePlateRequest) (*UpdatePlateReply, error)
+	ListPlate(context.Context, *ListPlateRequest) (*ListPlateReply, error)
+	DeletePlate(context.Context, *DeletePlateRequest) (*DeletePlateReply, error)
 	mustEmbedUnimplementedPostServer()
 }
 
@@ -189,6 +241,18 @@ func (UnimplementedPostServer) DetailPost(context.Context, *DetailPostRequest) (
 }
 func (UnimplementedPostServer) DetailPubPost(context.Context, *DetailPubPostRequest) (*DetailPubPostReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetailPubPost not implemented")
+}
+func (UnimplementedPostServer) CreatePlate(context.Context, *CreatePlateRequest) (*CreatePlateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePlate not implemented")
+}
+func (UnimplementedPostServer) UpdatePlate(context.Context, *UpdatePlateRequest) (*UpdatePlateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePlate not implemented")
+}
+func (UnimplementedPostServer) ListPlate(context.Context, *ListPlateRequest) (*ListPlateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPlate not implemented")
+}
+func (UnimplementedPostServer) DeletePlate(context.Context, *DeletePlateRequest) (*DeletePlateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePlate not implemented")
 }
 func (UnimplementedPostServer) mustEmbedUnimplementedPostServer() {}
 
@@ -365,6 +429,78 @@ func _Post_DetailPubPost_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Post_CreatePlate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePlateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).CreatePlate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_CreatePlate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).CreatePlate(ctx, req.(*CreatePlateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Post_UpdatePlate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePlateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).UpdatePlate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_UpdatePlate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).UpdatePlate(ctx, req.(*UpdatePlateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Post_ListPlate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPlateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).ListPlate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_ListPlate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).ListPlate(ctx, req.(*ListPlateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Post_DeletePlate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePlateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServer).DeletePlate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Post_DeletePlate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServer).DeletePlate(ctx, req.(*DeletePlateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Post_ServiceDesc is the grpc.ServiceDesc for Post service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -407,6 +543,22 @@ var Post_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DetailPubPost",
 			Handler:    _Post_DetailPubPost_Handler,
+		},
+		{
+			MethodName: "CreatePlate",
+			Handler:    _Post_CreatePlate_Handler,
+		},
+		{
+			MethodName: "UpdatePlate",
+			Handler:    _Post_UpdatePlate_Handler,
+		},
+		{
+			MethodName: "ListPlate",
+			Handler:    _Post_ListPlate_Handler,
+		},
+		{
+			MethodName: "DeletePlate",
+			Handler:    _Post_DeletePlate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
