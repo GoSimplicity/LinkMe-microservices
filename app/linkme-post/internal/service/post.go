@@ -345,3 +345,82 @@ func (s *PostService) getUserId(ctx context.Context) (int64, error) {
 
 	return info.UserId, nil
 }
+
+func (s *PostService) ListPlate(ctx context.Context, req *pb.ListPlateRequest) (*pb.ListPlateReply, error) {
+	plates, err := s.biz.ListPlates(ctx, biz.Pagination{
+		Page: int(req.Page),
+		Size: &req.Size,
+	})
+	if err != nil {
+		return &pb.ListPlateReply{
+			Code: 1,
+			Msg:  "Failed to list plates: " + err.Error(),
+		}, err
+	}
+
+	listPlates := make([]*pb.ListPlate, len(plates))
+	for i, plate := range plates {
+		listPlates[i] = &pb.ListPlate{
+			Id:   plate.ID,
+			Name: plate.Name,
+		}
+	}
+
+	return &pb.ListPlateReply{
+		Code: 0,
+		Msg:  "List plates successfully",
+		Data: listPlates,
+	}, nil
+}
+
+func (s *PostService) CreatePlate(ctx context.Context, req *pb.CreatePlateRequest) (*pb.CreatePlateReply, error) {
+	plate := biz.Plate{
+		Name: req.Name,
+	}
+
+	if err := s.biz.CreatePlate(ctx, plate); err != nil {
+		return &pb.CreatePlateReply{
+			Code: 1,
+			Msg:  "Failed to create plate: " + err.Error(),
+		}, err
+	}
+
+	return &pb.CreatePlateReply{
+		Code: 0,
+		Msg:  "Create plate successfully",
+	}, nil
+}
+
+func (s *PostService) DeletePlate(ctx context.Context, req *pb.DeletePlateRequest) (*pb.DeletePlateReply, error) {
+	if err := s.biz.DeletePlate(ctx, req.PlateId); err != nil {
+		return &pb.DeletePlateReply{
+			Code: 1,
+			Msg:  "Failed to delete plate: " + err.Error(),
+		}, err
+	}
+
+	return &pb.DeletePlateReply{
+		Code: 0,
+		Msg:  "Delete plate successfully",
+	}, nil
+}
+
+func (s *PostService) UpdatePlate(ctx context.Context, req *pb.UpdatePlateRequest) (*pb.UpdatePlateReply, error) {
+	plate := biz.Plate{
+		ID:   req.PlateId,
+		Name: req.Name,
+	}
+
+	err := s.biz.UpdatePlate(ctx, plate)
+	if err != nil {
+		return &pb.UpdatePlateReply{
+			Code: 1,
+			Msg:  err.Error(),
+		}, err
+	}
+
+	return &pb.UpdatePlateReply{
+		Code: 0,
+		Msg:  "update plate success",
+	}, nil
+}

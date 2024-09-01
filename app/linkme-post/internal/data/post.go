@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/GoSimplicity/LinkMe-microservices/app/linkme-post/internal/biz"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -235,6 +236,57 @@ func (p *postData) DeleteById(ctx context.Context, post biz.Post) error {
 		p.l.Error("failed to commit transaction", zap.Error(err))
 
 		return err
+	}
+
+	return nil
+}
+
+func (p *postData) CreatePlate(ctx context.Context, plate biz.Plate) error {
+	if err := p.data.db.WithContext(ctx).Create(&plate).Error; err != nil {
+		p.l.Error("failed to insert plate", zap.Error(err))
+		return fmt.Errorf("failed to create plate: %w", err)
+	}
+
+	return nil
+}
+
+func (p *postData) ListPlates(ctx context.Context, pagination biz.Pagination) ([]biz.Plate, error) {
+	var plates []biz.Plate
+
+	// 使用 offset 和 limit 分页，避免 Limit 方法被误用
+	if err := p.data.db.WithContext(ctx).
+		Offset(int(*pagination.Offset)).
+		Limit(int(*pagination.Size)).
+		Find(&plates).Error; err != nil {
+		p.l.Error("failed to list plates", zap.Error(err))
+		return nil, fmt.Errorf("failed to list plates: %w", err)
+	}
+
+	return plates, nil
+}
+
+func (p *postData) UpdatePlate(ctx context.Context, plate biz.Plate) error {
+	updates := map[string]interface{}{
+		"name": plate.Name,
+	}
+
+	if err := p.data.db.WithContext(ctx).
+		Model(&biz.Plate{}).
+		Where("id = ?", plate.ID).
+		Updates(updates).Error; err != nil {
+		p.l.Error("failed to update plate", zap.Error(err))
+		return fmt.Errorf("failed to update plate: %w", err)
+	}
+
+	return nil
+}
+
+func (p *postData) DeletePlate(ctx context.Context, plateId int64) error {
+	if err := p.data.db.WithContext(ctx).
+		Where("id = ?", plateId).
+		Delete(&biz.Plate{}).Error; err != nil {
+		p.l.Error("failed to delete plate", zap.Error(err))
+		return fmt.Errorf("failed to delete plate: %w", err)
 	}
 
 	return nil

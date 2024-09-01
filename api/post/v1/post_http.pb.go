@@ -19,23 +19,31 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationPostCreatePlate = "/api.post.Post/CreatePlate"
 const OperationPostCreatePost = "/api.post.Post/CreatePost"
+const OperationPostDeletePlate = "/api.post.Post/DeletePlate"
 const OperationPostDeletePost = "/api.post.Post/DeletePost"
 const OperationPostDetailPost = "/api.post.Post/DetailPost"
 const OperationPostDetailPubPost = "/api.post.Post/DetailPubPost"
+const OperationPostListPlate = "/api.post.Post/ListPlate"
 const OperationPostListPost = "/api.post.Post/ListPost"
 const OperationPostListPubPost = "/api.post.Post/ListPubPost"
 const OperationPostPublishPost = "/api.post.Post/PublishPost"
+const OperationPostUpdatePlate = "/api.post.Post/UpdatePlate"
 const OperationPostUpdatePost = "/api.post.Post/UpdatePost"
 
 type PostHTTPServer interface {
+	CreatePlate(context.Context, *CreatePlateRequest) (*CreatePlateReply, error)
 	CreatePost(context.Context, *CreatePostRequest) (*CreatePostReply, error)
+	DeletePlate(context.Context, *DeletePlateRequest) (*DeletePlateReply, error)
 	DeletePost(context.Context, *DeletePostRequest) (*DeletePostReply, error)
 	DetailPost(context.Context, *DetailPostRequest) (*DetailPostReply, error)
 	DetailPubPost(context.Context, *DetailPubPostRequest) (*DetailPubPostReply, error)
+	ListPlate(context.Context, *ListPlateRequest) (*ListPlateReply, error)
 	ListPost(context.Context, *ListPostRequest) (*ListPostReply, error)
 	ListPubPost(context.Context, *ListPubPostRequest) (*ListPubPostReply, error)
 	PublishPost(context.Context, *PublishPostRequest) (*PublishPostReply, error)
+	UpdatePlate(context.Context, *UpdatePlateRequest) (*UpdatePlateReply, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostReply, error)
 }
 
@@ -49,6 +57,10 @@ func RegisterPostHTTPServer(s *http.Server, srv PostHTTPServer) {
 	r.POST("/list_pub", _Post_ListPubPost0_HTTP_Handler(srv))
 	r.GET("/detail/{postId}", _Post_DetailPost0_HTTP_Handler(srv))
 	r.GET("/detail_pub/{postId}", _Post_DetailPubPost0_HTTP_Handler(srv))
+	r.POST("/create_plate", _Post_CreatePlate0_HTTP_Handler(srv))
+	r.POST("/update_plate", _Post_UpdatePlate0_HTTP_Handler(srv))
+	r.POST("/list_plate", _Post_ListPlate0_HTTP_Handler(srv))
+	r.DELETE("/delete_plate/{plateId}", _Post_DeletePlate0_HTTP_Handler(srv))
 }
 
 func _Post_CreatePost0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
@@ -227,14 +239,106 @@ func _Post_DetailPubPost0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context
 	}
 }
 
+func _Post_CreatePlate0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreatePlateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPostCreatePlate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreatePlate(ctx, req.(*CreatePlateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreatePlateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Post_UpdatePlate0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdatePlateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPostUpdatePlate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdatePlate(ctx, req.(*UpdatePlateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdatePlateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Post_ListPlate0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPlateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPostListPlate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPlate(ctx, req.(*ListPlateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPlateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Post_DeletePlate0_HTTP_Handler(srv PostHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeletePlateRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPostDeletePlate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeletePlate(ctx, req.(*DeletePlateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeletePlateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PostHTTPClient interface {
+	CreatePlate(ctx context.Context, req *CreatePlateRequest, opts ...http.CallOption) (rsp *CreatePlateReply, err error)
 	CreatePost(ctx context.Context, req *CreatePostRequest, opts ...http.CallOption) (rsp *CreatePostReply, err error)
+	DeletePlate(ctx context.Context, req *DeletePlateRequest, opts ...http.CallOption) (rsp *DeletePlateReply, err error)
 	DeletePost(ctx context.Context, req *DeletePostRequest, opts ...http.CallOption) (rsp *DeletePostReply, err error)
 	DetailPost(ctx context.Context, req *DetailPostRequest, opts ...http.CallOption) (rsp *DetailPostReply, err error)
 	DetailPubPost(ctx context.Context, req *DetailPubPostRequest, opts ...http.CallOption) (rsp *DetailPubPostReply, err error)
+	ListPlate(ctx context.Context, req *ListPlateRequest, opts ...http.CallOption) (rsp *ListPlateReply, err error)
 	ListPost(ctx context.Context, req *ListPostRequest, opts ...http.CallOption) (rsp *ListPostReply, err error)
 	ListPubPost(ctx context.Context, req *ListPubPostRequest, opts ...http.CallOption) (rsp *ListPubPostReply, err error)
 	PublishPost(ctx context.Context, req *PublishPostRequest, opts ...http.CallOption) (rsp *PublishPostReply, err error)
+	UpdatePlate(ctx context.Context, req *UpdatePlateRequest, opts ...http.CallOption) (rsp *UpdatePlateReply, err error)
 	UpdatePost(ctx context.Context, req *UpdatePostRequest, opts ...http.CallOption) (rsp *UpdatePostReply, err error)
 }
 
@@ -246,6 +350,19 @@ func NewPostHTTPClient(client *http.Client) PostHTTPClient {
 	return &PostHTTPClientImpl{client}
 }
 
+func (c *PostHTTPClientImpl) CreatePlate(ctx context.Context, in *CreatePlateRequest, opts ...http.CallOption) (*CreatePlateReply, error) {
+	var out CreatePlateReply
+	pattern := "/create_plate"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPostCreatePlate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *PostHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...http.CallOption) (*CreatePostReply, error) {
 	var out CreatePostReply
 	pattern := "/create"
@@ -253,6 +370,19 @@ func (c *PostHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostReque
 	opts = append(opts, http.Operation(OperationPostCreatePost))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PostHTTPClientImpl) DeletePlate(ctx context.Context, in *DeletePlateRequest, opts ...http.CallOption) (*DeletePlateReply, error) {
+	var out DeletePlateReply
+	pattern := "/delete_plate/{plateId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPostDeletePlate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -298,6 +428,19 @@ func (c *PostHTTPClientImpl) DetailPubPost(ctx context.Context, in *DetailPubPos
 	return &out, nil
 }
 
+func (c *PostHTTPClientImpl) ListPlate(ctx context.Context, in *ListPlateRequest, opts ...http.CallOption) (*ListPlateReply, error) {
+	var out ListPlateReply
+	pattern := "/list_plate"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPostListPlate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *PostHTTPClientImpl) ListPost(ctx context.Context, in *ListPostRequest, opts ...http.CallOption) (*ListPostReply, error) {
 	var out ListPostReply
 	pattern := "/list"
@@ -329,6 +472,19 @@ func (c *PostHTTPClientImpl) PublishPost(ctx context.Context, in *PublishPostReq
 	pattern := "/publish"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPostPublishPost))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PostHTTPClientImpl) UpdatePlate(ctx context.Context, in *UpdatePlateRequest, opts ...http.CallOption) (*UpdatePlateReply, error) {
+	var out UpdatePlateReply
+	pattern := "/update_plate"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPostUpdatePlate))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
